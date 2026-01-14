@@ -1,0 +1,9 @@
+
+.DS_Store
+._*
+
+.dialogs/
+logs/
+
+node_modules
+dist
