@@ -7,3 +7,6 @@ logs/
 
 node_modules
 dist
+
+# Local checkout of the dominds repository (intentionally not tracked here)
+dominds/

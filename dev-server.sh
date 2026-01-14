@@ -2,6 +2,15 @@
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+if [ ! -f "dominds/main/server.ts" ] || [ ! -d "dominds/webapp" ]; then
+	echo "❌ Missing ./dominds checkout (this repo does not track it)."
+	echo ""
+	echo "Bootstrap:"
+	echo "  git clone https://github.com/YOUR_GH/dominds.git dominds"
+	echo "  cd dominds && git remote add upstream https://github.com/longrun-ai/dominds.git && git fetch upstream --prune"
+	exit 1
+fi
+
 # Check if server is already running
 check_server_status() {
 	local tsx_running=false

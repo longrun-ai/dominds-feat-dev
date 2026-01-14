@@ -1,4 +1,0 @@
-[submodule "dominds"]
-	path = dominds
-	url = https://github.com/longrun-ai/dominds.git
-	branch = main

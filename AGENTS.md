@@ -1,8 +1,8 @@
 ## Project Overview
 
-This is an **in-tree development setup** for `dominds` — an AI-powered DevOps framework. The source code lives in the `dominds/` subdirectory, and **this outer workspace is the primary runtime workspace (rtws)** for the development team.
+This is an **in-tree development setup** for `dominds` — an AI-powered DevOps framework. The source code lives in a local checkout at `dominds/`, and **this outer workspace is the primary runtime workspace (rtws)** for the development team.
 
-- **dominds/** — The main framework source (TypeScript backend + Vite webapp)
+- **dominds/** — Local checkout of the main framework source (TypeScript backend + Vite webapp); intentionally gitignored here
 - **.minds/** — Team memory for the outer workspace (rtws = runtime workspace)
 
 ---
@@ -121,5 +121,5 @@ The outer workspace (`.minds/` in root) is the primary runtime workspace for the
 ## Git Policy (Humans Manage Commits)
 
 - **Do not create or rewrite commits**: never run `git commit`, `git merge`, `git rebase`, `git cherry-pick`, `git reset`, or `git push` unless explicitly instructed.
-- **Do not change submodule pointers by default**: avoid `git submodule update`, checking out a different submodule commit/branch, or otherwise changing the `dominds/` submodule HEAD unless explicitly instructed.
+- **Do not add `dominds/` to this repo**: `dominds/` is intentionally gitignored; changes to `dominds` should go through PRs in the `dominds` repo.
 - Read-only git commands (`git status`, `git diff`, `git log`, `git show`, `git blame`) are allowed.
