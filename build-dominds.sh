@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -14,10 +14,10 @@ if [ ! -d "dominds" ]; then
 fi
 
 cd dominds
-npm i
+pnpm i
 
 cd webapp
-npm i
+pnpm i
 
 cd ..
-npm run build
+pnpm run build
