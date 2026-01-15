@@ -128,7 +128,7 @@ const state = await snapshot();
 | ------------------------------------ | ------------------------------------ |
 | `openSubdialog(rootId, subdialogId)` | Opens a subdialog via call site link |
 | `getSubdialogHierarchy()`            | Returns parent-to-current path       |
-| `navigateToParent()`                 | Navigates back to supdialog      |
+| `navigateToParent()`                 | Navigates back to supdialog          |
 
 ### State Inspection
 

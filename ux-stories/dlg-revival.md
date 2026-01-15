@@ -65,24 +65,21 @@ Note: `snapshotDomindsUI()` currently captures the **running** dialog list. For 
 ```javascript
 function getListShadow(kind /* 'running' | 'done' | 'archived' */) {
   const appShadow = window.__e2e__.getAppShadow();
-  if (!appShadow) throw new Error("Missing dominds-app shadow root");
+  if (!appShadow) throw new Error('Missing dominds-app shadow root');
 
-  if (kind === "running") {
-    const el = appShadow.querySelector("running-dialog-list");
-    if (!el || !el.shadowRoot)
-      throw new Error("Missing running-dialog-list shadowRoot");
+  if (kind === 'running') {
+    const el = appShadow.querySelector('running-dialog-list');
+    if (!el || !el.shadowRoot) throw new Error('Missing running-dialog-list shadowRoot');
     return el.shadowRoot;
   }
-  if (kind === "done") {
-    const el = appShadow.querySelector("done-dialog-list");
-    if (!el || !el.shadowRoot)
-      throw new Error("Missing done-dialog-list shadowRoot");
+  if (kind === 'done') {
+    const el = appShadow.querySelector('done-dialog-list');
+    if (!el || !el.shadowRoot) throw new Error('Missing done-dialog-list shadowRoot');
     return el.shadowRoot;
   }
-  if (kind === "archived") {
-    const el = appShadow.querySelector("archived-dialog-list");
-    if (!el || !el.shadowRoot)
-      throw new Error("Missing archived-dialog-list shadowRoot");
+  if (kind === 'archived') {
+    const el = appShadow.querySelector('archived-dialog-list');
+    if (!el || !el.shadowRoot) throw new Error('Missing archived-dialog-list shadowRoot');
     return el.shadowRoot;
   }
   throw new Error(`Unknown kind: ${String(kind)}`);
@@ -91,21 +88,19 @@ function getListShadow(kind /* 'running' | 'done' | 'archived' */) {
 function listRootIds(kind) {
   const s = getListShadow(kind);
   // Root rows use data-self-id="" and data-root-id="<id>"
-  const roots = Array.from(
-    s.querySelectorAll(".dialog-item.root-dialog[data-root-id]")
-  );
+  const roots = Array.from(s.querySelectorAll('.dialog-item.root-dialog[data-root-id]'));
   return roots
-    .map((n) => n.getAttribute("data-root-id") || "")
-    .filter((x) => typeof x === "string" && x.length > 0);
+    .map((n) => n.getAttribute('data-root-id') || '')
+    .filter((x) => typeof x === 'string' && x.length > 0);
 }
 
 function isInputReadOnly() {
   const appShadow = window.__e2e__.getAppShadow();
-  const banner = appShadow.querySelector("#q4h-readonly-banner");
-  const input = appShadow.querySelector("#q4h-input");
+  const banner = appShadow.querySelector('#q4h-readonly-banner');
+  const input = appShadow.querySelector('#q4h-input');
   return {
-    bannerVisible: !!banner && !banner.classList.contains("hidden"),
-    inputHidden: !!input && input.classList.contains("hidden"),
+    bannerVisible: !!banner && !banner.classList.contains('hidden'),
+    inputHidden: !!input && input.classList.contains('hidden'),
   };
 }
 ```
@@ -145,23 +140,20 @@ mkdir -p tasks/ux-dlg-revival.tsk
 ### S2) Calibration gate: ensure E2E helpers are loaded
 
 ```javascript
-if (typeof window.__e2e__?.snapshotDomindsUI !== "function") {
+if (typeof window.__e2e__?.snapshotDomindsUI !== 'function') {
   const ts = String(Date.now());
 
-  if (typeof window.__domObservation__ !== "object") {
-    const obs = document.createElement("script");
+  if (typeof window.__domObservation__ !== 'object') {
+    const obs = document.createElement('script');
     obs.src = `/testing/dom-observation-utils.js?ts=${ts}`;
     document.head.appendChild(obs);
-    await waitUntil(() => typeof window.__domObservation__ === "object", 5000);
+    await waitUntil(() => typeof window.__domObservation__ === 'object', 5000);
   }
 
-  const helper = document.createElement("script");
+  const helper = document.createElement('script');
   helper.src = `/testing/e2e-test-helper.js?ts=${ts}`;
   document.head.appendChild(helper);
-  await waitUntil(
-    () => typeof window.__e2e__?.snapshotDomindsUI === "function",
-    5000
-  );
+  await waitUntil(() => typeof window.__e2e__?.snapshotDomindsUI === 'function', 5000);
 }
 ```
 
@@ -174,21 +166,18 @@ if (typeof window.__e2e__?.snapshotDomindsUI !== "function") {
 ```javascript
 window.__e2e__.checkConsoleErrors({ clear: true, threshold: 0 });
 
-await window.__e2e__.createDialog("tasks/ux-dlg-revival.tsk");
+await window.__e2e__.createDialog('tasks/ux-dlg-revival.tsk');
 await window.__e2e__.waitForInputEnabled();
 
 const snap = window.__e2e__.snapshotDomindsUI();
-if (!snap.currentDialog?.hasRealDialog)
-  throw new Error("Expected a selected dialog");
+if (!snap.currentDialog?.hasRealDialog) throw new Error('Expected a selected dialog');
 ```
 
 Record the current root id for later steps:
 
 ```javascript
-const rootId =
-  window.__e2e__.snapshotDomindsUI().currentDialog?.dialogInfo?.rootId;
-if (typeof rootId !== "string" || !rootId)
-  throw new Error("Missing current dialog rootId");
+const rootId = window.__e2e__.snapshotDomindsUI().currentDialog?.dialogInfo?.rootId;
+if (typeof rootId !== 'string' || !rootId) throw new Error('Missing current dialog rootId');
 rootId;
 ```
 
@@ -206,14 +195,8 @@ Infra assertions:
 - Within **2s**, `rootId` appears in `listRootIds('done')`
 
 ```javascript
-await window.__e2e__.waitUntil(
-  () => !listRootIds("running").includes(rootId),
-  2000
-);
-await window.__e2e__.waitUntil(
-  () => listRootIds("done").includes(rootId),
-  2000
-);
+await window.__e2e__.waitUntil(() => !listRootIds('running').includes(rootId), 2000);
+await window.__e2e__.waitUntil(() => listRootIds('done').includes(rootId), 2000);
 window.__e2e__.checkConsoleErrors({ clear: true, threshold: 0 });
 ```
 
@@ -252,14 +235,8 @@ Assertions:
 - Selecting it in Running re-enables input (banner hidden, input visible)
 
 ```javascript
-await window.__e2e__.waitUntil(
-  () => !listRootIds("done").includes(rootId),
-  2000
-);
-await window.__e2e__.waitUntil(
-  () => listRootIds("running").includes(rootId),
-  2000
-);
+await window.__e2e__.waitUntil(() => !listRootIds('done').includes(rootId), 2000);
+await window.__e2e__.waitUntil(() => listRootIds('running').includes(rootId), 2000);
 
 // Select it from running list and verify input returns usable.
 // (Human click) then:
@@ -283,14 +260,8 @@ Manual UX action:
 Assertions:
 
 ```javascript
-await window.__e2e__.waitUntil(
-  () => !listRootIds("running").includes(rootId),
-  2000
-);
-await window.__e2e__.waitUntil(
-  () => listRootIds("archived").includes(rootId),
-  2000
-);
+await window.__e2e__.waitUntil(() => !listRootIds('running').includes(rootId), 2000);
+await window.__e2e__.waitUntil(() => listRootIds('archived').includes(rootId), 2000);
 ```
 
 ### C2) Select archived dialog → read-only input
@@ -311,14 +282,8 @@ Manual UX action:
 Assertions:
 
 ```javascript
-await window.__e2e__.waitUntil(
-  () => !listRootIds("archived").includes(rootId),
-  2000
-);
-await window.__e2e__.waitUntil(
-  () => listRootIds("running").includes(rootId),
-  2000
-);
+await window.__e2e__.waitUntil(() => !listRootIds('archived').includes(rootId), 2000);
+await window.__e2e__.waitUntil(() => listRootIds('running').includes(rootId), 2000);
 ```
 
 ---
@@ -330,15 +295,15 @@ Goal: validate **task-doc node** action buttons (bulk actions apply to all dialo
 ### D1) Create two dialogs under the same task doc
 
 ```javascript
-await window.__e2e__.createDialog("tasks/ux-dlg-revival.tsk");
+await window.__e2e__.createDialog('tasks/ux-dlg-revival.tsk');
 await window.__e2e__.waitForInputEnabled();
 const a = window.__e2e__.snapshotDomindsUI().currentDialog?.dialogInfo?.rootId;
-if (typeof a !== "string" || !a) throw new Error("Missing dialog rootId a");
+if (typeof a !== 'string' || !a) throw new Error('Missing dialog rootId a');
 
-await window.__e2e__.createDialog("tasks/ux-dlg-revival.tsk");
+await window.__e2e__.createDialog('tasks/ux-dlg-revival.tsk');
 await window.__e2e__.waitForInputEnabled();
 const b = window.__e2e__.snapshotDomindsUI().currentDialog?.dialogInfo?.rootId;
-if (typeof b !== "string" || !b) throw new Error("Missing dialog rootId b");
+if (typeof b !== 'string' || !b) throw new Error('Missing dialog rootId b');
 
 ({ a, b });
 ```
@@ -353,13 +318,12 @@ Assertions:
 
 ```javascript
 await window.__e2e__.waitUntil(
-  () =>
-    !listRootIds("running").includes(a) && !listRootIds("running").includes(b),
-  2000
+  () => !listRootIds('running').includes(a) && !listRootIds('running').includes(b),
+  2000,
 );
 await window.__e2e__.waitUntil(
-  () => listRootIds("done").includes(a) && listRootIds("done").includes(b),
-  2000
+  () => listRootIds('done').includes(a) && listRootIds('done').includes(b),
+  2000,
 );
 ```
 
@@ -373,13 +337,12 @@ Assertions:
 
 ```javascript
 await window.__e2e__.waitUntil(
-  () => !listRootIds("done").includes(a) && !listRootIds("done").includes(b),
-  2000
+  () => !listRootIds('done').includes(a) && !listRootIds('done').includes(b),
+  2000,
 );
 await window.__e2e__.waitUntil(
-  () =>
-    listRootIds("running").includes(a) && listRootIds("running").includes(b),
-  2000
+  () => listRootIds('running').includes(a) && listRootIds('running').includes(b),
+  2000,
 );
 ```
 

@@ -42,7 +42,7 @@ If you run with the E2E helpers, keep the evidence lightweight:
 
 ## Scenario 1: Update Goals (Happy Path)
 
-**Intent**: During brainstorming, you refine *what you want* (Goals) without changing constraints or wiping the conversation.
+**Intent**: During brainstorming, you refine _what you want_ (Goals) without changing constraints or wiping the conversation.
 
 ### Steps
 
@@ -123,7 +123,7 @@ These should fail safely, with no partial edits.
 
 ## Optional Scenario 5: Encapsulation Guardrail
 
-This validates that the *only* way to edit `*.tsk/` is via `@change_mind` (not file tools).
+This validates that the _only_ way to edit `*.tsk/` is via `@change_mind` (not file tools).
 
 ### Steps
 
@@ -142,13 +142,15 @@ await createDialog('brainstorming-test.tsk');
 const snap1 = await snapshotDomindsUI();
 const roundBefore = snap1.currentDialog?.round || '';
 
-await fillAndSend([
-  'Update goals with a brainstorming list.',
-  '@change_mind !goals',
-  '- Option A: ...',
-  '- Option B: ...',
-  '- Decide next: pick one and define success.',
-].join('\\n'));
+await fillAndSend(
+  [
+    'Update goals with a brainstorming list.',
+    '@change_mind !goals',
+    '- Option A: ...',
+    '- Option B: ...',
+    '- Decide next: pick one and define success.',
+  ].join('\\n'),
+);
 
 await waitForInputEnabled();
 const snap2 = await snapshotDomindsUI();

@@ -62,15 +62,15 @@ After every action:
 
 ## Essential Helper Reference
 
-| Helper                                              | Purpose                                                                                 |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Helper                                              | Purpose                                                                              |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | `window.__e2e__.snapshotDomindsUI()`                | Take a full UI snapshot (includes `header.uiLanguage` + `header.serverWorkLanguage`) |
-| `window.__e2e__.waitUntil(fn, timeoutMs)`           | Poll until a condition is true                                                          |
-| `window.__e2e__.waitForInputEnabled()`              | Ensure a dialog is selected and input is usable                                         |
-| `window.__e2e__.createDialog(taskDoc, agent?)`      | Create a new dialog via UI                                                              |
-| `window.__e2e__.fillAndSend(msg)`                   | Send a message to the current dialog                                                    |
-| `window.__e2e__.waitForPendingTeammateCalls()`      | Wait for teammate/subdialog calls to settle                                             |
-| `window.__e2e__.getLatestTeammateResponseDetails()` | Inspect teammate-response narrative prefix (`narrativeLine`)                            |
+| `window.__e2e__.waitUntil(fn, timeoutMs)`           | Poll until a condition is true                                                       |
+| `window.__e2e__.waitForInputEnabled()`              | Ensure a dialog is selected and input is usable                                      |
+| `window.__e2e__.createDialog(taskDoc, agent?)`      | Create a new dialog via UI                                                           |
+| `window.__e2e__.fillAndSend(msg)`                   | Send a message to the current dialog                                                 |
+| `window.__e2e__.waitForPendingTeammateCalls()`      | Wait for teammate/subdialog calls to settle                                          |
+| `window.__e2e__.getLatestTeammateResponseDetails()` | Inspect teammate-response narrative prefix (`narrativeLine`)                         |
 
 ---
 
@@ -125,7 +125,8 @@ await waitUntil(
   15000,
 );
 const serverLang = window.__e2e__.snapshotDomindsUI().header.serverWorkLanguage;
-if (serverLang !== 'zh') throw new Error(`Expected serverWorkLanguage=zh, got: ${String(serverLang)}`);
+if (serverLang !== 'zh')
+  throw new Error(`Expected serverWorkLanguage=zh, got: ${String(serverLang)}`);
 
 // Open the menu so the per-choice explanation blocks are visible.
 button.click();
@@ -139,7 +140,9 @@ if (!(itemZh instanceof HTMLButtonElement)) throw new Error('Missing menu item z
 const labelEn = itemEn.querySelector('.ui-language-menu-item-label')?.textContent || '';
 const labelZh = itemZh.querySelector('.ui-language-menu-item-label')?.textContent || '';
 if (!labelEn.includes('Not Work Language')) {
-  throw new Error(`Expected en label to include 'Not Work Language', got: ${JSON.stringify(labelEn)}`);
+  throw new Error(
+    `Expected en label to include 'Not Work Language', got: ${JSON.stringify(labelEn)}`,
+  );
 }
 if (!labelZh.includes('工作语言')) {
   throw new Error(`Expected zh label to include '工作语言', got: ${JSON.stringify(labelZh)}`);
@@ -148,10 +151,14 @@ if (!labelZh.includes('工作语言')) {
 const tipEn = itemEn.querySelector('.ui-language-menu-item-tip')?.textContent || '';
 const tipZh = itemZh.querySelector('.ui-language-menu-item-tip')?.textContent || '';
 if (!tipEn.includes('Affects:') || !tipEn.includes('Does NOT affect:')) {
-  throw new Error(`Expected en tip block to be English and structured, got: ${JSON.stringify(tipEn)}`);
+  throw new Error(
+    `Expected en tip block to be English and structured, got: ${JSON.stringify(tipEn)}`,
+  );
 }
 if (!tipZh.includes('影响：') || !tipZh.includes('不影响：')) {
-  throw new Error(`Expected zh tip block to be Chinese and structured, got: ${JSON.stringify(tipZh)}`);
+  throw new Error(
+    `Expected zh tip block to be Chinese and structured, got: ${JSON.stringify(tipZh)}`,
+  );
 }
 
 // Close menu
@@ -293,8 +300,7 @@ const container = window.__e2e__.getAppShadow().querySelector('dominds-dialog-co
 const containerShadow = container?.shadowRoot;
 if (!containerShadow) throw new Error('Missing dominds-dialog-container shadowRoot');
 await window.__e2e__.waitUntil(
-  () =>
-    !!containerShadow.querySelector(`.generation-bubble[data-user-msg-id="${msgIdEn}"]`),
+  () => !!containerShadow.querySelector(`.generation-bubble[data-user-msg-id="${msgIdEn}"]`),
   15000,
 );
 const bubbleEn = containerShadow.querySelector(`.generation-bubble[data-user-msg-id="${msgIdEn}"]`);
@@ -323,8 +329,7 @@ await window.__e2e__.waitUntil(
 
 const msgIdZh = await window.__e2e__.fillAndSend('请用简体中文回复一句话。');
 await window.__e2e__.waitUntil(
-  () =>
-    !!containerShadow.querySelector(`.generation-bubble[data-user-msg-id="${msgIdZh}"]`),
+  () => !!containerShadow.querySelector(`.generation-bubble[data-user-msg-id="${msgIdZh}"]`),
   15000,
 );
 const bubbleZh = containerShadow.querySelector(`.generation-bubble[data-user-msg-id="${msgIdZh}"]`);
@@ -398,7 +403,7 @@ This step validates two things at once:
 
 - Backend emits stable error codes (`ERR_*`) for tool failures it owns (unknown call, tool exception).
 - Frontend translates those codes using the **generation bubble’s `data-user-language-code`** (per prompt),
-  so switching UI language *after sending* does not retroactively change prior results.
+  so switching UI language _after sending_ does not retroactively change prior results.
 
 #### A5.1) Unknown call: `ERR_UNKNOWN_CALL` translated in English for an English bubble
 
@@ -418,7 +423,10 @@ await window.__e2e__.waitUntil(() => menu.hidden === false, 2000);
 const itemEn = menu.querySelector('button[data-language="en"]');
 if (!(itemEn instanceof HTMLButtonElement)) throw new Error('Missing menu item en');
 itemEn.click();
-await window.__e2e__.waitUntil(() => window.__e2e__.snapshotDomindsUI().header.uiLanguage === 'en', 5000);
+await window.__e2e__.waitUntil(
+  () => window.__e2e__.snapshotDomindsUI().header.uiLanguage === 'en',
+  5000,
+);
 
 const msgIdUnknownEn = await window.__e2e__.fillAndSend('@no_such_tool hello');
 
@@ -428,7 +436,10 @@ await window.__e2e__.waitUntil(() => menu.hidden === false, 2000);
 const itemZh = menu.querySelector('button[data-language="zh"]');
 if (!(itemZh instanceof HTMLButtonElement)) throw new Error('Missing menu item zh');
 itemZh.click();
-await window.__e2e__.waitUntil(() => window.__e2e__.snapshotDomindsUI().header.uiLanguage === 'zh', 5000);
+await window.__e2e__.waitUntil(
+  () => window.__e2e__.snapshotDomindsUI().header.uiLanguage === 'zh',
+  5000,
+);
 
 // Wait for the bubble to exist, then assert the tool result is still English (because bubble lang is en).
 await window.__e2e__.waitUntil(
@@ -442,11 +453,10 @@ const bubble = containerShadow.querySelector(
   `.generation-bubble[data-user-msg-id="${msgIdUnknownEn}"]`,
 );
 const bubbleLang = bubble?.getAttribute('data-user-language-code') || '';
-if (bubbleLang !== 'en') throw new Error(`Expected bubble lang=en, got: ${JSON.stringify(bubbleLang)}`);
+if (bubbleLang !== 'en')
+  throw new Error(`Expected bubble lang=en, got: ${JSON.stringify(bubbleLang)}`);
 
-const resultText = (
-  bubble?.querySelector('.calling-result')?.textContent || ''
-).trim();
+const resultText = (bubble?.querySelector('.calling-result')?.textContent || '').trim();
 if (!resultText.startsWith('Unknown call:')) {
   throw new Error(`Expected English unknown-call translation, got: ${JSON.stringify(resultText)}`);
 }
@@ -472,7 +482,10 @@ await window.__e2e__.waitUntil(() => menu.hidden === false, 2000);
 const itemZh = menu.querySelector('button[data-language="zh"]');
 if (!(itemZh instanceof HTMLButtonElement)) throw new Error('Missing menu item zh');
 itemZh.click();
-await window.__e2e__.waitUntil(() => window.__e2e__.snapshotDomindsUI().header.uiLanguage === 'zh', 5000);
+await window.__e2e__.waitUntil(
+  () => window.__e2e__.snapshotDomindsUI().header.uiLanguage === 'zh',
+  5000,
+);
 
 const msgIdExecZh = await window.__e2e__.fillAndSend('@add_memory ../oops.md\\nhello');
 await window.__e2e__.waitUntil(
@@ -482,13 +495,14 @@ await window.__e2e__.waitUntil(
     ),
   15000,
 );
-const bubble = containerShadow.querySelector(`.generation-bubble[data-user-msg-id="${msgIdExecZh}"]`);
+const bubble = containerShadow.querySelector(
+  `.generation-bubble[data-user-msg-id="${msgIdExecZh}"]`,
+);
 const bubbleLang = bubble?.getAttribute('data-user-language-code') || '';
-if (bubbleLang !== 'zh') throw new Error(`Expected bubble lang=zh, got: ${JSON.stringify(bubbleLang)}`);
+if (bubbleLang !== 'zh')
+  throw new Error(`Expected bubble lang=zh, got: ${JSON.stringify(bubbleLang)}`);
 
-const resultText = (
-  bubble?.querySelector('.calling-result')?.textContent || ''
-).trim();
+const resultText = (bubble?.querySelector('.calling-result')?.textContent || '').trim();
 if (!resultText.startsWith('执行 @')) {
   throw new Error(`Expected zh tool-execution translation, got: ${JSON.stringify(resultText)}`);
 }
@@ -548,7 +562,8 @@ await waitUntil(
   15000,
 );
 const serverLang = window.__e2e__.snapshotDomindsUI().header.serverWorkLanguage;
-if (serverLang !== 'en') throw new Error(`Expected serverWorkLanguage=en, got: ${String(serverLang)}`);
+if (serverLang !== 'en')
+  throw new Error(`Expected serverWorkLanguage=en, got: ${String(serverLang)}`);
 
 // Set UI language to zh to create a mismatch with server en.
 button.click();
@@ -577,10 +592,14 @@ if (!labelZh.includes('非工作语言')) {
 const tipEn = itemEn.querySelector('.ui-language-menu-item-tip')?.textContent || '';
 const tipZh = itemZh.querySelector('.ui-language-menu-item-tip')?.textContent || '';
 if (!tipEn.includes('Affects:') || !tipEn.includes('Does NOT affect:')) {
-  throw new Error(`Expected en tip block to be English and structured, got: ${JSON.stringify(tipEn)}`);
+  throw new Error(
+    `Expected en tip block to be English and structured, got: ${JSON.stringify(tipEn)}`,
+  );
 }
 if (!tipZh.includes('影响：') || !tipZh.includes('不影响：')) {
-  throw new Error(`Expected zh tip block to be Chinese and structured, got: ${JSON.stringify(tipZh)}`);
+  throw new Error(
+    `Expected zh tip block to be Chinese and structured, got: ${JSON.stringify(tipZh)}`,
+  );
 }
 
 // Close menu

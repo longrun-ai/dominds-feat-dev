@@ -372,7 +372,8 @@ try {
 // Wait a bit and assert the round did NOT change.
 await sleep(1500);
 const roundAfter = (await snapshotDomindsUI()).currentDialog?.round || '';
-if (roundAfter !== roundBefore) throw new Error(`Round changed unexpectedly: before='${roundBefore}' after='${roundAfter}'`);
+if (roundAfter !== roundBefore)
+  throw new Error(`Round changed unexpectedly: before='${roundBefore}' after='${roundAfter}'`);
 await waitForInputEnabled();
 
 const post = await snapshotDomindsUI();
@@ -607,7 +608,9 @@ if (!cmdrSub?.selfId) throw new Error('Missing cmdr subdialog id');
 const parentTokenMsg = findVisibleMessageContainingAll(['SUBDLG_TOKEN_V2']);
 
 // 5B: open cmdr subdialog
-await openSubdialogAndWait(rootInfo.rootId, cmdrSub.selfId, { requireInputEnabled: true });
+await openSubdialogAndWait(rootInfo.rootId, cmdrSub.selfId, {
+  requireInputEnabled: true,
+});
 
 const subSnap = await snapshotDomindsUI();
 const subRoundBefore = subSnap.currentDialog?.round || '';

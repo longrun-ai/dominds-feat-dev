@@ -1211,7 +1211,9 @@ const supMessages = supPost.chat?.visibleMessages || [];
 const cmdrResultMsg = supMessages.find((m) => m.type === 'teammate' && m.author === '@cmdr');
 const cmdrResultMatch =
   docPreviewLine.length > 0
-    ? findVisibleMessageContainingAll([docPreviewLine], { caseInsensitive: false })
+    ? findVisibleMessageContainingAll([docPreviewLine], {
+        caseInsensitive: false,
+      })
     : null;
 const cmdrResultOk = Boolean(cmdrResultMatch);
 
