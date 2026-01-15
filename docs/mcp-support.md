@@ -126,8 +126,7 @@ into Dominds’ tool system, and therefore can never be presented to agents for 
 
 ### Pattern Rules
 
-- Patterns use simple wildcard matching with `*` and `**` (same wildcard characters as directory
-  access-control patterns, but applied to tool names as plain strings).
+- Patterns use simple wildcard matching with `*` (match any substring).
 - Matching is evaluated against the **original MCP tool name** (before rename transforms). This
   keeps filters stable even if naming transforms change.
 
@@ -135,11 +134,11 @@ into Dominds’ tool system, and therefore can never be presented to agents for 
 
 `whitelist` supports two modes depending on whether `blacklist` is configured:
 
-- **Whitelist-only mode** (no `blacklist` configured):
+- **Whitelist-only mode** (`blacklist` omitted or empty):
   - If `whitelist` is provided and non-empty, **only** tools matching at least one `whitelist`
     pattern are registered.
   - If `whitelist` is omitted or empty, all tools are registered.
-- **Whitelist + blacklist mode** (both configured):
+- **Whitelist + blacklist mode** (`blacklist` provided and non-empty):
   - Tools matching any `blacklist` pattern are never registered, **unless** they also match the
     `whitelist` (whitelist overrides blacklist for cherry-picking).
   - Tools that match neither `whitelist` nor `blacklist` are registered (i.e. whitelist does not
@@ -178,6 +177,99 @@ Notes:
 - `prefix: "x_"` always adds `x_` in front of the current name.
 - `prefix: { remove, add }` removes the specified leading substring if present, then adds `add`.
 - `suffix: "_x"` always appends `"_x"` to the current name.
+
+## Tool Name Validity (Reject Invalid Names)
+
+Dominds must **reject** MCP tools whose names are invalid for function-tool naming rules shared by
+supported LLM providers. Rejected tools are never registered.
+
+Exact rule (intersection of OpenAI + Anthropic tool name constraints):
+
+- Must match: `^[a-zA-Z0-9_-]{1,64}$`
+  - Allowed characters: ASCII letters, digits, underscore, hyphen
+  - Length: 1–64 characters
+
+Notes:
+
+- This applies to both the original MCP tool name and the post-transform Dominds tool name.
+- Dominds must not auto-normalize invalid names (no implicit renaming). Only explicit configured
+  transforms may change the name.
+- This rule is chosen because both OpenAI and Anthropic enforce essentially the same constraints for
+  tool/function names; using the intersection avoids provider-specific surprises.
+
+## Tool Schema Support (MCP Input JSON Schema)
+
+Dominds should treat MCP tools as `FuncTool`s. That requires `FuncTool.parameters` to support the
+full JSON Schema feature set used by standard MCP servers.
+
+This implies extending `dominds/main/tool.ts` schema types beyond the current minimal subset to
+support (at minimum) the JSON Schema constructs commonly emitted by MCP servers, including:
+
+- `type`: including `'integer'` and `'null'` (in addition to string/number/boolean/object/array), and
+  union forms (e.g. `type: ['string', 'null']`)
+- Composition: `oneOf`, `anyOf`, `allOf`, `not`
+- Literals: `enum`, `const`, `default`
+- Objects: `properties`, `required`, `additionalProperties` (boolean or schema), `patternProperties`,
+  `propertyNames`
+- Arrays: `items` (schema or tuple), `prefixItems`, `minItems`, `maxItems`, `uniqueItems`
+- Strings: `minLength`, `maxLength`, `pattern`, `format`
+- Numbers/integers: `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`
+- Metadata: `title`, `description`
+
+For now, Dominds should **pass the schema through** to the LLM provider as-is, and only tighten this
+if/when a provider rejects specific schemas in practice. Any provider-side schema rejection must be
+surfaced via Problems + logs.
+
+## Provider-Safe Tool Projection (LLM Wrapper API)
+
+Even if Dominds can represent and validate an MCP tool schema internally, each LLM provider may have
+its own tool schema constraints. Dominds needs a provider-specific “projection” step so we only send
+provider-compatible tool definitions to the model.
+
+Design:
+
+- Keep a canonical, full-fidelity `FuncTool` in the tool registry.
+- At generation time, project tools for the active provider:
+  - `projectFuncToolsForProvider(apiType, funcTools) -> { tools, problems }`
+  - The generator uses only `tools` in the provider request payload.
+  - (Future) tools excluded by projection produce Problems entries so the user can see why tools are
+    missing for that provider.
+
+The projection layer is an LLM wrapper API that lives between:
+
+- `Team.Member.listTools()` (tool registry output)
+- LLM generators (e.g. `dominds/main/llm/gen/codex.ts`, `dominds/main/llm/gen/anthropic.ts`)
+
+Rules:
+
+- For now, projection is a **no-op passthrough**: it does not attempt to “down-convert” schemas or
+  pre-emptively exclude tools. Providers are allowed to reject requests if they dislike a tool
+  schema.
+- When a provider rejects a tool schema, Dominds must surface a Problem describing the provider,
+  tool name, and error text. We can later evolve projection into true provider-safe filtering and/or
+  schema downgrading.
+- This projection must be deterministic and side-effect-free (no background mutations).
+
+## Retry & Stop Policy (When Providers Reject Requests)
+
+Dominds must not blindly retry provider rejections that are caused by invalid requests (e.g. tool
+schema/tool name/tool payload incompatibility). These should stop the dialog and require explicit
+human intervention.
+
+Policy:
+
+- **Provider rejection (non-retriable)**: if the LLM provider rejects the request (e.g. HTTP 400, or a
+  structured provider error indicating an invalid request/tool schema), Dominds must:
+  - Transition the dialog into a **stopped/interrupted** run state (no automatic retries).
+  - Surface a Problem with provider name, dialog id, and the error text (plus implicated tool name if
+    identifiable).
+  - Allow the user to resume after they change config/code (e.g. adjust MCP config, rename tools,
+    reduce tool set, etc.).
+- **Network/retriable errors**: Dominds may auto-retry only for clearly retriable classes such as
+  transient network failures/timeouts and provider transient errors (e.g. rate limits or 5xx), using
+  bounded backoff and a max retry count.
+
+This keeps the system responsive and avoids infinite “retry loops” caused by invalid tool schemas.
 
 ## Environment Variables (`env`)
 
@@ -291,6 +383,9 @@ Recommendation: implement both (watch for fast feedback; poll for reliability).
 
 Always debounce (e.g. 100–500ms) because editors may write via temp file + rename or multiple writes.
 
+Treat deletion of `.minds/mcp.yaml` as equivalent to an empty config (clear all servers): unregister
+all MCP toolsets/tools and stop all MCP server processes.
+
 ### Atomicity: Reload as “compute then swap”
 
 Reload should be implemented as:
@@ -328,6 +423,11 @@ Compute a stable hash per server definition (including command/args/env/tools fi
 - **Changed server**: treat as remove + add (or do an in-place update), but keep the operation
   atomic from the registry’s point of view.
 
+Reloads are committed **per server independently**:
+
+- If server A fails to reload, keep A’s last-known-good registration running.
+- If server B reloads successfully in the same cycle, commit B’s update even if A failed.
+
 ### Ordering (avoid collisions and partial states)
 
 When applying a reload:
@@ -362,7 +462,12 @@ If reload fails (invalid YAML, missing env var, server spawn fails, tool schema 
 
 - Log an actionable error with the failing server ID and reason.
 - Keep the **last known good** MCP runtime registration in place.
-- Do not partially apply a reload (no half-updated registry state).
+  - “Good” means: a server was successfully started, initialized, and its toolset/tools were
+    registered.
+  - An already-initialized MCP server instance must keep functioning (and remain registered) until a
+    new “good” instance replaces it.
+- Do not partially apply a reload for a given server (no half-updated registry state for that
+  server).
 
 ### Interaction with `team.yaml` during reload
 
@@ -380,10 +485,18 @@ This can be useful for:
 
 ## Validation & Error Handling
 
-Dominds should fail early (with actionable messages) on:
+Dominds must **always start**, even if MCP config or servers are misconfigured. MCP issues should be
+reported via Problems + logs, and MCP should degrade gracefully per-server.
+
+Dominds should fail early (with actionable messages) at two scopes:
+
+**Workspace-level (reject this reload attempt; keep last-known-good set as-is):**
 
 - Invalid YAML, missing `version`, or unsupported `version`.
 - Duplicate server IDs.
+
+**Per-server (reject only that server’s update; keep that server’s last-known-good instance/tools):**
+
 - Non-stdio transport values (until other transports are implemented).
 - Tool name collisions after transforms.
 - Missing host environment variables referenced by `{ env: ... }`.
@@ -391,5 +504,46 @@ Dominds should fail early (with actionable messages) on:
 Warnings (non-fatal) should include:
 
 - Tools never registered due to `blacklist` patterns.
-- Tools never registered because they do not match `whitelist`.
+- Tools never registered because they do not match `whitelist` (only in whitelist-only mode).
 - Tools dropped due to collisions.
+
+## Problems Panel/Button (WebUI Design)
+
+Some MCP issues should be visible in the WebUI (not only in backend logs), especially when they
+prevent tools from being available to agents.
+
+### UX
+
+- Add a header “pill” button named **Problems** with:
+  - A count badge (number of active problems).
+  - A severity color (error > warning > info).
+- Clicking toggles a right-side panel (or modal) listing current problems.
+- Panel supports:
+  - Filter by severity/source (optional).
+  - Copy details (serverId, tool name, reason).
+  - Clear/acknowledge (optional; if implemented, it only clears UI state, not the underlying cause).
+
+### Data model (Active problems only)
+
+Problems are a workspace-level stream (not per-dialog). They represent **current active** issues
+only; when the underlying condition disappears (e.g. config fixed, server removed), the problem is
+automatically removed from the active set.
+
+Each problem should have:
+
+- `id` (stable/dedup-able key)
+- `severity` (`info` | `warning` | `error`)
+- `timestamp`
+- `source` (e.g. `mcp`)
+- `message` (human readable)
+- `detail` (structured: `serverId`, `toolName`, etc.)
+
+### Transport
+
+Use WebSocket to keep the UI current:
+
+- Server sends a snapshot on connect: `type: 'problems_snapshot'` with `version` + full list.
+- Server broadcasts new snapshots whenever the set changes.
+- Client may request an on-demand refresh: `type: 'get_problems'`.
+
+Problems should be kept in memory on the server as the current active set.
