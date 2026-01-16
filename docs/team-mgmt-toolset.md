@@ -13,6 +13,7 @@ We want a safe way for a “team manager” agent (typically `dijiang`) to:
 
 - Create/update `.minds/team.yaml` (team roster + permissions + toolsets).
 - Create/update `.minds/llm.yaml` (LLM provider definitions overriding defaults).
+- Create/update `.minds/mcp.yaml` (MCP server definitions that register dynamic toolsets).
 - Create/update `.minds/team/<member>/{persona,knowledge,lessons}.md` (agent minds).
 
 At the same time, we do **not** want to hand that agent full workspace read/write (e.g. the
@@ -141,6 +142,10 @@ reading source code.
 - `@team_mgmt_manual !topics` → list topics.
 - `@team_mgmt_manual !llm` → how to manage `.minds/llm.yaml` (+ templates).
 - `@team_mgmt_manual !llm !builtin-defaults` → show builtin providers/models (from defaults).
+- `@team_mgmt_manual !mcp` → how to manage `.minds/mcp.yaml` (+ templates).
+- `@team_mgmt_manual !mcp !transports` → stdio vs `streamable_http`, env/headers wiring.
+- `@team_mgmt_manual !mcp !tools` → whitelist/blacklist + naming transforms + collision rules.
+- `@team_mgmt_manual !mcp !troubleshooting` → common MCP failure modes and how to recover.
 - `@team_mgmt_manual !team` → how to manage `.minds/team.yaml` (+ templates).
 - `@team_mgmt_manual !team !member-properties` → list supported member fields and meanings.
 - `@team_mgmt_manual !minds` → how to manage `.minds/team/<id>/*.md` (persona/knowledge/lessons).
@@ -170,6 +175,13 @@ manual must cover **all** information currently present there, at minimum:
   - Provide a “builtin defaults” view via `!llm !builtin-defaults`.
     - Implementation guidance: render this content from `dominds/main/llm/defaults.yaml` at runtime
       (or via a shared helper) rather than copy/pasting a static block into code, so it won’t drift.
+- `!mcp`:
+  - Explain `.minds/mcp.yaml` as the source of dynamic MCP toolsets.
+  - Explain how MCP servers map to toolsets (`mcp_<serverId>`) and how those toolsets are granted via
+    `.minds/team.yaml`.
+  - Explain tool exposure controls (whitelist/blacklist) and naming transforms (prefix/suffix).
+  - Explain secret/env wiring patterns and operational troubleshooting (Problems + logs, restart,
+    hot reload semantics).
 
 ## Dynamic Loading from the Dominds Installation (Runtime Resources)
 
@@ -239,6 +251,105 @@ Best practices:
 - Add only providers you truly need. Most setups should rely on `defaults.yaml`.
 - Keep model keys stable; they become the `model` values used in `.minds/team.yaml`.
 
+## Managing `.minds/mcp.yaml` (MCP Servers)
+
+### What it does
+
+`.minds/mcp.yaml` configures MCP (Model Context Protocol) servers as a first-class tool source.
+Each configured server registers a Dominds **toolset** named `mcp_<serverId>` and a set of tools
+under that toolset.
+
+This file is **hot-reloaded** at runtime (no server restart required). If the file is absent, MCP
+support is disabled (no dynamic MCP toolsets are registered).
+
+Reference specs:
+
+- MCP behavior and semantics: `dominds/docs/mcp-support.md`
+- Tools view UX and Problems panel: `dominds/docs/team-tools-view.md`
+
+### Mapping: server → toolset (and granting it)
+
+- Server ID `sdk_http` registers toolset `mcp_sdk_http`.
+- To allow a teammate to use the MCP tools, grant the toolset in `.minds/team.yaml`:
+
+```yaml
+members:
+  alice:
+    toolsets:
+      - ws_read
+      - mcp_sdk_http
+```
+
+Notes:
+
+- MCP tool names are global across all toolsets (built-in + MCP). Collisions cause tools to be
+  skipped and should surface via Problems + logs.
+- `mcp_admin` is a built-in toolset that contains `mcp_restart` (best-effort per-server restart).
+
+### File format (template)
+
+```yaml
+version: 1
+servers:
+  <serverId>:
+    # Transport: stdio
+    transport: stdio
+    command: npx
+    args: ['-y', '@playwright/mcp@latest']
+    env: {}
+
+    # Transport: streamable_http
+    # transport: streamable_http
+    # url: http://127.0.0.1:3000/mcp
+    # headers: {}
+    # sessionId: '' # optional
+
+    # Tool exposure controls
+    tools:
+      whitelist: [] # optional
+      blacklist: [] # optional
+
+    # Tool name transforms
+    transform: [] # optional
+```
+
+### Tool exposure controls (whitelist / blacklist)
+
+Use `tools.whitelist` / `tools.blacklist` to reduce the exposed tool surface and avoid UI clutter.
+Patterns use `*` wildcards and apply to the **original MCP tool name** (before transforms), so
+filters remain stable even if naming transforms change later.
+
+### Naming transforms (prefix / suffix)
+
+MCP servers often export short/common tool names (`open`, `search`, `list`, …). Use transforms to
+avoid global collisions and make tool names recognizable:
+
+```yaml
+transform:
+  - prefix: 'playwright_'
+  - suffix: '_mcp'
+```
+
+### Env and headers wiring
+
+Prefer copying from the host environment for secrets:
+
+```yaml
+env:
+  MCP_TOKEN:
+    env: MY_LOCAL_MCP_TOKEN
+```
+
+For `streamable_http`, `headers` supports the same literal-or-env mapping.
+
+### Operational behavior (hot reload + last-known-good)
+
+- Config edits should apply without restart.
+- If a server update fails (spawn/connect/schema/name collision/etc.), the system should keep that
+  server’s **last-known-good** toolset registered and surface a Problem describing the failure.
+- Deleting `.minds/mcp.yaml` should unregister all MCP-derived toolsets/tools and auto-clear related
+  MCP Problems.
+
 ## Managing `.minds/team.yaml`
 
 ### What it does
@@ -267,6 +378,7 @@ member_defaults:
   no_read_dirs:
     - .minds/team.yaml
     - .minds/llm.yaml
+    - .minds/mcp.yaml
     - .minds/team/**
   no_write_dirs:
     - .minds/**
@@ -353,3 +465,10 @@ This avoids needing to grant full rtws access to configure the team.
 - **Provider not found**: Ensure `.minds/team.yaml` `provider` keys exist in merged provider config
   (`dominds/main/llm/defaults.yaml` + `.minds/llm.yaml`).
 - **Access denied when editing `.minds/`**: Intended for general file tools; use `team-mgmt` tools.
+- **MCP tools not visible in Tools view**:
+  - Confirm `.minds/mcp.yaml` exists and is valid.
+  - Open **Problems** and look for MCP-related errors.
+  - Confirm the teammate is granted the relevant `mcp_<serverId>` toolset in `.minds/team.yaml`.
+- **MCP server keeps failing to (re)load**:
+  - Check Problems details (missing env var, invalid tool name, collisions, connection errors).
+  - After fixing config, use `mcp_restart` (from `mcp_admin`) for a best-effort per-server restart.
