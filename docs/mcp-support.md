@@ -8,14 +8,17 @@ rtws root.
 
 ## Status (Current Code)
 
-As of the current Dominds implementation in this workspace, **MCP is not implemented yet**:
+As of the current Dominds implementation in this workspace, MCP is implemented (using the official
+MCP TypeScript SDK):
 
-- There is no `.minds/mcp.yaml` loader.
-- No MCP-derived tools/toolsets are registered at runtime.
-- The only toolsets that exist are the built-ins registered in `dominds/main/tools/registry.ts`.
+- `.minds/mcp.yaml` loader with mandatory hot-reload.
+- MCP-derived tools/toolsets registered into the existing global tool(set) registry.
+- Supported transports: `stdio` and `streamable_http` (SSE transport is not supported as a separate
+  config option).
+- Workspace Problems surfaced to the WebUI (Problems pill + panel) for MCP and LLM provider
+  rejections.
 
-This doc is therefore a **design + implementation sketch**, grounded in how Dominds tools and
-toolsets work today.
+This doc remains the canonical design/spec for the behavior and semantics.
 
 ## Relevant Existing Primitives (How Tools Work Today)
 
@@ -37,9 +40,9 @@ system:
 
 - Configure MCP servers via `.minds/mcp.yaml`.
 - Treat each MCP server as a Dominds **toolset** (so it can be granted via `team.yaml`).
-- Support tool-name **whitelist/blacklist filtering** by pattern.
-- Support tool-name **prefix/suffix transforms** to avoid collisions and improve naming UX.
-- Support safe environment variable wiring, including **renaming/copying from host env** (so secrets
+- Support tool-name whitelist/blacklist filtering by pattern.
+- Support tool-name prefix/suffix transforms to avoid collisions and improve naming UX.
+- Support safe environment variable wiring, including renaming/copying from host env (so secrets
   don’t need to be committed to YAML).
 
 ## Non-goals
@@ -92,8 +95,8 @@ At minimum:
 - A registry “owner” layer that tracks which tool names belong to which MCP server, so it can:
   - Unregister stale tools (`unregisterTool`) and toolsets (`unregisterToolset`) on reload.
   - Avoid leaving old tools behind after config edits.
-- An MCP client implementation per server (stdio first), which:
-  - Spawns the server process (`command` + `args` + `env`).
+- An MCP client implementation per server (official SDK), which:
+  - Connects via `stdio` (spawn `command` + `args` + `env`) or `streamable_http` (`url` + `headers`).
   - Performs MCP handshake and fetches the tool list (including per-tool JSON schema).
   - Exposes each MCP tool as a Dominds `FuncTool` whose `call()` performs the MCP `callTool` request.
 
@@ -297,6 +300,18 @@ Semantics:
 - For `{ env: EXISTING_ENV_VAR_NAME }`, the value is taken from the Dominds process environment at
   runtime; if missing, server startup should fail with a clear message.
 
+## HTTP Headers (`streamable_http`)
+
+`streamable_http` servers can optionally define HTTP request headers. Values use the same literal
+or `{ env: ... }` mapping form as `env`:
+
+```yaml
+headers:
+  Authorization:
+    env: MCP_AUTH_TOKEN
+  X-Client-Name: 'dominds'
+```
+
 ## Proposed `.minds/mcp.yaml` Schema (v1)
 
 This is a Dominds-oriented schema. It is intentionally small and should be easy to validate.
@@ -306,14 +321,20 @@ version: 1
 servers:
   <serverId>:
     # Transport config (minimum viable set)
+    #
+    # 1) stdio
     transport: stdio
     command: npx
-    args:
-      - '-y'
-      - '@playwright/mcp@latest'
+    args: ['-y', '@playwright/mcp@latest']
 
     # Optional environment wiring
     env: {}
+
+    # 2) streamable_http
+    # transport: streamable_http
+    # url: http://127.0.0.1:3000/mcp
+    # headers: {} # optional (supports literal or { env: NAME } values)
+    # sessionId: '' # optional
 
     # Tool exposure controls
     tools:
@@ -416,7 +437,8 @@ Rules:
 
 ### Diff rules (added/removed/changed)
 
-Compute a stable hash per server definition (including command/args/env/tools filters/transforms).
+Compute a stable hash per server definition (including transport-specific fields like
+command/args/env or url/headers/sessionId, plus tool filters/transforms).
 
 - **Added server**: spawn client, list tools, register its tools + toolset.
 - **Removed server**: unregister its toolset, unregister its tools, stop its client.
@@ -497,14 +519,14 @@ Dominds should fail early (with actionable messages) at two scopes:
 
 **Per-server (reject only that server’s update; keep that server’s last-known-good instance/tools):**
 
-- Non-stdio transport values (until other transports are implemented).
+- Unsupported `transport` values (for example `sse` is not supported as a config option).
 - Tool name collisions after transforms.
 - Missing host environment variables referenced by `{ env: ... }`.
 
 Warnings (non-fatal) should include:
 
 - Tools never registered due to `blacklist` patterns.
-- Tools never registered because they do not match `whitelist` (only in whitelist-only mode).
+- Tools excluded by whitelist-only mode (only when `blacklist` is omitted or empty).
 - Tools dropped due to collisions.
 
 ## Problems Panel/Button (WebUI Design)

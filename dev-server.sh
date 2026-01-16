@@ -16,7 +16,7 @@ check_server_status() {
 	local tsx_running=false
 	local vite_running=false
 
-	if pgrep -f "tsx.*server" >/dev/null 2>&1; then
+	if pgrep -f "tsx.*dominds/main/(server|cli)\\.ts" >/dev/null 2>&1; then
 		tsx_running=true
 	fi
 
@@ -35,7 +35,7 @@ check_server_status() {
 show_status() {
 	echo "=== Dominds Development Server Status ==="
 
-	if pgrep -f "tsx.*server" >/dev/null 2>&1; then
+	if pgrep -f "tsx.*dominds/main/(server|cli)\\.ts" >/dev/null 2>&1; then
 		echo "✅ Backend server (tsx) is running"
 	else
 		echo "❌ Backend server (tsx) is not running"
@@ -104,8 +104,8 @@ echo "🚀 Starting development servers..."
 mkdir logs >/dev/null 2>&1
 
 # Start backend and frontend with separate log files
-# Backend: runs from outer project (as rtws), uses tsx
-NODE_ENV=dev npx tsx dominds/main/server.ts -p 5556 --mode dev >logs/backend-stdout.log 2>logs/backend-stderr.log &
+# Backend: runs from outer project (as rtws), uses tsx + cli entry (dotenv + -C handling)
+NODE_ENV=dev npx tsx dominds/main/cli.ts webui -p 5556 --mode dev --nobrowser >logs/backend-stdout.log 2>logs/backend-stderr.log &
 # Frontend: runs from dominds/webapp
 cd dominds/webapp && npx vite --port 5555 --strictPort >../../logs/frontend-stdout.log 2>../../logs/frontend-stderr.log &
 

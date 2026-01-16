@@ -2,11 +2,13 @@
 .DS_Store
 ._*
 
-.dialogs/
-logs/
+.env.local
 
 node_modules
 dist
+
+.dialogs/
+logs/
 
 # Local checkout of the dominds repository (intentionally not tracked here)
 dominds/
