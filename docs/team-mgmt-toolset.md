@@ -9,7 +9,7 @@ rtws root.
 
 ## Motivation
 
-We want a safe way for a “team manager” agent (typically `dijiang`) to:
+We want a safe way for a “team manager” agent (typically the shadow teammate `fuxi`) to:
 
 - Create/update `.minds/team.yaml` (team roster + permissions + toolsets).
 - Create/update `.minds/llm.yaml` (LLM provider definitions overriding defaults).
@@ -25,7 +25,7 @@ equivalent of the `ws_mod` toolset + unrestricted `read_dirs`/`write_dirs`), bec
 - A “bootstrap” team manager should be able to configure the team without being able to change the
   product code, `.dialogs/`, etc.
 
-## Migration Plan (Replacing Builtin `dijiang` Knowledge)
+## Migration Plan (Replacing legacy builtin team-manager knowledge)
 
 This document is a **design spec** for the new `team-mgmt` toolset. It is not something we should
 ever tell an agent to “look up” at runtime.
@@ -33,17 +33,16 @@ ever tell an agent to “look up” at runtime.
 Instead, the runtime “single source of truth” for team management guidance should be
 `@team_mgmt_manual`.
 
-Today, some of the guidance lives in `dominds/main/minds/builtin/dijiang/knowledge.md` inside the
-`dominds/` submodule.
+Historically, some of the guidance lived in a legacy builtin “team manager” mind set inside the
+`dominds/` source tree. That legacy builtin is being removed. The runtime “single source of truth”
+should be the `@team_mgmt_manual` tool output.
 
-Planned change (as part of implementing the `team-mgmt` toolset and manual):
+Planned change:
 
 - Add a new texting tool `team_mgmt_manual` whose responses cover the team-management topics (file
   formats, workflows, safety).
-- Reduce (or remove) the team-management sections from the builtin
-  `dominds/main/minds/builtin/dijiang/knowledge.md` to avoid duplication.
-  - If a stub is kept, it should point the agent to `@team_mgmt_manual` (and not to this design
-    document).
+- Remove legacy builtin guidance to avoid duplication. If any stub remains, it must point to
+  `@team_mgmt_manual` (and not to this design document).
 
 Rationale:
 
@@ -158,10 +157,10 @@ select the most specific match and fall back to the nearest parent when needed.
 If UX wants a friendlier label than `@team_mgmt_manual`, treat that as presentation-only; the
 canonical command remains `@team_mgmt_manual`.
 
-## Manual Coverage Requirements (from builtin `dijiang` knowledge)
+## Manual Coverage Requirements (legacy coverage)
 
-As part of the planned migration away from `dominds/main/minds/builtin/dijiang/knowledge.md`, the
-manual must cover **all** information currently present there, at minimum:
+As part of the migration away from the legacy builtin team-manager knowledge files, the manual
+must cover (at minimum) the information that used to live there:
 
 - `!team`:
   - Explain `member_defaults`, `default_responder`, and `members` (structure overview).
@@ -383,25 +382,15 @@ member_defaults:
   no_write_dirs:
     - .minds/**
 
-default_responder: dijiang
+default_responder: pangu
 
 members:
-  dijiang:
-    name: Dijiang
-    icon: '💥'
+  # Example visible teammate (recommended): define at least one non-hidden responder for daily work.
+  dev:
+    name: Dev
+    icon: '🧑‍💻'
     toolsets:
-      - team-mgmt
-      - ws_read
-    # Optionally, allow dijiang to use normal file tools on `.minds/` too:
-    # read_dirs:
-    #   - .minds/**
-    # write_dirs:
-    #   - .minds/**
-
-  cmdr:
-    name: Commander
-    icon: 'ᯓ★'
-    toolsets:
+      - ws_mod
       - os
     streaming: true
 ```

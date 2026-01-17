@@ -190,4 +190,3 @@ Pass criteria (Client B):
 - If Client B had that dialog selected, selection is cleared and input becomes non-usable.
 
 (Automation note: deletion uses a browser confirm dialog; Playwright must accept it.)
-

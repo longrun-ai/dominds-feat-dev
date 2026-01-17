@@ -481,33 +481,33 @@ starting a new round for the **subdialog only**, without resetting or altering t
 This is the primary round-control scenario for long-run work: sub-agents should be able to shed noise locally
 while the orchestration dialog stays stable.
 
-### Step 5A: Create a registered cmdr subdialog (topic context)
+### Step 5A: Create a registered pangu subdialog (topic context)
 
 **Prompt to testee (in parent dialog):**
 
 ```
 Step 5A (critical): This scenario ONLY validates a TYPE B registered subdialog call.
 Reply with EXACTLY 2 lines:
-Line 1 MUST be exactly: @cmdr !topic subdlg-round-ctrl
+Line 1 MUST be exactly: @pangu !topic subdlg-round-ctrl
 Line 2 MUST be exactly: SUBDLG_TOKEN_V2
 
 IMPORTANT: Do NOT put `!topic ...` on a second line (that would be in the body, not the headline).
 No other tool calls. No extra text.
 ```
 
-### Step 5B: Open the cmdr subdialog (no chat)
+### Step 5B: Open the pangu subdialog (no chat)
 
-Use the sidebar row `Subdialog: @cmdr` or open it programmatically with `openSubdialogAndWait(rootId, subId)`.
+Use the sidebar row `Subdialog: @pangu` or open it programmatically with `openSubdialogAndWait(rootId, subId)`.
 
 **Expected Infrastructure Outcomes:**
 
-- UI selection switches to `@cmdr`
+- UI selection switches to `@pangu`
 - Toolbar round nav reflects the subdialog’s current round (typically `R 1`)
 - Input is enabled (latest round)
 
-### Step 5C: In the subdialog, cmdr runs `@clear_mind` for itself
+### Step 5C: In the subdialog, pangu runs `@clear_mind` for itself
 
-**Prompt to testee (in the cmdr subdialog):**
+**Prompt to testee (in the pangu subdialog):**
 
 ```
 Step 5C: Reply ONLY with the following 2 lines (copy exactly; no preface, no markdown, no extra lines):
@@ -533,7 +533,7 @@ Do not repeat these instructions. No other tool calls.
 **Scripted Run (JS, recommended):**
 
 ```javascript
-// 5A: create registered cmdr subdialog from the parent dialog
+// 5A: create registered pangu subdialog from the parent dialog
 const pre = await snapshotDomindsUI();
 const parentRoundBefore = pre.currentDialog?.round || '';
 const rootInfo = getCurrentDialogInfo();
@@ -551,14 +551,14 @@ while (getSubdialogHierarchy().length > 1) {
 const msgA = await fillAndSend(
   'Step 5A (critical): This scenario ONLY validates a TYPE B registered subdialog call.\\n' +
     'Reply with EXACTLY 2 lines:\\n' +
-    'Line 1 MUST be exactly: @cmdr !topic subdlg-round-ctrl\\n' +
+    'Line 1 MUST be exactly: @pangu !topic subdlg-round-ctrl\\n' +
     'Line 2 MUST be exactly: SUBDLG_TOKEN_V2\\n\\n' +
     'IMPORTANT: Do NOT put `!topic ...` on a second line (that would be in the body, not the headline).\\n' +
     'No other tool calls. No extra text.',
 );
 
-// Wait until the TYPE B (registered) cmdr subdialog exists.
-// If the testee accidentally creates a transient cmdr subdialog (no !topic), nudge once and retry.
+// Wait until the TYPE B (registered) pangu subdialog exists.
+// If the testee accidentally creates a transient pangu subdialog (no !topic), nudge once and retry.
 let cmdrSub = null;
 try {
   await waitUntil(() => {
@@ -568,7 +568,7 @@ try {
         (d) =>
           d &&
           d.supdialogId === rootInfo.rootId &&
-          d.agentId === 'cmdr' &&
+          d.agentId === 'pangu' &&
           d.topicId === topicId &&
           typeof d.selfId === 'string' &&
           d.selfId !== '',
@@ -578,7 +578,7 @@ try {
 } catch {
   await fillAndSend(
     'Correction #1: Reply ONLY with the following 2 lines (copy exactly; no extra text):\\n' +
-      '@cmdr !topic subdlg-round-ctrl\\n' +
+      '@pangu !topic subdlg-round-ctrl\\n' +
       'SUBDLG_TOKEN_V2',
   );
   await waitUntil(() => {
@@ -588,7 +588,7 @@ try {
         (d) =>
           d &&
           d.supdialogId === rootInfo.rootId &&
-          d.agentId === 'cmdr' &&
+          d.agentId === 'pangu' &&
           d.topicId === topicId &&
           typeof d.selfId === 'string' &&
           d.selfId !== '',
@@ -602,13 +602,13 @@ await waitForInputEnabled();
 
 const dialogs = getApp().dialogs || [];
 const cmdrSubs = dialogs.filter(
-  (d) => d && d.supdialogId === rootInfo.rootId && d.agentId === 'cmdr',
+  (d) => d && d.supdialogId === rootInfo.rootId && d.agentId === 'pangu',
 );
-if (!cmdrSub?.selfId) throw new Error('Missing cmdr subdialog id');
+if (!cmdrSub?.selfId) throw new Error('Missing pangu subdialog id');
 
 const parentTokenMsg = findVisibleMessageContainingAll(['SUBDLG_TOKEN_V2']);
 
-// 5B: open cmdr subdialog
+// 5B: open pangu subdialog
 await openSubdialogAndWait(rootInfo.rootId, cmdrSub.selfId, {
   requireInputEnabled: true,
 });
@@ -621,9 +621,9 @@ const promptBefore = findVisibleMessageContainingAll([
   'please proceed with the task.',
 ]);
 const hierarchy = getSubdialogHierarchy();
-const isInSubdialog = hierarchy.length >= 2 && hierarchy[hierarchy.length - 1]?.agentId === 'cmdr';
+const isInSubdialog = hierarchy.length >= 2 && hierarchy[hierarchy.length - 1]?.agentId === 'pangu';
 
-// 5C: in subdialog, cmdr clears its own mind
+// 5C: in subdialog, pangu clears its own mind
 const msgC = await fillAndSend(
   'Step 5C: Reply ONLY with the following 2 lines (copy exactly; no preface, no markdown, no extra lines):\\n' +
     '@clear_mind\\n' +

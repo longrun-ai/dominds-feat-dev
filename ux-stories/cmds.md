@@ -1,4 +1,4 @@
-# Dominds WebUI E2E: Shell Commands via @cmdr - For e2e-browser-tester Agent
+# Dominds WebUI E2E: Shell Commands via @pangu - For e2e-browser-tester Agent
 
 You are the **tester agent** standing in for a human user. Your role is to validate that **dominds** provides flawless agentic infrastructure for shell command execution and daemon tracking. The testee should **cooperate** with your directions to help validate dominds features.
 
@@ -6,7 +6,7 @@ You are the **tester agent** standing in for a human user. Your role is to valid
 
 This test validates **dominds infrastructure**, not the testee agent's performance.
 
-- The testee (typically `@cmdr`) is a reasonable LLM-powered AI agent. It should **cooperate with your instructions** to exercise dominds features, but may still make mistakes, miss tool calls, or deviate (as all LLMs do).
+- The testee (typically `@pangu`) is a reasonable LLM-powered AI agent. It should **cooperate with your instructions** to exercise dominds features, but may still make mistakes, miss tool calls, or deviate (as all LLMs do).
 - **Dominds must work flawlessly** regardless of testee behavior - providing reliable tool routing, proper daemon tracking, and UX that lets YOU guide the testee to success
 - Your job: verify dominds enables you to nudge, correct, and guide the testee toward achieving business goals
 
@@ -190,11 +190,11 @@ If the team never loads, treat it as an infrastructure failure (likely missing L
 
 ### Before You Begin
 
-Create a fresh dialog with `@cmdr` as the responder:
+Create a fresh dialog with `@pangu` as the responder:
 
 ```javascript
 const baseline = await snapshotDomindsUI();
-await createDialog('cmds-test.tsk', '@cmdr');
+await createDialog('cmds-test.tsk', '@pangu');
 await waitForInputEnabled();
 const snap = await snapshotDomindsUI();
 const delta = snap.reportDeltaTo(baseline);
@@ -228,7 +228,7 @@ If these conditions aren't met -> dominds infrastructure bug, stop.
 
 **Goal:** Ensure the testee understands that it should cooperate and use shell tool calls exactly as instructed.
 
-**Important:** Avoid `@` symbols here to prevent unintended teammate calls. Use words like “commander” instead of `@cmdr`.
+**Important:** Avoid `@` symbols here to prevent unintended teammate calls. Use words like “Pangu” instead of `@pangu`.
 
 ```javascript
 const msgId = await fillAndSend(

@@ -1,4 +1,4 @@
-# Dominds WebUI E2E: Teammate Calls to @cmdr - For e2e-browser-tester Agent
+# Dominds WebUI E2E: Teammate Calls to @pangu - For e2e-browser-tester Agent
 
 You are the **tester agent** standing in for a human user. Your role is to validate that **dominds** provides flawless agentic infrastructure for teammate call delegation. The testee should **cooperate** with your directions to help validate dominds features.
 
@@ -16,8 +16,8 @@ This test validates **dominds teammate call infrastructure**, not the testee age
 
 The testee, when properly guided, must be able to:
 
-- Execute oneshot teammate calls to `@cmdr` for single env var queries (TYPE C - transient subdialog)
-- Execute topic-based teammate calls to `@cmdr` for multiple related queries (TYPE B - registered subdialog)
+- Execute oneshot teammate calls to `@pangu` for single env var queries (TYPE C - transient subdialog)
+- Execute topic-based teammate calls to `@pangu` for multiple related queries (TYPE B - registered subdialog)
 - Maintain context across multiple topic-based calls within the same registered subdialog
 - Properly handle subdialog completion and response supply to supdialog
 
@@ -34,7 +34,7 @@ The testee, when properly guided, must be able to:
 
 - **Assert infra, not prose** - Pass/fail must be based on UI state + teammate call bubbles, not the testee’s summary.
 - **Time-bound every step** - If `waitForTeammateResponse()` or `waitForPendingTeammateCalls()` does not resolve within the allowed timeout, treat as infra failure.
-- **One retry for infra gaps only** - If no teammate response or wrong callsite, immediately retry once with explicit `@cmdr` call + tool-formatted instruction and move on.
+- **One retry for infra gaps only** - If no teammate response or wrong callsite, immediately retry once with explicit `@pangu` call + tool-formatted instruction and move on.
 - **Compliance nudges are separate** - If the testee responds but does not fully comply (formatting, missing confirmation, extra lines, etc.), use the _Compliance Nudge Loop_ below (up to 3 nudges).
 - **Check console errors after every action** - Catch silent UI/protocol breakage early.
 - **Control noise** - Keep prompts short and enforce “one tool call only”.
@@ -71,7 +71,7 @@ const msgId = await fillAndSend('your prompt here');
 // 5. WAIT - when you expect a teammate response
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
@@ -129,12 +129,12 @@ if (!pendingDone || !responseReady) {
   const retryTeammateStart = getTeammateMessageCount();
   const retryCallSiteBefore = getLatestTeammateCallSiteId();
   const retryId = await fillAndSend(
-    'Retry: @cmdr please run shell_cmd command="echo $HOME". Use only one shell_cmd call.',
+    'Retry: @pangu please run shell_cmd command="echo $HOME". Use only one shell_cmd call.',
   );
 
   const retryCallSiteId = await waitForTeammateCallSiteId({
     after: retryCallSiteBefore,
-    firstMention: '@cmdr',
+    firstMention: '@pangu',
   });
   let retryDone = await waitForPendingTeammateCalls();
   let retryReady = await waitForTeammateResponse({
@@ -156,8 +156,8 @@ if (!pendingDone || !responseReady) {
 
 **Fallback: Missing or Wrong Teammate Call**
 
-If the teammate call site does not appear (or appears without `@cmdr`), retry once with
-an explicit `@cmdr` directive and a single tool-formatted instruction. Do not keep re-prompting.
+If the teammate call site does not appear (or appears without `@pangu`), retry once with
+an explicit `@pangu` directive and a single tool-formatted instruction. Do not keep re-prompting.
 
 ---
 
@@ -181,7 +181,7 @@ const nudge = async (n, reason, correction) => {
   );
   const callSiteId = await waitForTeammateCallSiteId({
     after: callSiteBefore,
-    firstMention: '@cmdr',
+    firstMention: '@pangu',
   });
   let pendingDone = await waitForPendingTeammateCalls();
   let responseReady = await waitForTeammateResponse({
@@ -334,14 +334,14 @@ If these conditions aren't met → dominds infrastructure bug, stop.
 
 **Goal:** Ensure the testee understands the test setup and can articulate it correctly in its own words.
 
-**Important:** Avoid `@` symbols here to prevent unintended teammate calls. Use words like “commander” instead of `@cmdr`.
+**Important:** Avoid `@` symbols here to prevent unintended teammate calls. Use words like “Pangu” instead of `@pangu`.
 
 ```javascript
 const preflightStart = await snapshotDomindsUI();
 const msgId = await fillAndSend(
   'Calibration: You are the testee in a dominds teammate-call infrastructure test. ' +
     'In your own words, explain how you will behave during this test. ' +
-    'Cover: (1) you will cooperate with instructions, (2) you will only contact the commander teammate when explicitly instructed, ' +
+    'Cover: (1) you will cooperate with instructions, (2) you will only contact the Pangu teammate when explicitly instructed, ' +
     '(3) you will use exactly one tool action when requested, (4) you will not call any teammates or tools during calibration. ' +
     'Do not use the @ symbol.',
 );
@@ -372,21 +372,21 @@ const preflightErrors = checkConsoleErrors();
 
 **Goal:** Validate a **user-initiated** teammate call (the tester triggers the call directly).
 
-**Important:** This is intentionally a direct `@cmdr` call from the tester (human). The call
-text is delivered straight to the cmdr subdialog (no intermediary instruction step). Expect
-the call origin to show **Human → @cmdr** if your UI exposes it.
+**Important:** This is intentionally a direct `@pangu` call from the tester (human). The call
+text is delivered straight to the pangu subdialog (no intermediary instruction step). Expect
+the call origin to show **Human → @pangu** if your UI exposes it.
 
 ```javascript
 // 1. Send a direct teammate call (user-initiated)
 const teammateStart = getTeammateMessageCount();
 const callSiteBefore = getLatestTeammateCallSiteId();
 const msgId = await fillAndSend(
-  '@cmdr Please run shell_cmd command="echo $HOME". Use exactly one tool call and reply with the HOME value only.',
+  '@pangu Please run shell_cmd command="echo $HOME". Use exactly one tool call and reply with the HOME value only.',
 );
 
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
@@ -410,8 +410,8 @@ const errors = checkConsoleErrors();
 
 **Pass Criteria (A0):**
 
-- [ ] `@cmdr` call site appears
-- [ ] HOME value returned by cmdr
+- [ ] `@pangu` call site appears
+- [ ] HOME value returned by pangu
 - [ ] Subdialog created and completed (TYPE C)
 - [ ] No console errors
 
@@ -442,15 +442,15 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 ```javascript
 // 2. Send the prompt
 const msgId = await fillAndSend(
-  'Current dialog responder: issue a teammate call to the cmdr teammate (mention `@cmdr` without `!topic`) ' +
+  'Current dialog responder: issue a teammate call to the pangu teammate (mention `@pangu` without `!topic`) ' +
     'to query the HOME environment variable. ' +
-    'Roles: root dialog responder sends the teammate call; cmdr runs shell_cmd; tester/human runs nothing. ' +
+    'Roles: root dialog responder sends the teammate call; pangu runs shell_cmd; tester/human runs nothing. ' +
     'Use shell_cmd with command="echo $HOME". Use only one shell_cmd call, no extra commands.',
 );
 
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
@@ -480,13 +480,13 @@ const errors = checkConsoleErrors();
 
 **What to look for in `delta` and verification:**
 
-| Check                                                          | Expected         | Meaning                  |
-| -------------------------------------------------------------- | ---------------- | ------------------------ |
-| `post.chat.visibleMessageCount > pre.chat.visibleMessageCount` | true             | Response appended        |
-| `pendingDone && responseReady`                                 | true             | Teammate call completed  |
-| `post.input.textareaEnabled`                                   | true             | Processing complete      |
-| `latestTeammate.author`                                        | contains `@cmdr` | Teammate call visible    |
-| `errors.length`                                                | 0                | No infrastructure errors |
+| Check                                                          | Expected          | Meaning                  |
+| -------------------------------------------------------------- | ----------------- | ------------------------ |
+| `post.chat.visibleMessageCount > pre.chat.visibleMessageCount` | true              | Response appended        |
+| `pendingDone && responseReady`                                 | true              | Teammate call completed  |
+| `post.input.textareaEnabled`                                   | true              | Processing complete      |
+| `latestTeammate.author`                                        | contains `@pangu` | Teammate call visible    |
+| `errors.length`                                                | 0                 | No infrastructure errors |
 
 **UI observation (post-call):**
 
@@ -511,7 +511,7 @@ const verification = {
 
 **Expected verification values:**
 
-- `teammateAuthor` includes `@cmdr` or `Commander`
+- `teammateAuthor` includes `@pangu` or `Pangu`
 - `hasFuncCall === true` with `funcName === 'shell_cmd'`
 - `teammatePreview` contains a non-empty HOME path (e.g., `/Users/...` or `/home/...`)
 - `errors.length === 0`
@@ -528,10 +528,10 @@ const subdialogState = {
 
 **Pass Criteria (A1):**
 
-- [ ] `@cmdr` teammate call visible in response
+- [ ] `@pangu` teammate call visible in response
 - [ ] `shell_cmd` tool call executed with `echo $HOME`
 - [ ] Response contains HOME environment variable value
-- [ ] Call origin is the current dialog responder → cmdr (not Human → cmdr)
+- [ ] Call origin is the current dialog responder → pangu (not Human → pangu)
 - [ ] Subdialog hierarchy shows 1 level (transient subdialog completed)
 - [ ] No console errors
 
@@ -565,7 +565,7 @@ const ready = {
 
 ### Scenario B1: Establish Registered Subdialog Context
 
-**Goal:** Test TYPE B teammate call (`@cmdr !topic env-check`)
+**Goal:** Test TYPE B teammate call (`@pangu !topic env-check`)
 
 ```javascript
 // 1. Verify input ready
@@ -581,17 +581,17 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 ```javascript
 // 2. Send the prompt
 const msgId = await fillAndSend(
-  'Use the cmdr teammate with topic env-check (mention `@cmdr !topic env-check`) to establish a registered subdialog context. ' +
-    'Roles: root dialog responder instructs cmdr; cmdr runs shell_cmd; tester/human runs nothing. ' +
-    'In that call, instruct cmdr to run shell_cmd command="echo $USER" (no @ prefix). ' +
-    'Only cmdr should execute the tool; you must not run shell_cmd yourself. ' +
+  'Use the pangu teammate with topic env-check (mention `@pangu !topic env-check`) to establish a registered subdialog context. ' +
+    'Roles: root dialog responder instructs pangu; pangu runs shell_cmd; tester/human runs nothing. ' +
+    'In that call, instruct pangu to run shell_cmd command="echo $USER" (no @ prefix). ' +
+    'Only pangu should execute the tool; you must not run shell_cmd yourself. ' +
     'Do NOT ask the tester/human to run anything. ' +
-    'Wait for cmdr’s reply and report the USER value you receive.',
+    'Wait for pangu’s reply and report the USER value you receive.',
 );
 
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
@@ -639,7 +639,7 @@ const hierarchyExpected = hierarchy.length >= 2;
 
 **Pass Criteria (B1):**
 
-- [ ] `@cmdr !topic env-check` visible in response
+- [ ] `@pangu !topic env-check` visible in response
 - [ ] USER environment variable value retrieved
 - [ ] Sidebar shows a new `Subdialog: ...` row under the root dialog
 - [ ] No console errors
@@ -669,17 +669,17 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 ```javascript
 // 2. Send second query in same topic
 const msgId2 = await fillAndSend(
-  'Again use the cmdr teammate with topic env-check (mention `@cmdr !topic env-check`) to query the PATH environment variable. ' +
-    'Roles: root dialog responder instructs cmdr; cmdr runs shell_cmd; tester/human runs nothing. ' +
-    'In that call, instruct cmdr to run shell_cmd command="echo $PATH" (no @ prefix). ' +
-    'Only cmdr should execute the tool; you must not run shell_cmd yourself. ' +
+  'Again use the pangu teammate with topic env-check (mention `@pangu !topic env-check`) to query the PATH environment variable. ' +
+    'Roles: root dialog responder instructs pangu; pangu runs shell_cmd; tester/human runs nothing. ' +
+    'In that call, instruct pangu to run shell_cmd command="echo $PATH" (no @ prefix). ' +
+    'Only pangu should execute the tool; you must not run shell_cmd yourself. ' +
     'Do NOT ask the tester/human to run anything. ' +
     'Report the PATH value you receive, and confirm this is the SAME subdialog context.',
 );
 
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
@@ -742,19 +742,19 @@ const errorsB2 = checkConsoleErrors();
 const teammateStart = getTeammateMessageCount();
 const callSiteBefore = getLatestTeammateCallSiteId();
 const msgId3 = await fillAndSend(
-  'Query the SHELL environment variable using the cmdr teammate with topic env-check (mention `@cmdr !topic env-check`). ' +
-    'Roles: root dialog responder instructs cmdr; cmdr runs shell_cmd; tester/human runs nothing. ' +
-    'In that call, instruct cmdr to run shell_cmd command="echo $SHELL" (no @ prefix). ' +
-    'Only cmdr should execute the tool; you must not run shell_cmd yourself. ' +
+  'Query the SHELL environment variable using the pangu teammate with topic env-check (mention `@pangu !topic env-check`). ' +
+    'Roles: root dialog responder instructs pangu; pangu runs shell_cmd; tester/human runs nothing. ' +
+    'In that call, instruct pangu to run shell_cmd command="echo $SHELL" (no @ prefix). ' +
+    'Only pangu should execute the tool; you must not run shell_cmd yourself. ' +
     'Do NOT ask the tester/human to run anything. ' +
     'Use exactly one tool call. ' +
-    'Summarize all three environment variables you have queried (USER, PATH, SHELL) using the values returned by cmdr. ' +
+    'Summarize all three environment variables you have queried (USER, PATH, SHELL) using the values returned by pangu. ' +
     'Formatting is flexible, but include all three values clearly.',
 );
 
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
@@ -843,7 +843,7 @@ const bootErrors = checkConsoleErrors();
 
 ### Scenario C1: Create a Registered Subdialog for Doc Scan (Type B)
 
-**Goal:** Create a `@cmdr !topic` subdialog, instruct it to list document files, and explicitly
+**Goal:** Create a `@pangu !topic` subdialog, instruct it to list document files, and explicitly
 encourage a clarification supcall about file extensions (do not guess).
 
 ```javascript
@@ -852,16 +852,16 @@ const teammateStart = getTeammateMessageCount();
 const callSiteBefore = getLatestTeammateCallSiteId();
 
 const msgId = await fillAndSend(
-  'Follow the task doc strictly. Create the registered cmdr subdialog with topic "doc-scan" using only `@cmdr !topic doc-scan`. ' +
-    'Cmdr must ask the parent for extensions via a Type A supcall using `@super` (NO `!topic`) before listing (no guessing), then list files using those extensions. ' +
+  'Follow the task doc strictly. Create the registered pangu subdialog with topic "doc-scan" using only `@pangu !topic doc-scan`. ' +
+    'Pangu must ask the parent for extensions via a Type A supcall using `@super` (NO `!topic`) before listing (no guessing), then list files using those extensions. ' +
     'Only the call line should contain the teammate handle. ' +
-    'Roles: root dialog responder issues the cmdr call; cmdr runs tools; tester/human runs nothing. ' +
+    'Roles: root dialog responder issues the pangu call; pangu runs tools; tester/human runs nothing. ' +
     'Use exactly one tool call. Do not run tools yourself.',
 );
 
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
@@ -886,7 +886,7 @@ const errors = checkConsoleErrors();
 const dialogs = getAllDialogs();
 const rootInfo = getCurrentDialogInfo();
 const cmdrSubdialogs = dialogs.filter(
-  (d) => d.supdialogId === rootInfo.rootId && d.agentId === 'cmdr',
+  (d) => d.supdialogId === rootInfo.rootId && d.agentId === 'pangu',
 );
 const cmdrSubdialog = cmdrSubdialogs
   .slice()
@@ -897,9 +897,9 @@ const cmdrSubdialogCount = cmdrSubdialogs.length;
 
 **Pass Criteria (C1):**
 
-- [ ] `@cmdr !topic doc-scan` visible in response
+- [ ] `@pangu !topic doc-scan` visible in response
 - [ ] Subdialog established and ready to proceed
-- [ ] Sidebar shows a single `Subdialog: ...` row for `@cmdr` (no duplicates)
+- [ ] Sidebar shows a single `Subdialog: ...` row for `@pangu` (no duplicates)
 - [ ] `cmdrSubdialogCount === 1` (if >1, record infra failure but continue with latest for C2)
 - [ ] `cmdrSubdialog?.selfId` is defined (use the newest if duplicates exist)
 - [ ] No console errors
@@ -909,22 +909,22 @@ const cmdrSubdialogCount = cmdrSubdialogs.length;
 ### Scenario C2: Subdialog Requests Clarification (Type A)
 
 **Goal:** Verify the subdialog requested extension clarification via a Type A supcall and listed
-document files accordingly **without any tester messages inside the subdialog**. If the cmdr testee
+document files accordingly **without any tester messages inside the subdialog**. If the pangu testee
 fails to do so, treat it as non-compliance and **only then** use a subdialog nudge (fallback). Ensure
 the parent’s response is bridged back into the subdialog without creating a new subdialog.
 
 ```javascript
-// 1. Open the cmdr subdialog
+// 1. Open the pangu subdialog
 const rootInfo = getCurrentDialogInfo();
 const dialogs = getAllDialogs();
 const cmdrSubdialogs = dialogs.filter(
-  (d) => d.supdialogId === rootInfo.rootId && d.agentId === 'cmdr',
+  (d) => d.supdialogId === rootInfo.rootId && d.agentId === 'pangu',
 );
 const cmdrSubdialog = cmdrSubdialogs
   .slice()
   .sort((a, b) => (a.lastModified || '').localeCompare(b.lastModified || ''))
   .pop();
-if (!cmdrSubdialog?.selfId) throw new Error('Missing cmdr subdialog id');
+if (!cmdrSubdialog?.selfId) throw new Error('Missing pangu subdialog id');
 await openSubdialog(rootInfo.rootId, cmdrSubdialog.selfId);
 await waitForInputEnabled();
 
@@ -937,7 +937,7 @@ try {
           node.querySelector('.author-name')?.textContent?.trim() ||
           node.querySelector('.author')?.textContent?.trim() ||
           '';
-        return author === '@dijiang';
+        return author === '@fuxi';
       });
     },
     20000,
@@ -954,10 +954,10 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 let pendingDone = true;
 let responseReady = true;
 
-// 2. Ideal path: cmdr already issued a Type A supcall; do NOT inject subdialog messages.
-//    Fallback only: if cmdr did not ask the parent, treat as non-compliance and use the formal nudge loop.
+// 2. Ideal path: pangu already issued a Type A supcall; do NOT inject subdialog messages.
+//    Fallback only: if pangu did not ask the parent, treat as non-compliance and use the formal nudge loop.
 const subMessages = subSnap.chat?.visibleMessages || [];
-const alreadyAsked = subMessages.some((m) => m.type === 'teammate' && m.author === '@dijiang');
+const alreadyAsked = subMessages.some((m) => m.type === 'teammate' && m.author === '@fuxi');
 
 const nudgeSubdialog = async (n, reason, correction) => {
   const nudgeStart = getTeammateMessageCount();
@@ -1000,7 +1000,7 @@ if (!alreadyAsked) {
     responseReady = nudgeState.responseReady;
     const nudgeSnap = await snapshotDomindsUI();
     const nudgeMessages = nudgeSnap.chat?.visibleMessages || [];
-    const askedNow = nudgeMessages.some((m) => m.type === 'teammate' && m.author === '@dijiang');
+    const askedNow = nudgeMessages.some((m) => m.type === 'teammate' && m.author === '@fuxi');
     if (askedNow) break;
   }
 }
@@ -1012,13 +1012,13 @@ const errors = checkConsoleErrors();
 
 const subMessagesPost = subPost.chat?.visibleMessages || [];
 const parentResponseMsg = subMessagesPost.find(
-  (m) => m.type === 'teammate' && m.author === '@dijiang',
+  (m) => m.type === 'teammate' && m.author === '@fuxi',
 );
 const parentResponseDetails =
   getTeammateResponseDetails()
     .slice()
     .reverse()
-    .find((m) => m.authorName === '@dijiang') || null;
+    .find((m) => m.authorName === '@fuxi') || null;
 const responseNarrative = parentResponseDetails?.narrativeLine || '';
 const responseCallHeadLine = parentResponseDetails?.callHeadLine || '';
 const responseBody = parentResponseDetails?.responseBody || '';
@@ -1033,7 +1033,7 @@ const responseNarrativeHasHeadLine = responseCallHeadLine !== '';
 const pendingDoneOk = pendingDone && (subPost.chat?.pendingTeammateCalls ?? 0) === 0;
 const responseReadyOk = responseReady && Boolean(parentResponseMsg);
 
-// 3. Ideal path: cmdr already listed document files. Fallback only if missing.
+// 3. Ideal path: pangu already listed document files. Fallback only if missing.
 const hasDocList = subMessagesPost.some(
   (m) =>
     (m.preview || '').includes('.md') ||
@@ -1134,7 +1134,7 @@ await waitForInputEnabled();
 const supSnap = await snapshotDomindsUI();
 const supMessages = supSnap.chat?.visibleMessages || [];
 const supdialogPromptMsg = findVisibleMessageContainingAll(
-  ['during processing your original assignment', '@cmdr', '@dijiang'],
+  ['during processing your original assignment', '@pangu', '@fuxi'],
   { caseInsensitive: true },
 );
 const supdialogPromptOk = Boolean(supdialogPromptMsg);
@@ -1146,7 +1146,7 @@ const responseDetails = getTeammateResponseDetails();
 const parentResponseDetails = responseDetails
   .slice()
   .reverse()
-  .find((m) => m.authorName === '@dijiang');
+  .find((m) => m.authorName === '@fuxi');
 const subResponsePreview = parentResponseDetails?.responseBody || '';
 const derivedLine =
   subResponsePreview
@@ -1169,7 +1169,7 @@ const errors = checkConsoleErrors();
 
 **Pass Criteria (C3):**
 
-- [ ] `supdialogPromptOk === true` (subdialog prompt present with `@cmdr requests:`)
+- [ ] `supdialogPromptOk === true` (subdialog prompt present with `@pangu requests:`)
 - [ ] `supMatchMsg` exists (parent response visible somewhere in the timeline)
 - [ ] `previewsMatch === true` (subdialog received the same parent response text)
 - [ ] No console errors
@@ -1178,7 +1178,7 @@ const errors = checkConsoleErrors();
 
 ### Scenario C4: Parent Receives Subdialog Result and Continues
 
-**Goal:** After the cmdr subdialog uses the parent's clarification and emits the final doc list,
+**Goal:** After the pangu subdialog uses the parent's clarification and emits the final doc list,
 verify the supdialog receives that subdialog response and continues the original request using it.
 
 ```javascript
@@ -1201,14 +1201,14 @@ const docPreviewLine =
 await waitUntil(async () => {
   const snap = await snapshotDomindsUI();
   const messages = snap.chat?.visibleMessages || [];
-  const hasCmdrResult = messages.some((m) => m.type === 'teammate' && m.author === '@cmdr');
+  const hasCmdrResult = messages.some((m) => m.type === 'teammate' && m.author === '@pangu');
   const countIncreased = (snap.chat?.visibleMessageCount || 0) > beforeCount;
   return hasCmdrResult || countIncreased;
 }, 60000);
 
 const supPost = await snapshotDomindsUI();
 const supMessages = supPost.chat?.visibleMessages || [];
-const cmdrResultMsg = supMessages.find((m) => m.type === 'teammate' && m.author === '@cmdr');
+const cmdrResultMsg = supMessages.find((m) => m.type === 'teammate' && m.author === '@pangu');
 const cmdrResultMatch =
   docPreviewLine.length > 0
     ? findVisibleMessageContainingAll([docPreviewLine], {
@@ -1242,8 +1242,8 @@ const errors = checkConsoleErrors();
 **If the parent does not continue** after receiving the result, use the _Compliance Nudge Loop_:
 
 ```
-Correction: Use the cmdr subdialog's document list to answer the original request. Reply with the list only.
-Do NOT create any new teammate calls (do not call `@cmdr` again) and do NOT run tools. Use the already-visible `@cmdr` response bubble above as the source of truth, and output only the file list.
+Correction: Use the pangu subdialog's document list to answer the original request. Reply with the list only.
+Do NOT create any new teammate calls (do not call `@pangu` again) and do NOT run tools. Use the already-visible `@pangu` response bubble above as the source of truth, and output only the file list.
 ```
 
 ---
@@ -1260,7 +1260,7 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 const msgId = await fillAndSend('prompt here');
 const callSiteId = await waitForTeammateCallSiteId({
   after: callSiteBefore,
-  firstMention: '@cmdr',
+  firstMention: '@pangu',
 });
 let pendingDone = await waitForPendingTeammateCalls();
 let responseReady = await waitForTeammateResponse({
