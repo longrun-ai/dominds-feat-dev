@@ -83,7 +83,7 @@ If Dominds is already running, restart it after creating `.env.local`:
 
 T1c requires the testee agent to have access to:
 
-- the stdio MCP server toolset (`mcp_sdk_stdio`, created at runtime from `.minds/mcp.yaml`)
+- the stdio MCP server toolset (`sdk_stdio`, created at runtime from `.minds/mcp.yaml`)
 - `mcp_admin` (contains `mcp_restart`)
 - `env` (optional, only needed for the `env_set` hot-edit step)
 
@@ -272,13 +272,13 @@ clickActivity('tools');
 getToolsPanelState().refresh.click();
 await waitUntil(() => {
   const t = getToolsPanelState();
-  return t.toolsets.some((ts) => ts.title.startsWith('mcp_sdk_http '));
+  return t.toolsets.some((ts) => ts.title.startsWith('sdk_http '));
 }, 30000);
 ```
 
 Expected:
 
-- A toolset titled like `mcp_sdk_http (N)` exists.
+- A toolset titled like `sdk_http (N)` exists.
 - It includes tool names like `greet` and `multi-greet` (exact set depends on server version).
 - Problems does not show `mcp_server_*` error for `sdk_http`.
 
@@ -305,7 +305,7 @@ Then in UI, refresh Tools activity and wait (first-time spawn + list can take a 
 
 Expected:
 
-- A toolset titled like `mcp_sdk_stdio (3)` exists.
+- A toolset titled like `sdk_stdio (3)` exists.
 - It includes `stdio_greet`, `stdio_echo`, and `stdio_env_report`.
 - Problems does not show a per-server error for `sdk_stdio`.
 
@@ -332,7 +332,7 @@ servers:
 
 Expected:
 
-- `mcp_sdk_stdio` is still registered and contains tools (`greet`, `echo`, `env_report`).
+- `sdk_stdio` is still registered and contains tools (`greet`, `echo`, `env_report`).
 - Create the dialog using a `.tsk/` task package directory (e.g. `tasks/ux-dlg-stop-resume.tsk/`),
   since Dominds dialog task-doc paths are required to end with `.tsk/`.
 - Create a dialog and ask the testee agent to call MCP tool `env_report` (no args). The returned JSON must include:
@@ -375,7 +375,7 @@ Then:
 
 Expected:
 
-- Tools list for `mcp_sdk_http` now only includes `greet` (or the subset matching whitelist).
+- Tools list for `sdk_http` now only includes `greet` (or the subset matching whitelist).
 - Problems includes entries indicating tools were excluded by whitelist-only mode, with **serverId**
   and **toolName** in the detail.
 - When you revert whitelist back to `[]`, the excluded tools return and those Problems auto-clear.
@@ -478,7 +478,7 @@ servers:
 
 Expected:
 
-- `mcp_good_a` is registered and contains tools like `a_greet`.
+- `good_a` is registered and contains tools like `a_greet`.
 - `broken_b` surfaces a server error Problem (missing required host env var), but **does not**
   prevent `good_a` from functioning.
 - Fix `broken_b` (remove the missing env header mapping) and confirm it becomes registered without
@@ -486,8 +486,8 @@ Expected:
 
 Last-known-good invariant to verify:
 
-- Make `broken_b` succeed once (remove the missing env mapping), confirm `mcp_broken_b` is present.
-- Then re-introduce the missing env mapping and confirm `mcp_broken_b` **remains** present (stays on
+- Make `broken_b` succeed once (remove the missing env mapping), confirm `broken_b` is present.
+- Then re-introduce the missing env mapping and confirm `broken_b` **remains** present (stays on
   the last-known-good runtime) while a Problem indicates reload failed.
 
 ### T7) Deleting `.minds/mcp.yaml` clears MCP registrations
@@ -496,7 +496,7 @@ Delete `.minds/mcp.yaml` while Dominds is running.
 
 Expected:
 
-- All MCP server toolsets (e.g. `mcp_sdk_http`, `mcp_good_a`, `mcp_broken_b`) disappear from Tools panel after refresh.
+- All MCP server toolsets (e.g. `sdk_http`, `good_a`, `broken_b`) disappear from Tools panel after refresh.
 - (`mcp_admin` is built-in and is expected to remain.)
 - MCP Problems for removed servers auto-clear (workspace becomes clean).
 - Dominds remains usable (no crash, no dead UI).
@@ -523,7 +523,7 @@ Precondition: `sdk_http` is currently registered and visible in Tools panel.
 
 Expected:
 
-- Existing `mcp_sdk_http` toolset stays present (last-known-good preserved).
+- Existing `sdk_http` toolset stays present (last-known-good preserved).
 - Problems includes a workspace config error referencing `.minds/mcp.yaml`.
 - Fix YAML back to valid and confirm the workspace config error auto-clears.
 

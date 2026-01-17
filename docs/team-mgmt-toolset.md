@@ -177,7 +177,7 @@ manual must cover **all** information currently present there, at minimum:
       (or via a shared helper) rather than copy/pasting a static block into code, so it won’t drift.
 - `!mcp`:
   - Explain `.minds/mcp.yaml` as the source of dynamic MCP toolsets.
-  - Explain how MCP servers map to toolsets (`mcp_<serverId>`) and how those toolsets are granted via
+  - Explain how MCP servers map to toolsets (`<serverId>`) and how those toolsets are granted via
     `.minds/team.yaml`.
   - Explain tool exposure controls (whitelist/blacklist) and naming transforms (prefix/suffix).
   - Explain secret/env wiring patterns and operational troubleshooting (Problems + logs, restart,
@@ -256,7 +256,7 @@ Best practices:
 ### What it does
 
 `.minds/mcp.yaml` configures MCP (Model Context Protocol) servers as a first-class tool source.
-Each configured server registers a Dominds **toolset** named `mcp_<serverId>` and a set of tools
+Each configured server registers a Dominds **toolset** named `<serverId>` and a set of tools
 under that toolset.
 
 This file is **hot-reloaded** at runtime (no server restart required). If the file is absent, MCP
@@ -269,7 +269,7 @@ Reference specs:
 
 ### Mapping: server → toolset (and granting it)
 
-- Server ID `sdk_http` registers toolset `mcp_sdk_http`.
+- Server ID `sdk_http` registers toolset `sdk_http`.
 - To allow a teammate to use the MCP tools, grant the toolset in `.minds/team.yaml`:
 
 ```yaml
@@ -277,7 +277,7 @@ members:
   alice:
     toolsets:
       - ws_read
-      - mcp_sdk_http
+      - sdk_http
 ```
 
 Notes:
@@ -468,7 +468,7 @@ This avoids needing to grant full rtws access to configure the team.
 - **MCP tools not visible in Tools view**:
   - Confirm `.minds/mcp.yaml` exists and is valid.
   - Open **Problems** and look for MCP-related errors.
-  - Confirm the teammate is granted the relevant `mcp_<serverId>` toolset in `.minds/team.yaml`.
+  - Confirm the teammate is granted the relevant `<serverId>` toolset in `.minds/team.yaml`.
 - **MCP server keeps failing to (re)load**:
   - Check Problems details (missing env var, invalid tool name, collisions, connection errors).
   - After fixing config, use `mcp_restart` (from `mcp_admin`) for a best-effort per-server restart.
