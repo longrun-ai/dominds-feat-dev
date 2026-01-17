@@ -22,7 +22,7 @@ Hard rules:
 From repo root:
 
 ```bash
-./clear-records.sh
+./ux-rtws/clear-records.sh
 ./dev-server.sh restart
 ```
 

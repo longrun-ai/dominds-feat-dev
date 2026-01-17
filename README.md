@@ -1,15 +1,20 @@
 # Dominds Feature Development
 
-This repository is the **outer runtime workspace (rtws)** used to do **PR-based development** on `dominds`.
+This repository is the **dev wrapper workspace** used to do **PR-based development** on `dominds`.
 
-Key idea: the actual framework source lives in a local checkout at `dominds/` (a normal Git repo), while this outer repo
-provides the workspace layout, scripts, logs, and team state you use during development.
+Key idea: the actual framework source lives in a local checkout at `dominds/` (a normal Git repo), while this repo provides the workspace layout, scripts, logs, and UX testing setup.
+
+The repo root is also used as the **DevOps runtime workspace (rtws)** for feat-dev: `.minds/` is the agent team definition and workspace memory used when you run Dominds/agents against this repo.
+
+For WebUI dev/UX testing, `./dev-server.sh` runs the Dominds backend + frontend with `ux-rtws/` as the rtws, so dev/UX runs don’t pollute the root workspace.
 
 ## Repository Layout
 
 - `dominds/` — local checkout of the `dominds` source (TypeScript backend + Vite webapp), **gitignored by this repo**
-- `.minds/` — team memory for the outer workspace (rtws)
-- `.dialogs/`, `logs/` — runtime artifacts (intentionally not tracked)
+- `.minds/` — team definition + workspace memory for DevOps/feat-dev runs in the repo root rtws
+- `ux-rtws/` — dedicated rtws for dev/UX testing (`.minds/`, `.dialogs/`, `.env.local`, fixtures, helper scripts)
+- `ux-stories/` — E2E/UX stories and checklists (assumes `ux-rtws/` is the rtws)
+- `logs/` — `dev-server.sh` wrapper stdout/stderr logs (intentionally not tracked)
 
 ## Getting Started
 
@@ -72,6 +77,31 @@ This project is designed so that **all code PRs happen in the `dominds` repo**.
    ```
 
 ## Development
+
+### Bootstrapping (DevOps)
+
+Prefer installing the **released** `dominds` CLI globally (stable versions from the registry), then run it from this repo root to use `./.minds/` as the team definition/workspace memory:
+
+```bash
+# Option A (preferred): stable release from npm registry
+npm install -g dominds
+
+# Option B (emergency only): if the released CLI is broken, link a clean checkout of `main`
+# from a different directory (do NOT link the same `./dominds` checkout you are editing for PRs).
+git clone https://github.com/longrun-ai/dominds.git ~/src/dominds-main
+pnpm -C ~/src/dominds-main install
+pnpm -C ~/src/dominds-main run build:backend
+pnpm -C ~/src/dominds-main link --global
+```
+
+Then:
+
+```bash
+dominds      # default = webui, rtws = repo root
+dominds read
+```
+
+### WebUI Dev Server (Dev/UX)
 
 Start both backend (5556) and frontend (5555) dev servers:
 

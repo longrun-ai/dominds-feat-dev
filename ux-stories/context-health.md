@@ -17,9 +17,10 @@ This test validates Dominds infrastructure, not “LLM smartness”.
 
 ### S0) Write `.minds/team.yaml` to force provider/model
 
-Repo root:
+RTWS (`ux-rtws/`):
 
 ```bash
+cd ux-rtws
 mkdir -p .minds
 cat > .minds/team.yaml <<'YAML'
 member_defaults:
@@ -32,15 +33,16 @@ YAML
 
 ### S1) Write `.minds/llm.yaml` with a `mock` provider + small model limits
 
-Repo root:
+RTWS (`ux-rtws/`):
 
 ```bash
+cd ux-rtws
 cat > .minds/llm.yaml <<'YAML'
 providers:
   mock:
     name: Mock (E2E)
     apiType: mock
-    baseUrl: ux-stories/fixtures/mock-llm
+    baseUrl: fixtures/mock-llm
     apiKeyEnvVar: MOCK_LLM_KEY
     models:
       context-health-e2e:
@@ -285,8 +287,9 @@ Pass criteria:
 
 ## Cleanup
 
-Repo root:
+RTWS (`ux-rtws/`):
 
 ```bash
+cd ux-rtws
 rm -f .minds/team.yaml .minds/llm.yaml
 ```

@@ -1,9 +1,14 @@
 ## Project Overview
 
-This is an **in-tree development setup** for `dominds` — an AI-powered DevOps framework. The source code lives in a local checkout at `dominds/`, and **this outer workspace is the primary runtime workspace (rtws)** for the development team.
+This is an **in-tree development setup** for `dominds` — an AI-powered DevOps framework. The source code lives in a local checkout at `dominds/`.
+
+The repo root is the **DevOps runtime workspace (rtws)** for feat-dev work: `.minds/` is the agent team definition and workspace memory used when you run Dominds/agents against this repo.
+
+For WebUI dev/UX testing, `./dev-server.sh` runs Dominds with `ux-rtws/` as the rtws, so dev/UX runs don’t pollute the root workspace.
 
 - **dominds/** — Local checkout of the main framework source (TypeScript backend + Vite webapp); intentionally gitignored here
-- **.minds/** — Team memory for the outer workspace (rtws = runtime workspace)
+- **.minds/** — Team definition + workspace memory for DevOps/feat-dev runs in the repo root rtws
+- **ux-rtws/** — Dedicated rtws for WebUI dev/UX testing (`.minds/`, `.dialogs/`, `.env.local`, fixtures, helper scripts)
 
 ---
 
@@ -33,6 +38,30 @@ This is an **in-tree development setup** for `dominds` — an AI-powered DevOps 
 ## Common Commands
 
 All commands run from the root directory unless otherwise noted.
+
+### Bootstrapping (DevOps)
+
+Prefer installing the **released** `dominds` CLI globally (stable versions from the registry), then run it from the repo root to use root `.minds/` as the team definition/workspace memory:
+
+```bash
+# Option A (preferred): stable release from npm registry
+npm install -g dominds
+
+# Option B (emergency only): if the released CLI is broken, link a clean checkout of `main`
+# from a different directory (do NOT link the same `./dominds` checkout you are editing for PRs).
+git clone https://github.com/longrun-ai/dominds.git ~/src/dominds-main
+pnpm -C ~/src/dominds-main install
+pnpm -C ~/src/dominds-main run build:backend
+pnpm -C ~/src/dominds-main link --global
+```
+
+Then:
+
+```bash
+dominds           # default = webui, rtws = repo root
+dominds read      # inspect team config from ./ .minds/
+dominds tui --help
+```
 
 ### Development
 
@@ -75,17 +104,21 @@ npx tsx texting/parsing.ts
 
 ### CLI Tools
 
-**CAVEATS: they are not well implemented yet, avoid using the**
+**CAVEATS: they are not well implemented yet, avoid using them**
 
 ```bash
-# Terminal UI for dialogs (operates on outer rtws)
-npx tsx dominds/main/cli/tui.ts
+# Terminal UI for dialogs
+# - DevOps/feat-dev: run in repo root (uses ./ .minds/)
+npx tsx dominds/main/cli.ts tui
+# - WebUI dev/UX: run against ux-rtws/
+npx tsx dominds/main/cli.ts tui -C ux-rtws
 
-# Read team member configurations (outer rtws)
-npx tsx dominds/main/cli/read.ts
+# Read team member configurations
+npx tsx dominds/main/cli.ts read
+npx tsx dominds/main/cli.ts read -C ux-rtws
 ```
 
-All CLI tools operate on the outer workspace (rtws) by default.
+All CLI tools operate on the current working directory as the rtws by default; use repo root for DevOps/feat-dev (`./.minds/**`), and `-C ux-rtws` (or run from `ux-rtws/`) for WebUI dev/UX (`ux-rtws/.minds/**`).
 
 ## Architecture
 
@@ -109,14 +142,17 @@ WebSocket communication uses a simple message protocol defined in `main/shared/t
 
 ### Workspace Context
 
-The outer workspace (`.minds/` in root) is the primary runtime workspace for the development team. All tool operations and dialogs operate on this workspace by default.
+This repo uses two runtime workspaces:
+
+- **DevOps rtws (repo root)**: use `./.minds/**` for the feat-dev agent team definition + workspace memory.
+- **WebUI dev/UX rtws (`ux-rtws/`)**: used by `./dev-server.sh`; safe to wipe/reset; E2E stories in `ux-stories/` assume this.
 
 ## Key Conventions
 
 - **Node.js version**: 22.x required (>=22 <23 in package.json engines)
 - **TypeScript**: Strict mode with no `any` allowed
-- **Logs**: Written to outer workspace's `logs/` directory
-- **Dialogs**: Persisted as YAML files in outer workspace's `.dialogs/` directory
+- **Logs**: `./dev-server.sh` redirects stdout/stderr to `logs/` (wrapper logs)
+- **Dialogs**: persisted under the chosen rtws (repo root `./.dialogs/` for DevOps; `ux-rtws/.dialogs/` for WebUI dev/UX)
 
 ## Git Policy (Humans Manage Commits)
 

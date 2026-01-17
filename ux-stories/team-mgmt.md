@@ -18,9 +18,10 @@ This test validates Dominds infrastructure, not “LLM smartness”.
 
 This UX story assumes the rtws has **no team config**.
 
-If it exists, remove it (rtws repo root):
+If it exists, remove it (rtws = `ux-rtws/`):
 
 ```bash
+cd ux-rtws
 rm -f .minds/team.yaml
 ```
 

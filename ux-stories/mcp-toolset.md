@@ -54,6 +54,8 @@ Enable operators to safely wire in external tool sources (MCP servers) at runtim
 
 ## Setup
 
+Note: in this repo, the runtime workspace (rtws) used by `./dev-server.sh` is `ux-rtws/`. All `.minds/**` paths below refer to `ux-rtws/.minds/**`.
+
 ### S0) Start Dominds
 
 From repo root:
@@ -66,7 +68,7 @@ From repo root:
 
 This enables verifying `{ env: SOME_HOST_VAR }` mappings for stdio MCP servers.
 
-Create `.env.local` in the **rtws repo root**:
+Create `ux-rtws/.env.local` (rtws):
 
 ```dotenv
 UX_RENAME_SOURCE=renamed_from_env_local
@@ -96,7 +98,7 @@ may not live-update team info until you refresh/reopen the relevant panel.
 
 ### S1) Ensure the workspace has no leftover MCP config (baseline)
 
-Ensure `.minds/mcp.yaml` is absent (or empty) in the **rtws repo root** (not `dominds/.minds/`).
+Ensure `ux-rtws/.minds/mcp.yaml` is absent (or empty) (not `dominds/.minds/`).
 Deletion must be treated as “clear all servers”.
 
 ### S2) Streamable HTTP MCP server (recommended)
@@ -116,7 +118,7 @@ Leave it running for the rest of this test. (Stop it only when a scenario explic
 ### S3) Stdio MCP server (spawned by Dominds)
 
 For stdio transport, Dominds spawns the server process based on `.minds/mcp.yaml`. A small stdio
-test server is included at `ux-stories/fixtures/mcp-stdio-server.mjs:1`.
+test server is included at `ux-rtws/fixtures/mcp-stdio-server.mjs:1`.
 
 Important: stdio transport uses **stdout** for the MCP protocol. The test server writes readiness
 to **stderr** only.
@@ -292,7 +294,7 @@ servers:
   sdk_stdio:
     transport: stdio
     command: node
-    args: ['ux-stories/fixtures/mcp-stdio-server.mjs']
+    args: ['fixtures/mcp-stdio-server.mjs']
     env: {}
     tools:
       whitelist: []
@@ -319,7 +321,7 @@ servers:
   sdk_stdio:
     transport: stdio
     command: node
-    args: ['ux-stories/fixtures/mcp-stdio-server.mjs']
+    args: ['fixtures/mcp-stdio-server.mjs']
     env:
       MCP_DIRECT: direct_literal_from_mcp_yaml
       MCP_RENAMED: { env: UX_RENAME_SOURCE }

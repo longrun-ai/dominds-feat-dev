@@ -33,9 +33,11 @@ dlg_generating_start
 
 - **Frontend**: `http://localhost:5555`
 - **Backend**: `http://localhost:5556`
-- **Logs**: `logs/` directory
-- **Workspace**: Use `./` (root rtws) exclusively for testing
-- **Persistence**: `.dialogs/run/<dialogId>/round-*.jsonl`
+- **Logs**: `logs/` directory (dev-server wrapper stdout/stderr)
+- **Workspace (rtws)**: `ux-rtws/` (dev-server runs processes with this as cwd)
+- **Persistence**: `ux-rtws/.dialogs/run/<dialogId>/round-*.jsonl`
+
+Note: the repo root has its own `.minds/` for DevOps/feat-dev work; WebUI dev/UX uses `ux-rtws/.minds/` instead.
 
 ## Project Structure
 
@@ -315,7 +317,7 @@ waitForDomChange(fn, opts); // Wait until condition met
 
 - [ ] Frontend shows LLM generation lifecycle events
 - [ ] Streaming element removed when complete
-- [ ] Messages persist in `.dialogs/run/<dialogId>/`
+- [ ] Messages persist in `ux-rtws/.dialogs/run/<dialogId>/`
 - [ ] No blocking errors in backend logs
 - [ ] Per-chunk updates visible without bubble flash
 - [ ] Dialog hierarchy restores on page reload
@@ -328,7 +330,7 @@ waitForDomChange(fn, opts); // Wait until condition met
 | ------------------- | ------------------------------------------------------------- |
 | Not connected       | Verify ports 5555/5556 free, dev server running               |
 | No streaming chunks | Verify provider keys; run `llm-streaming.ts`                  |
-| Persistence gaps    | Check JSONL files in `.dialogs/run/<dialogId>/`               |
+| Persistence gaps    | Check JSONL files in `ux-rtws/.dialogs/run/<dialogId>/`       |
 | Restoration fails   | Refresh browser; check `restoreDialogHierarchy()`             |
 | Q4H panel not found | Verify `.q4h-toggle-bar` and `.q4h-panel-container` selectors |
 
@@ -343,7 +345,7 @@ tail -n 200 logs/backend-stdout.log
 tail -n 80 logs/backend-stderr.log
 
 # Round events
-cat .dialogs/run/*/round-*.jsonl | head -n 50
+cat ux-rtws/.dialogs/run/*/round-*.jsonl | head -n 50
 
 # Stream verification
 pnpm -C dominds tsx tests/driving/llm-streaming.ts --agent=gd --prompt="check"

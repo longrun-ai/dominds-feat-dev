@@ -32,7 +32,7 @@ Start the dev servers with a deterministic locale so the test is stable:
 
 ```bash
 # Optional: wipe prior dialog records for deterministic UI state
-./clear-records.sh
+./ux-rtws/clear-records.sh
 
 # Work language = zh (Simplified Chinese)
 LANG=zh_CN.UTF-8 ./dev-server.sh restart

@@ -1,13 +1,37 @@
 #!/bin/bash
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOMINDS_DIR="$SCRIPT_DIR/dominds"
+RTWS_DIR="$SCRIPT_DIR/ux-rtws"
+LOGS_DIR="$SCRIPT_DIR/logs"
 
-if [ ! -f "dominds/main/server.ts" ] || [ ! -d "dominds/webapp" ]; then
+cd "$SCRIPT_DIR"
+
+if [ ! -d "$RTWS_DIR" ]; then
+	echo "❌ Missing ux RTWS directory: $RTWS_DIR"
+	echo ""
+	echo "Create it with:"
+	echo "  mkdir -p ux-rtws"
+	exit 1
+fi
+
+if [ ! -f "$DOMINDS_DIR/main/server.ts" ] || [ ! -d "$DOMINDS_DIR/webapp" ]; then
 	echo "❌ Missing ./dominds checkout (this repo does not track it)."
 	echo ""
 	echo "Bootstrap:"
 	echo "  git clone https://github.com/YOUR_GH/dominds.git dominds"
 	echo "  cd dominds && git remote add upstream https://github.com/longrun-ai/dominds.git && git fetch upstream --prune"
+	exit 1
+fi
+
+TSX_BIN="$DOMINDS_DIR/node_modules/.bin/tsx"
+VITE_BIN="$DOMINDS_DIR/webapp/node_modules/.bin/vite"
+
+if [ ! -x "$TSX_BIN" ] || [ ! -x "$VITE_BIN" ]; then
+	echo "❌ Missing dominds dev dependencies."
+	echo ""
+	echo "Install them with:"
+	echo "  cd dominds && pnpm install"
 	exit 1
 fi
 
@@ -20,7 +44,7 @@ check_server_status() {
 		tsx_running=true
 	fi
 
-	if pgrep -f "vite" >/dev/null 2>&1; then
+	if pgrep -f "vite.*--port(=| )5555" >/dev/null 2>&1; then
 		vite_running=true
 	fi
 
@@ -41,16 +65,17 @@ show_status() {
 		echo "❌ Backend server (tsx) is not running"
 	fi
 
-	if pgrep -f "vite" >/dev/null 2>&1; then
+	if pgrep -f "vite.*--port(=| )5555" >/dev/null 2>&1; then
 		echo "✅ Frontend server (Vite) is running"
 	else
 		echo "❌ Frontend server (Vite) is not running"
 	fi
 
 	echo ""
-	echo "📁 Logs location: $(pwd)/logs/"
-	echo "   - Backend: $(pwd)/logs/backend-stdout.log, backend-stderr.log"
-	echo "   - Frontend: $(pwd)/logs/frontend-stdout.log, frontend-stderr.log"
+	echo "📁 Wrapper logs location: $LOGS_DIR/"
+	echo "   - Backend: $LOGS_DIR/backend-stdout.log, backend-stderr.log"
+	echo "   - Frontend: $LOGS_DIR/frontend-stdout.log, frontend-stderr.log"
+	echo "📁 RTWS (process cwd): $RTWS_DIR/"
 	echo ""
 	echo "🌐 Access URLs:"
 	echo "   - Frontend: http://localhost:5555"
@@ -65,8 +90,8 @@ case "${1:-start}" in
 	;;
 "restart")
 	echo "🔄 Force restarting development servers..."
-	pkill -f tsx
-	pkill -f vite
+	pkill -f "tsx.*dominds/main/(server|cli)\\.ts" 2>/dev/null
+	pkill -f "vite.*--port(=| )5555" 2>/dev/null
 	sleep 2
 	;;
 "start")
@@ -80,8 +105,8 @@ case "${1:-start}" in
 "stop")
 	if check_server_status; then
 		echo "🛑 Stopping development servers..."
-		pkill -f tsx
-		pkill -f vite
+		pkill -f "tsx.*dominds/main/(server|cli)\\.ts" 2>/dev/null
+		pkill -f "vite.*--port(=| )5555" 2>/dev/null
 		echo "✅ Development servers stopped"
 	else
 		echo "ℹ️  No development servers are currently running"
@@ -101,13 +126,13 @@ case "${1:-start}" in
 esac
 
 echo "🚀 Starting development servers..."
-mkdir logs >/dev/null 2>&1
+mkdir -p "$LOGS_DIR" >/dev/null 2>&1
 
 # Start backend and frontend with separate log files
-# Backend: runs from outer project (as rtws), uses tsx + cli entry (dotenv + -C handling)
-NODE_ENV=dev npx tsx dominds/main/cli.ts webui -p 5556 --mode dev --nobrowser >logs/backend-stdout.log 2>logs/backend-stderr.log &
-# Frontend: runs from dominds/webapp
-cd dominds/webapp && npx vite --port 5555 --strictPort >../../logs/frontend-stdout.log 2>../../logs/frontend-stderr.log &
+# Backend: runs with ux RTWS as process cwd (so root is never the RTWS)
+(cd "$RTWS_DIR" && NODE_ENV=dev "$TSX_BIN" "$DOMINDS_DIR/main/cli.ts" webui -p 5556 --mode dev --nobrowser) >"$LOGS_DIR/backend-stdout.log" 2>"$LOGS_DIR/backend-stderr.log" &
+# Frontend: runs with ux RTWS as process cwd, but serves dominds/webapp as Vite root
+(cd "$RTWS_DIR" && "$VITE_BIN" "$DOMINDS_DIR/webapp" --port 5555 --strictPort) >"$LOGS_DIR/frontend-stdout.log" 2>"$LOGS_DIR/frontend-stderr.log" &
 
 # Note: Servers are backgrounded (not fully detached) so they terminate
 # when the parent shell/IDE/agent terminates. This is intentional for

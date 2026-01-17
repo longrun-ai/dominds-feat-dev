@@ -171,7 +171,7 @@ function expectedReasonText(kind /* 'user_stop' | 'emergency_stop' | 'server_res
 From repo root:
 
 ```bash
-./clear-records.sh
+./ux-rtws/clear-records.sh
 ./dev-server.sh restart
 ```
 

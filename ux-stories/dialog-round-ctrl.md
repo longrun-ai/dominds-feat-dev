@@ -186,10 +186,10 @@ Create a fresh dialog using a dedicated task document so `@change_mind` doesn’
 Before each run, wipe all runtime-workspace dialog records so you start from a known clean slate:
 
 ```bash
-./clear-records.sh; ./dev-server.sh restart
+./ux-rtws/clear-records.sh; ./dev-server.sh restart
 ```
 
-This deletes `./.dialogs/` in the rtws, so **all prior dialogs/rounds are gone** (intended for deterministic E2E).
+This deletes `ux-rtws/.dialogs/` in the rtws, so **all prior dialogs/rounds are gone** (intended for deterministic E2E).
 
 ```javascript
 const baseline = await snapshotDomindsUI();
