@@ -143,7 +143,7 @@ if (!toolCall.hasFuncCall) {
 
 Dominds auto-creates an adhoc team when `.minds/team.yaml` is missing by picking the first
 configured LLM provider with an API key environment variable set. This should provide
-at least `dijiang` (default responder) and `cmdr` (Commander).
+at least the shadow members `fuxi` and `pangu` (default responder is typically `pangu`).
 
 **Verify before starting tests:**
 
@@ -159,8 +159,8 @@ const teamState = {
 
 **You should see:**
 
-- `teamState.teamIds` includes `dijiang` and `cmdr`
-- `teamState.defaultResponder` is a non-empty string (typically `dijiang`)
+- `teamState.teamIds` includes `fuxi` and `pangu`
+- `teamState.defaultResponder` is a non-empty string (typically `pangu`)
 
 If the team never loads, treat it as an infrastructure failure (likely missing LLM API key env var).
 

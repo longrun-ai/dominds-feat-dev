@@ -136,7 +136,8 @@ If any of these fail → infrastructure failure (unless explicitly marked as “
 ## Adhoc Team Bootstrap (No .minds/team.yaml)
 
 Dominds auto-creates an adhoc team when `.minds/team.yaml` is missing by picking the first
-configured LLM provider with an API key environment variable set.
+configured LLM provider with an API key environment variable set. This should provide the shadow
+members `fuxi` and `pangu` (default responder is typically `pangu`).
 
 **Verify before starting tests:**
 

@@ -167,7 +167,7 @@ manual must cover **all** information currently present there, at minimum:
   - Explain `member_defaults`, `default_responder`, and `members` (structure overview).
   - Include an explicit “member configuration properties” reference (fields table) via
     `!team !member-properties`:
-    - `name`, `icon`, `gofor`, `provider`, `model`, `toolsets`, `tools`, `streaming`
+    - `name`, `icon`, `gofor`, `provider`, `model`, `toolsets`, `tools`, `streaming`, `hidden`
     - `read_dirs`, `no_read_dirs`, `write_dirs`, `no_write_dirs`
 - `!llm`:
   - Explain the provider map structure used by `.minds/llm.yaml` and how it relates to
@@ -362,7 +362,7 @@ For `streamable_http`, `headers` supports the same literal-or-env mapping.
 - Directory access control for workspace file tools (`read_dirs`, `write_dirs`, `no_*`).
 
 The file is loaded by `Team.load()` in `dominds/main/team.ts`. If the file is absent, the runtime
-bootstraps a default team (today it creates a default `dijiang` + `cmdr`).
+bootstraps a default team (today it creates shadow members `fuxi` + `pangu`).
 
 ### File format (template)
 
@@ -439,21 +439,22 @@ Suggested structure:
   team.yaml
   llm.yaml
   team/
-    dijiang/
+    fuxi/
       persona.md
       knowledge.md
       lessons.md
-    cmdr/
+    pangu/
       persona.md
       knowledge.md
       lessons.md
 ```
 
-## Bootstrap Policy: “ad-hoc `dijiang`”
+## Bootstrap Policy: Shadow bootstrap members
 
 Preferred behavior for initial bootstrap:
 
-- The ad-hoc `dijiang` instance should get `team-mgmt` (and the manual tool), not broad `ws_mod`.
+- The shadow `fuxi` instance should get `team-mgmt` (and the manual tool), not broad `ws_mod`.
+- The shadow `pangu` instance should get broad workspace toolsets (e.g. `ws_read`, `ws_mod`, `os`), but not `team-mgmt`.
 - After `.minds/team.yaml` is created, the team definition becomes the source of truth.
 
 This avoids needing to grant full rtws access to configure the team.
