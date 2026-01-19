@@ -26,7 +26,7 @@ cat > .minds/team.yaml <<'YAML'
 member_defaults:
   provider: mock
   model: context-health-e2e
-default_responder: pangu
+default_responder: fuxi
 members: {}
 YAML
 ```
