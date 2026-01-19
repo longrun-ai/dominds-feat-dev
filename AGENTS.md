@@ -97,9 +97,9 @@ pnpm run format             # Prettier format (code + markdown)
 ### Testing
 
 ```bash
-# Run tests with tests/ as CWD for correct path resolution
-cd dominds/tests
-npx tsx texting/parsing.ts
+# Run tests using pnpm
+pnpm -C dominds/tests run parsing
+pnpm -C dominds/tests run realtime
 ```
 
 ### CLI Tools
