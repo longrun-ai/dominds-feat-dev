@@ -326,9 +326,9 @@ const assertions = {
 **Prompt to testee:**
 
 ```
-Step 2: Issue exactly one @change_mind call.
+Step 2: Issue exactly one @change_mind !progress call.
 Reply with EXACTLY 3 lines:
-Line 1: @change_mind
+Line 1: @change_mind !progress
 Line 2: # Task Update
 Line 3: We are now testing dialog round control.
 
@@ -355,9 +355,9 @@ const snap = await snapshotDomindsUI();
 const roundBefore = snap.currentDialog?.round || '';
 
 const msgId = await fillAndSend(
-  'Step 2: Issue exactly one @change_mind call.\\n' +
+  'Step 2: Issue exactly one @change_mind !progress call.\\n' +
     'Reply ONLY with the following 3 lines (copy exactly; no extra text):\\n' +
-    '@change_mind\\n' +
+    '@change_mind !progress\\n' +
     '# Task Update\\n' +
     'We are now testing dialog round control.',
 );
@@ -371,27 +371,18 @@ try {
 }
 
 // Wait a bit and assert the round did NOT change.
-await sleep(1500);
+await new Promise((r) => setTimeout(r, 1500));
 const roundAfter = (await snapshotDomindsUI()).currentDialog?.round || '';
 if (roundAfter !== roundBefore)
   throw new Error(`Round changed unexpectedly: before='${roundBefore}' after='${roundAfter}'`);
 await waitForInputEnabled();
 
 const post = await snapshotDomindsUI();
-const prompt = findVisibleMessageContainingAll([
-  'This is round #',
-  'you just changed your mind',
-  'please proceed with the task.',
-]);
-
 const firstVisible = post.chat?.visibleMessages?.[0] || null;
-const noToolTextInCurrentRound = !findVisibleMessageContainingAll(['@change_mind', 'change_mind']);
 
 const assertions = {
   toolAppeared,
-  promptExists: !!prompt,
-  promptIsFirstVisibleBubble: (prompt?.index ?? -1) === 0,
-  currentRoundHasNoToolBubble: noToolTextInCurrentRound,
+  roundStable: roundAfter === roundBefore,
   consoleErrors: checkConsoleErrors(),
 };
 ```

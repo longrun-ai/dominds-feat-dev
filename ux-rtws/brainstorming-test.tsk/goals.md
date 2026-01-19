@@ -1,0 +1,3 @@
+- (Brainstorming rerun) Option A: add a new UX story runner.
+- Option B: harden websocket reconnect behavior.
+- Option C: improve tool-call visibility in chat.
