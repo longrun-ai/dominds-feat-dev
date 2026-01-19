@@ -1,4 +1,3 @@
-- (Brainstorming rerun) No web browsing.
-- Do not touch production systems.
-- Keep edits minimal and reversible.
-- Do not use file tools to access *.tsk directly.
+- No web browsing.
+- Keep changes under 10 lines per file.
+- Don’t touch prod.

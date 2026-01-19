@@ -30,6 +30,7 @@ After each step, the tester should note:
 - Whether earlier chat messages are still visible (no timeline wipe).
 - Whether the task doc changed **in the right section**.
 - Whether the tool bubble shows success/failure appropriately.
+- If multiple `@change_mind` calls were included in a single message: verify there is one tool bubble per call, and that each updated section matches its corresponding body (no “cross-write” between sections).
 
 Note: The current WebUI does not render `*.tsk/` task-doc panes (Goals/Constraints/Progress). For now, validate section
 updates by inspecting the workspace files (e.g., `brainstorming-test.tsk/goals.md`, `constraints.md`, `progress.md`).
@@ -92,7 +93,51 @@ If you run with the E2E helpers, keep the evidence lightweight:
    - Progress is replaced.
    - Goals/Constraints remain unchanged.
 
-## Scenario 4: Failure Modes (Safety)
+## Scenario 4: Update Multiple Sections in One Message (Batch Happy Path)
+
+**Intent**: In a single chat send, the testee updates **multiple** task-doc sections by including multiple `@change_mind` calls (one per section). This validates the WebUI/tooling behavior when the user wants to “batch apply” a set of edits without multiple sends.
+
+Important: `*.tsk/` still enforces **one selector per `@change_mind` call**. This scenario is about putting multiple calls into a single message, not adding a multi-selector feature to the tool.
+
+### Steps
+
+1. Tester: Ask the testee to send **one message** that contains three `@change_mind` calls: `!goals`, `!constraints`, and `!progress`.
+2. Verify in UI:
+   - Round did **not** change.
+   - Messages were **not** cleared.
+   - There are **three** tool bubbles (one per `@change_mind` call), and all are successful.
+3. Verify in workspace files:
+   - `brainstorming-test.tsk/goals.md` reflects the new goals body.
+   - `brainstorming-test.tsk/constraints.md` reflects the new constraints body.
+   - `brainstorming-test.tsk/progress.md` reflects the new progress body.
+   - No cross-writes (e.g., constraints text ending up in goals).
+
+### Example (one message; not strict)
+
+```
+@change_mind !goals
+- Explore 3 product directions.
+- Pick 1 direction with clear success criteria.
+@/
+
+@change_mind !constraints
+- No web browsing.
+- Keep changes under 10 lines per file.
+- Don’t touch prod.
+@/
+
+@change_mind !progress
+- Chose Option B as the leading direction.
+- Defined success criteria draft.
+@/
+```
+
+### Pass Conditions (semantic)
+
+- All three sections are updated to the intended content, and the UI shows three successful tool executions.
+- No round reset / no timeline wipe.
+
+## Scenario 5: Failure Modes (Safety)
 
 These should fail safely, with no partial edits.
 
@@ -121,7 +166,7 @@ These should fail safely, with no partial edits.
   - Tool call fails (content required)
   - No task doc section changes
 
-## Optional Scenario 5: Encapsulation Guardrail
+## Optional Scenario 6: Encapsulation Guardrail
 
 This validates that the _only_ way to edit `*.tsk/` is via `@change_mind` (not file tools).
 

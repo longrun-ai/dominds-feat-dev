@@ -1,3 +1,2 @@
-- (Brainstorming rerun) Updated goals + constraints via @change_mind.
-- Verified no round reset and messages preserved.
-- Next: run remaining ux-stories in clean rtws.
+- Chose Option B as the leading direction.
+- Defined success criteria draft.

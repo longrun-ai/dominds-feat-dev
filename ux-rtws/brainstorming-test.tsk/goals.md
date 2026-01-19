@@ -1,3 +1,2 @@
-- (Brainstorming rerun) Option A: add a new UX story runner.
-- Option B: harden websocket reconnect behavior.
-- Option C: improve tool-call visibility in chat.
+- Explore 3 product directions.
+- Pick 1 direction with clear success criteria.
