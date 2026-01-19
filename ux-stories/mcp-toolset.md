@@ -86,7 +86,7 @@ If Dominds is already running, restart it after creating `.env.local`:
 T1c requires the testee agent to have access to:
 
 - the stdio MCP server toolset (`sdk_stdio`, created at runtime from `.minds/mcp.yaml`)
-- `mcp_admin` (contains `mcp_restart`)
+- `mcp_admin` (contains `mcp_restart` and `mcp_release`)
 - `env` (optional, only needed for the `env_set` hot-edit step)
 
 This UX story must be runnable with the **ad-hoc team** (no `.minds/team.yaml`).
@@ -228,6 +228,33 @@ function getProblemsState() {
   });
   return { count, severity, items };
 }
+
+function getRemindersCount() {
+  const e2e = window.__e2e__;
+  if (e2e && typeof e2e.getRemindersCount === 'function') return e2e.getRemindersCount();
+  const s = getAppShadow();
+  const el = s.querySelector('#toolbar-reminders-toggle span');
+  if (!(el instanceof HTMLElement)) throw new Error('Missing reminders count span');
+  return Number((el.textContent || '0').trim() || '0');
+}
+
+async function openReminders() {
+  const e2e = window.__e2e__;
+  if (e2e && typeof e2e.openReminders === 'function') return await e2e.openReminders();
+  throw new Error('Missing window.__e2e__.openReminders() helper');
+}
+
+function getRemindersContent() {
+  const e2e = window.__e2e__;
+  if (e2e && typeof e2e.getRemindersContent === 'function') return e2e.getRemindersContent();
+  throw new Error('Missing window.__e2e__.getRemindersContent() helper');
+}
+
+async function closeReminders() {
+  const e2e = window.__e2e__;
+  if (e2e && typeof e2e.closeReminders === 'function') return await e2e.closeReminders();
+  throw new Error('Missing window.__e2e__.closeReminders() helper');
+}
 ```
 
 ---
@@ -258,6 +285,7 @@ Create `.minds/mcp.yaml`:
 version: 1
 servers:
   sdk_http:
+    truely-stateless: false
     transport: streamable_http
     url: http://127.0.0.1:3000/mcp
     headers: {}
@@ -292,6 +320,7 @@ Edit `.minds/mcp.yaml`:
 version: 1
 servers:
   sdk_stdio:
+    truely-stateless: false
     transport: stdio
     command: node
     args: ['fixtures/mcp-stdio-server.mjs']
@@ -319,6 +348,7 @@ Edit `.minds/mcp.yaml` to include env mappings for the stdio server:
 version: 1
 servers:
   sdk_stdio:
+    truely-stateless: false
     transport: stdio
     command: node
     args: ['fixtures/mcp-stdio-server.mjs']
@@ -354,6 +384,109 @@ Optional (host env hot-edit):
 2. Call `mcp_restart` again for `sdk_stdio`.
 3. `env_report` must return `MCP_RENAMED: "renamed_hot"`.
 
+### T1d) Lease reminder appears on first MCP tool use (default non-stateless)
+
+Purpose: verify the new per-dialog MCP client leasing behavior for servers with
+`truely-stateless: false` (default).
+
+Precondition:
+
+- `sdk_stdio` is present in `.minds/mcp.yaml` and has `truely-stateless: false`.
+- The testee agent has `sdk_stdio` and `mcp_admin` toolsets.
+
+1. Create a fresh dialog (pick any `.tsk`), then record baseline reminder count:
+
+```javascript
+await window.__e2e__.createDialog('tasks/ux-smoke.tsk', '@pangu');
+await window.__e2e__.waitForInputEnabled();
+const baselineReminders = getRemindersCount();
+```
+
+2. Send in chat (force exactly one tool call):
+
+```text
+Call exactly one tool: stdio_env_report with empty args. Then stop (no other tool calls).
+```
+
+3. Wait for completion and validate reminders:
+
+```javascript
+await window.__e2e__.waitUntil(() => window.__e2e__.noLingering(), 120000);
+await window.__e2e__.waitForInputEnabled();
+
+await window.__e2e__.waitUntil(() => getRemindersCount() >= baselineReminders + 1, 15000);
+await openReminders();
+const text = getRemindersContent();
+if (!text.includes('MCP toolset lease')) throw new Error('Missing MCP lease reminder text');
+if (!text.includes('sdk_stdio')) throw new Error('Lease reminder missing serverId (sdk_stdio)');
+if (!text.includes('mcp_release')) throw new Error('Lease reminder missing mcp_release instruction');
+await closeReminders();
+```
+
+Expected:
+
+- Reminders count increases by >= 1 on first MCP tool use.
+- Reminders widget shows an MCP lease reminder mentioning `sdk_stdio` and `mcp_release`.
+
+### T1e) `mcp_release` releases the lease and clears the reminder
+
+Using the same dialog from T1d:
+
+1. Record reminder count before release:
+
+```javascript
+const beforeRelease = getRemindersCount();
+```
+
+2. Send in chat:
+
+```text
+Call exactly one tool: mcp_release({"serverId":"sdk_stdio"}). Then stop (no other tool calls).
+```
+
+3. Wait and validate:
+
+```javascript
+await window.__e2e__.waitUntil(() => window.__e2e__.noLingering(), 120000);
+await window.__e2e__.waitForInputEnabled();
+await window.__e2e__.waitUntil(() => getRemindersCount() <= beforeRelease - 1, 15000);
+```
+
+Expected:
+
+- Reminders count decreases (lease reminder auto-drops for this dialog).
+
+### T1f) Second dialog gets a separate lease (no cross-dialog sharing)
+
+Purpose: verify that another dialog using the same MCP toolset gets its own lease reminder (i.e.,
+separate client instance).
+
+1. Create a second dialog and record baseline reminders:
+
+```javascript
+await window.__e2e__.createDialog('tasks/ux-smoke.tsk', '@pangu');
+await window.__e2e__.waitForInputEnabled();
+const baseline2 = getRemindersCount();
+```
+
+2. Send in chat:
+
+```text
+Call exactly one tool: stdio_env_report with empty args. Then stop (no other tool calls).
+```
+
+3. Wait and validate:
+
+```javascript
+await window.__e2e__.waitUntil(() => window.__e2e__.noLingering(), 120000);
+await window.__e2e__.waitForInputEnabled();
+await window.__e2e__.waitUntil(() => getRemindersCount() >= baseline2 + 1, 15000);
+```
+
+Expected:
+
+- The second dialog also receives an MCP lease reminder on first tool use.
+
 ### T2) Hot reload: editing `.minds/mcp.yaml` updates tool registration without restart
 
 Edit `.minds/mcp.yaml` to whitelist-only mode (since blacklist is empty):
@@ -362,6 +495,7 @@ Edit `.minds/mcp.yaml` to whitelist-only mode (since blacklist is empty):
 version: 1
 servers:
   sdk_http:
+    truely-stateless: false
     transport: streamable_http
     url: http://127.0.0.1:3000/mcp
     tools:
@@ -390,6 +524,7 @@ Edit `.minds/mcp.yaml`:
 version: 1
 servers:
   sdk_http:
+    truely-stateless: false
     transport: streamable_http
     url: http://127.0.0.1:3000/mcp
     tools:
@@ -414,6 +549,7 @@ Edit `.minds/mcp.yaml` to force a within-server collision (`multi-greet` becomes
 version: 1
 servers:
   sdk_http:
+    truely-stateless: false
     transport: streamable_http
     url: http://127.0.0.1:3000/mcp
     tools:
@@ -439,6 +575,7 @@ Edit `.minds/mcp.yaml` to introduce an invalid tool name (contains `:`):
 version: 1
 servers:
   sdk_http:
+    truely-stateless: false
     transport: streamable_http
     url: http://127.0.0.1:3000/mcp
     tools:
@@ -462,12 +599,14 @@ Create `.minds/mcp.yaml` with **two** servers pointing at the same MCP endpoint:
 version: 1
 servers:
   good_a:
+    truely-stateless: false
     transport: streamable_http
     url: http://127.0.0.1:3000/mcp
     tools: { whitelist: [], blacklist: [] }
     transform:
       - prefix: 'a_'
   broken_b:
+    truely-stateless: false
     transport: streamable_http
     url: http://127.0.0.1:3000/mcp
     headers:
@@ -513,6 +652,7 @@ Precondition: `sdk_http` is currently registered and visible in Tools panel.
    version: 1
    servers:
      sdk_http:
+       truely-stateless: false
        transport: streamable_http
        url: http://127.0.0.1:3000/mcp
        tools:
@@ -538,5 +678,6 @@ For each test run, capture:
 - A Tools panel snapshot showing toolsets grouped (`details.toolset`), and timestamp changes after
   refresh.
 - A Problems panel snapshot showing at least one MCP problem with serverId + toolName in detail.
+- A Reminders widget snapshot showing the MCP lease reminder, and confirmation it clears after `mcp_release`.
 - Confirmation that issues auto-clear when config is fixed or servers removed.
 - Confirmation that tool list reflects hot reload without restarting Dominds.

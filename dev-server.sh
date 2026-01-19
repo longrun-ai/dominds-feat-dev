@@ -129,8 +129,10 @@ echo "🚀 Starting development servers..."
 mkdir -p "$LOGS_DIR" >/dev/null 2>&1
 
 # Start backend and frontend with separate log files
-# Backend: runs with ux RTWS as process cwd (so root is never the RTWS)
-(cd "$RTWS_DIR" && NODE_ENV=dev "$TSX_BIN" "$DOMINDS_DIR/main/cli.ts" webui -p 5556 --mode dev --nobrowser) >"$LOGS_DIR/backend-stdout.log" 2>"$LOGS_DIR/backend-stderr.log" &
+# Backend: runs with ux RTWS as process cwd (so repo root is never the RTWS)
+# NOTE: bind backend to 127.0.0.1 so Vite proxy targets (127.0.0.1:5556) work even on hosts where
+# `localhost` resolves to IPv6-only (::1).
+(cd "$RTWS_DIR" && NODE_ENV=dev "$TSX_BIN" "$DOMINDS_DIR/main/cli.ts" webui -p 5556 -h 127.0.0.1 --mode dev --nobrowser) >"$LOGS_DIR/backend-stdout.log" 2>"$LOGS_DIR/backend-stderr.log" &
 # Frontend: runs with ux RTWS as process cwd, but serves dominds/webapp as Vite root
 (cd "$RTWS_DIR" && "$VITE_BIN" "$DOMINDS_DIR/webapp" --port 5555 --strictPort) >"$LOGS_DIR/frontend-stdout.log" 2>"$LOGS_DIR/frontend-stderr.log" &
 
