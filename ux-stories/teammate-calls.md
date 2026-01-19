@@ -537,6 +537,65 @@ const subdialogState = {
 
 ---
 
+### Scenario A2: Batch `@change_mind` + Teammate Call in One Message (Mixed Actions)
+
+**Goal:** Validate that dominds can process **multiple** `@change_mind` updates (multiple sections) and a **teammate call** in the **same user message**, without dropping/merging actions or corrupting subdialog routing.
+
+This is a “mixed actions” stress case:
+
+- Multiple task-doc section updates (Goals/Constraints/Progress)
+- A teammate call to `@pangu` (TYPE C)
+- All triggered from a single send (one user message)
+
+**Important notes:**
+
+- `@change_mind` for `*.tsk/` still requires **exactly one** selector per call. This scenario uses **multiple calls** in one message.
+- The user message must **not** begin with `@pangu` (otherwise you’ve turned it into a **direct user-initiated** teammate call and you’re no longer testing “responder delegates to teammate”).
+
+#### Steps
+
+1. Capture a baseline snapshot (`pre`) and record the current round indicator (should remain stable; `@change_mind` must not reset rounds).
+2. Send exactly **one** user message instructing the responder to:
+   1. Call `@change_mind !goals` with a new goals list
+   2. Call `@change_mind !constraints` with a new constraints list
+   3. Call `@change_mind !progress` with a new progress list
+   4. Then issue a teammate call to `@pangu` (no `!topic`) to run exactly one `shell_cmd` with `command="echo $HOME"`, and return the HOME value
+3. Wait for all teammate calls to complete and input to re-enable.
+4. Verify in UI:
+   - There is **one** assistant turn that contains **three** successful `@change_mind` tool bubbles (one per selector) and a visible `@pangu` teammate call + response.
+   - No cross-write: the “goals-like” text is in goals, “constraints-like” text is in constraints, etc.
+   - Subdialog hierarchy returns to a single level after completion (transient subdialog completed).
+   - No console errors.
+5. Verify in the workspace filesystem (outside dominds file tools; `*.tsk/` is encapsulated):
+   - `cmds-test.tsk/goals.md` matches the new goals body (semantic match).
+   - `cmds-test.tsk/constraints.md` matches the new constraints body.
+   - `cmds-test.tsk/progress.md` matches the new progress body.
+
+#### Example prompt (one send; not strict)
+
+```text
+In one response, do these steps in order:
+1) Update the task doc goals via @change_mind !goals to:
+- Confirm teammate routing works under mixed actions.
+- Confirm task-doc updates work under mixed actions.
+2) Update constraints via @change_mind !constraints to:
+- Use one selector per call.
+- No direct user-initiated @pangu call.
+3) Update progress via @change_mind !progress to:
+- Started mixed-action verification.
+4) Then delegate to @pangu (no !topic): run exactly one shell_cmd command="echo $HOME" and reply with HOME only.
+```
+
+**Pass Criteria (A2):**
+
+- [ ] UI shows 3 successful `@change_mind` tool executions (Goals/Constraints/Progress) from the same send
+- [ ] UI shows a responder-initiated `@pangu` teammate call and a `shell_cmd` execution for `echo $HOME`
+- [ ] All three task-doc files updated correctly (`cmds-test.tsk/goals.md`, `constraints.md`, `progress.md`)
+- [ ] Subdialog hierarchy returns to 1 level (transient complete)
+- [ ] No console errors
+
+---
+
 ## Part B: Topic-Based Teammate Call (TYPE B - Registered Subdialog)
 
 ### Before You Begin
