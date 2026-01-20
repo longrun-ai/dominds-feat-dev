@@ -10,5 +10,8 @@ dist
 .dialogs/
 logs/
 
+# Test scratch files (created by UX stories)
+scratch/
+
 # Local checkout of the dominds repository (intentionally not tracked here)
 dominds/

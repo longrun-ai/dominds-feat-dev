@@ -127,8 +127,8 @@ const mustHave = [
   'team_mgmt_list_dir',
   'team_mgmt_read_file',
   'team_mgmt_overwrite_file',
-  'team_mgmt_patch_file',
-  'team_mgmt_apply_patch',
+  'team_mgmt_plan_file_modification',
+  'team_mgmt_apply_file_modification',
   'team_mgmt_mkdir',
   'team_mgmt_move_path',
   'team_mgmt_rm_file',
@@ -193,16 +193,16 @@ hello-1
 !!@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
 ```
 
-3. Patch it:
+3. Plan + apply an edit (use a fixed hunk id so the test doesn’t need to parse tool output):
 
-````text
-!!@team_mgmt_patch_file .minds/team-mgmt-ws-e2e.txt
-```diff
-@@ -1,1 +1,1 @@
--hello-1
-+hello-2
+```text
+!!@team_mgmt_plan_file_modification .minds/team-mgmt-ws-e2e.txt 1~1 !e2e1
+hello-2
 ```
-````
+
+```text
+!!@team_mgmt_apply_file_modification !e2e1
+```
 
 4. Confirm:
 
