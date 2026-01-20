@@ -1,4 +1,4 @@
-# Dominds WebUI E2E: Dialog Round Control (@clear_mind) + Task Doc Update (@change_mind)
+# Dominds WebUI E2E: Dialog Round Control (`!!@clear_mind`) + Task Doc Update (`!!@change_mind`)
 
 You are the **tester agent** standing in for a human user. Your role is to validate that **dominds** provides flawless dialog round control infrastructure for mental clarity operations. The testee should **cooperate** with your directions to help validate dominds features.
 
@@ -16,8 +16,8 @@ Enable **autonomous mind clearing** during long-run work (days → months): afte
 
 Dominds must support:
 
-- `@clear_mind`: reset the dialog + optionally add a reminder
-- `@change_mind`: overwrite the task doc (or `*.tsk/` section) with **no round reset**
+- `!!@clear_mind`: reset the dialog + optionally add a reminder (UI headline renders as `@clear_mind`)
+- `!!@change_mind`: overwrite the task doc (or `*.tsk/` section) with **no round reset** (UI headline renders as `@change_mind`)
 - Follow-up coroutine prompt: appears as the **first visible message** in the new round (target UX: first user message), with **no backfeeding** from the tool call itself
 - One-round timeline: UI shows **only one round at a time** (round transitions clear `#dialog-container` then refill)
 
@@ -106,7 +106,7 @@ prev = post;
 Round control tools can interrupt/replace the current chat timeline, so treat “stream completion”
 as **round + prompt stabilization**, not just the last assistant bubble finishing.
 
-For every `@clear_mind` step:
+For every `!!@clear_mind` step:
 
 1. **Tool bubble must appear at least once**: `await waitUntil(() => detectToolCall('clear_mind').hasToolCall, 15000)`
 2. **Round must change** (toolbar `#round-nav` text changes): wait up to **20s**, extend to **120s** only if `noLingering()` is false
@@ -181,7 +181,7 @@ If the team never loads, treat it as an infrastructure failure (likely missing L
 
 ## Before You Begin
 
-Create a fresh dialog using a dedicated task document so `@change_mind` doesn’t clobber other tests.
+Create a fresh dialog using a dedicated task document so `!!@change_mind` doesn’t clobber other tests.
 
 Before each run, wipe all runtime-workspace dialog records so you start from a known clean slate:
 
@@ -236,14 +236,14 @@ Calibration: Restate the plan in 2 sentences. Sentence 1: you'll make exactly on
 
 ---
 
-## Scenario 1: @clear_mind with reminder
+## Scenario 1: !!@clear_mind with reminder
 
 **Goal:** Verify round reset, reminder persistence, and new-round prompt injection via follow-up coroutine.
 
 **Prompt to testee:**
 
 ```
-Step 1: Issue exactly one @clear_mind call. Put the reminder text in the body: "Remember to verify the new-round prompt." No other tool calls.
+Step 1: Issue exactly one !!@clear_mind call. Put the reminder text in the body: "Remember to verify the new-round prompt." No other tool calls.
 ```
 
 **Expected Infrastructure Outcomes:**
@@ -273,7 +273,7 @@ const remindersBefore = getRemindersCount();
 const q4hBefore = getQ4HCount();
 
 const msgId = await fillAndSend(
-  'Step 1: Issue exactly one @clear_mind call. Put the reminder text in the body: ' +
+  'Step 1: Issue exactly one !!@clear_mind call. Put the reminder text in the body: ' +
     '"Remember to verify the new-round prompt." No other tool calls.',
 );
 
@@ -319,16 +319,16 @@ const assertions = {
 
 ---
 
-## Scenario 2: @change_mind updates task doc
+## Scenario 2: !!@change_mind updates task doc
 
 **Goal:** Verify task doc overwrite with **no** round reset.
 
 **Prompt to testee:**
 
 ```
-Step 2: Issue exactly one @change_mind !progress call.
+Step 2: Issue exactly one !!@change_mind !progress call.
 Reply with EXACTLY 3 lines:
-Line 1: @change_mind !progress
+Line 1: !!@change_mind !progress
 Line 2: # Task Update
 Line 3: We are now testing dialog round control.
 
@@ -355,9 +355,9 @@ const snap = await snapshotDomindsUI();
 const roundBefore = snap.currentDialog?.round || '';
 
 const msgId = await fillAndSend(
-  'Step 2: Issue exactly one @change_mind !progress call.\\n' +
+  'Step 2: Issue exactly one !!@change_mind !progress call.\\n' +
     'Reply ONLY with the following 3 lines (copy exactly; no extra text):\\n' +
-    '@change_mind !progress\\n' +
+    '!!@change_mind !progress\\n' +
     '# Task Update\\n' +
     'We are now testing dialog round control.',
 );
@@ -389,14 +389,14 @@ const assertions = {
 
 ---
 
-## Scenario 3: @clear_mind without reminder (optional)
+## Scenario 3: !!@clear_mind without reminder (optional)
 
 **Goal:** Ensure reminder persistence logic is optional and round reset still works.
 
 **Prompt to testee:**
 
 ```
-Step 3 (optional): Issue exactly one @clear_mind call with an empty body. No other tool calls.
+Step 3 (optional): Issue exactly one !!@clear_mind call with an empty body. No other tool calls.
 ```
 
 **Expected Infrastructure Outcomes:**
@@ -466,7 +466,7 @@ const assertions = {
 
 ## Scenario 5: Subdialog responder clears its own mind (required)
 
-**Goal:** Validate that a **subdialog responder** can autonomously run `@clear_mind` inside the subdialog,
+**Goal:** Validate that a **subdialog responder** can autonomously run `!!@clear_mind` inside the subdialog,
 starting a new round for the **subdialog only**, without resetting or altering the parent dialog round/timeline.
 
 This is the primary round-control scenario for long-run work: sub-agents should be able to shed noise locally
@@ -479,7 +479,7 @@ while the orchestration dialog stays stable.
 ```
 Step 5A (critical): This scenario ONLY validates a TYPE B registered subdialog call.
 Reply with EXACTLY 2 lines:
-Line 1 MUST be exactly: @pangu !topic subdlg-round-ctrl
+Line 1 MUST be exactly: !!@pangu !topic subdlg-round-ctrl
 Line 2 MUST be exactly: SUBDLG_TOKEN_V2
 
 IMPORTANT: Do NOT put `!topic ...` on a second line (that would be in the body, not the headline).
@@ -496,13 +496,13 @@ Use the sidebar row `Subdialog: @pangu` or open it programmatically with `openSu
 - Toolbar round nav reflects the subdialog’s current round (typically `R 1`)
 - Input is enabled (latest round)
 
-### Step 5C: In the subdialog, pangu runs `@clear_mind` for itself
+### Step 5C: In the subdialog, pangu runs `!!@clear_mind` for itself
 
 **Prompt to testee (in the pangu subdialog):**
 
 ```
 Step 5C: Reply ONLY with the following 2 lines (copy exactly; no preface, no markdown, no extra lines):
-@clear_mind
+!!@clear_mind
 Remember SUBDLG_TOKEN_V2
 
 Do not repeat these instructions. No other tool calls.
@@ -510,7 +510,7 @@ Do not repeat these instructions. No other tool calls.
 
 **Expected Infrastructure Outcomes (subdialog):**
 
-- A `@clear_mind` call bubble appears in the subdialog timeline
+- A `@clear_mind` call bubble appears in the subdialog timeline (triggered by `!!@clear_mind` input)
 - Subdialog round changes (e.g., `R 1 → R 2`)
 - New-round prompt appears as the first visible message in the subdialog
 - Input returns enabled after follow-up coroutine
@@ -617,7 +617,7 @@ const isInSubdialog = hierarchy.length >= 2 && hierarchy[hierarchy.length - 1]?.
 // 5C: in subdialog, pangu clears its own mind
 const msgC = await fillAndSend(
   'Step 5C: Reply ONLY with the following 2 lines (copy exactly; no preface, no markdown, no extra lines):\\n' +
-    '@clear_mind\\n' +
+    '!!@clear_mind\\n' +
     'Remember SUBDLG_TOKEN_V2\\n\\n' +
     'Do not repeat these instructions. No other tool calls.',
 );
@@ -672,7 +672,7 @@ const assertions = {
 
 **Fail Conditions (Infra):**
 
-- Subdialog `@clear_mind` resets the **parent** dialog round or clears the parent timeline
+- Subdialog `!!@clear_mind` resets the **parent** dialog round or clears the parent timeline
 - Subdialog round does not increment or new-round prompt does not appear
 - Navigation between subdialog and parent breaks (cannot re-open or loses linkage)
 
@@ -683,7 +683,7 @@ const assertions = {
 If the tool call is missing or the new-round prompt does not appear within timeout, retry once with an explicit directive.
 
 ```
-Retry: Issue exactly one @clear_mind call now. Do not include any other tool calls or text.
+Retry: Issue exactly one !!@clear_mind call now. Do not include any other tool calls or text.
 ```
 
 If the retry also fails, mark as infra failure and move on.
@@ -729,11 +729,11 @@ await closeReminders();
 
 ```javascript
 const baselineReminders = Number(window.__roundCtrlBaselineReminders__ || 0);
-const reminderNoToDelete = baselineReminders + 1; // @delete_reminder uses 1-based numbering
+const reminderNoToDelete = baselineReminders + 1; // !!@delete_reminder uses 1-based numbering (UI headline renders as @delete_reminder)
 ```
 
 ```
-Teardown Step A: Issue exactly one @delete_reminder <reminderNoToDelete> call. No other tool calls.
+Teardown Step A: Issue exactly one !!@delete_reminder <reminderNoToDelete> call. No other tool calls.
 ```
 
 3. Verify reminders return to pre-test baseline:
@@ -742,6 +742,6 @@ Teardown Step A: Issue exactly one @delete_reminder <reminderNoToDelete> call. N
 await waitForRemindersCount(baselineReminders, 15000);
 ```
 
-If you added multiple reminders, repeat `@delete_reminder <currentCount>` one-by-one until you reach `baselineReminders`.
+If you added multiple reminders, repeat `!!@delete_reminder <currentCount>` one-by-one until you reach `baselineReminders`.
 
 If reminders cannot be deleted or the count doesn’t update, treat it as an infrastructure failure in reminder tooling.

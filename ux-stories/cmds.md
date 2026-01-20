@@ -228,13 +228,13 @@ If these conditions aren't met -> dominds infrastructure bug, stop.
 
 **Goal:** Ensure the testee understands that it should cooperate and use shell tool calls exactly as instructed.
 
-**Important:** Avoid `@` symbols here to prevent unintended teammate calls. Use words like “Pangu” instead of `@pangu`.
+**Important:** Avoid starting a line at column 0 with `!!@` here to prevent unintended teammate calls. Use words like “Pangu” instead of `!!@pangu`.
 
 ```javascript
 const msgId = await fillAndSend(
   'Calibration: You are the testee in a dominds shell-command infrastructure test. ' +
     'Reply ONLY with the three bullets below, verbatim. Do not add anything else. ' +
-    'Do not call any teammates or tools. Avoid the @ symbol.\n' +
+    'Do not call any teammates or tools. Avoid the !!@ prefix.\n' +
     '- I will follow the test instructions exactly.\n' +
     '- I will only run shell commands when explicitly instructed.\n' +
     '- I will use exactly one shell command when requested.',
@@ -260,7 +260,7 @@ const preflightErrors = checkConsoleErrors();
 
 **Advisory template (use if calibration fails):**
 
-- Suggest stronger prompt constraints, e.g. “Do not call any teammates or tools unless explicitly asked; never emit @ or !topic.”
+- Suggest stronger prompt constraints, e.g. “Do not call any teammates or tools unless explicitly asked; never emit the !!@ prefix or !topic.”
 - Suggest a single-sentence checklist that the testee must repeat verbatim before proceeding.
 - Suggest adding a final confirmation question: “Do you agree? Reply only with ‘YES’.”
 

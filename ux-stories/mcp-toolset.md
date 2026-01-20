@@ -419,7 +419,8 @@ await openReminders();
 const text = getRemindersContent();
 if (!text.includes('MCP toolset lease')) throw new Error('Missing MCP lease reminder text');
 if (!text.includes('sdk_stdio')) throw new Error('Lease reminder missing serverId (sdk_stdio)');
-if (!text.includes('mcp_release')) throw new Error('Lease reminder missing mcp_release instruction');
+if (!text.includes('mcp_release'))
+  throw new Error('Lease reminder missing mcp_release instruction');
 await closeReminders();
 ```
 
