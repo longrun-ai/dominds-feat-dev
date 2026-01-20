@@ -151,6 +151,7 @@ This repo uses two runtime workspaces:
 
 - **Node.js version**: 22.x required (>=22 <23 in package.json engines)
 - **TypeScript**: Strict mode with no `any` allowed
+- **i18n (中文语义基准)**: Treat `zh` text as the canonical source of semantics. Never update `zh` content by translating from `en`; instead, update `en` to match `zh` when needed.
 - **Logs**: `./dev-server.sh` redirects stdout/stderr to `logs/` (wrapper logs)
 - **Dialogs**: persisted under the chosen rtws (repo root `./.dialogs/` for DevOps; `ux-rtws/.dialogs/` for WebUI dev/UX)
 
