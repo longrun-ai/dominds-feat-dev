@@ -160,3 +160,6 @@ This repo uses two runtime workspaces:
 - **Do not create or rewrite commits**: never run `git commit`, `git merge`, `git rebase`, `git cherry-pick`, `git reset`, or `git push` unless explicitly instructed.
 - **Do not add `dominds/` to this repo**: `dominds/` is intentionally gitignored; changes to `dominds` should go through PRs in the `dominds` repo.
 - Read-only git commands (`git status`, `git diff`, `git log`, `git show`, `git blame`) are allowed.
+- **Parallel worktree edits are normal**: assume humans and other agents may modify the same worktree concurrently. Do not assume exclusive control or that the working tree stays stable during a task.
+- **Monitor diffs to avoid clobbering**: re-check `git status` / `git diff` (and `git -C dominds status` / `git -C dominds diff` when working in `dominds/`) before making edits to files, and especially before any “cleanup” actions.
+- **Never revert unrelated changes by default**: do not discard/revert/overwrite unstaged changes from other ongoing tasks unless explicitly asked. If you detect unrelated diffs, call them out and ask how to proceed.
