@@ -9,6 +9,7 @@ members:
     name: Runtime / Dialog Engine
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: `dominds/main/**` runtime/dialog engine（核心执行模型与状态）'
       - 'Interfaces/接口: event/state 语义（供 server/webui/cli/tools 消费）'
@@ -20,6 +21,7 @@ members:
     name: Server / API / WS
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: `dominds/main/server/**` + `server.ts/api-routes.ts/websocket-handler.ts`'
       - 'Interfaces/接口: `/api/*` contract + `/ws` packet schema + error/progress 语义'
@@ -31,6 +33,7 @@ members:
     name: WebUI / UX
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: `dominds/webapp/**`（Vite SPA）'
       - 'Interfaces/接口: 消费 `/api/*` & `/ws`；对齐后端状态/错误/进度语义'
@@ -42,6 +45,7 @@ members:
     name: CLI / TUI
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: `dominds/main/cli.ts` + `dominds/main/cli/**` + CLI shared helpers'
       - 'Interfaces/接口: CLI UX contract（commands/args/output/exit codes）'
@@ -53,6 +57,7 @@ members:
     name: Tooling & Guardrails
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: `dominds/main/tools/**` + tools registry + guardrails/policies'
       - 'Interfaces/接口: tool calling contract；permission/audit hooks（runtime/MCP）'
@@ -64,6 +69,7 @@ members:
     name: QA / Regression Gate
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: `dominds/tests/**` + lint/type/format gates'
       - 'Interfaces/接口: 发布前 checklist + 各域 pass/fail 口径'
@@ -75,6 +81,7 @@ members:
     name: MCP Integration (low-frequency)
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: `dominds/main/mcp/**` + MCP docs；协议集成边界'
       - 'Interfaces/接口: runtime/tools 暴露给 MCP 的契约；supervisor/client 行为'
@@ -86,6 +93,7 @@ members:
     name: 上下文优化 / Prompt & Memory Curator
     toolsets:
       - ws_mod
+      - memory
     gofor:
       - 'Scope/范围: Dominds 系统提示词、记忆与差遣牒呈现（system prompt / team+personal memory / task docs / reminders）'
       - 'Interfaces/接口: 与 runtime/server/webui 对齐“信息如何呈现/压缩/引用”'
@@ -99,9 +107,19 @@ members:
       - team-mgmt
       - ws_read
       - ws_mod
+      - memory
+      - team_memory
     gofor:
       - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
       - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'
       - 'Deliverables/交付: 体验问题清单（严重度/复现步骤）、改进建议与验收点'
       - 'Non-goals/不负责: 作为协议 owner 决策（交给对应域负责人）'
       - 'Regression/回归: 维护关键用户旅程的人工验收清单（交 QA 纳入 gate）'
+
+  cmdr:
+    name: Commander (Shell Runner)
+    toolsets:
+      - os
+    gofor:
+      - 'Scope/范围: 仅负责执行必要的 shell 命令（构建/测试/启动/停止），并结构化回传 stdout/stderr/exit code。'
+      - 'Non-goals/不负责: 不读取/不写入任何工作区文件内容；不做破坏性操作（删除/重置/改权限）除非明确风险与回滚。'
