@@ -1,0 +1,8 @@
+# TaskDoc Ignore Patterns
+# This file controls which folders are excluded from the taskdoc search
+
+# don't put taskdocs for outer ws in product src repo
+dominds/*
+
+# don't mess with testing rtws taskdocs
+ux-rtws/*
