@@ -65,6 +65,7 @@ Keep-going reads diligence from the **rtws** (`process.cwd()` in the backend). F
 `./dev-server.sh` uses `ux-rtws/` as the rtws, so the effective path is:
 
 - `ux-rtws/.minds/diligence.md`
+- `ux-rtws/.minds/team.yaml` (per-member cap `diligence-push-max`)
 
 This story treats that file as **temporary and private**:
 
@@ -97,6 +98,25 @@ DILIGENCE_AUTO_SENT
 
 Now reply with EXACTLY this single line and nothing else (no tools):
 KG_OK
+EOF
+
+# Also ensure @fuxi is allowed to receive keep-going pushes:
+# Built-in shadow members fuxi/pangu default to diligence-push-max: 0 unless overridden.
+export GOING_ON_AND_ON_TEAM_YAML_BAK=""
+if [ -f ux-rtws/.minds/team.yaml ]; then
+  export GOING_ON_AND_ON_TEAM_YAML_BAK="ux-rtws/.minds/team.yaml.bak.going-on-and-on.$(date +%s)"
+  mv ux-rtws/.minds/team.yaml "$GOING_ON_AND_ON_TEAM_YAML_BAK"
+  echo "Backed up team.yaml to: $GOING_ON_AND_ON_TEAM_YAML_BAK"
+fi
+
+cat > ux-rtws/.minds/team.yaml <<'EOF'
+member_defaults:
+  provider: codex
+  model: gpt-5.2-codex
+
+members:
+  fuxi:
+    diligence-push-max: 3
 EOF
 ```
 
@@ -461,4 +481,13 @@ if [ -n "${GOING_ON_AND_ON_DILIGENCE_BAK:-}" ] && [ -f "$GOING_ON_AND_ON_DILIGEN
 fi
 
 unset GOING_ON_AND_ON_DILIGENCE_BAK
+
+rm -f ux-rtws/.minds/team.yaml
+
+if [ -n "${GOING_ON_AND_ON_TEAM_YAML_BAK:-}" ] && [ -f "$GOING_ON_AND_ON_TEAM_YAML_BAK" ]; then
+  mv "$GOING_ON_AND_ON_TEAM_YAML_BAK" ux-rtws/.minds/team.yaml
+  echo "Restored team.yaml from: $GOING_ON_AND_ON_TEAM_YAML_BAK"
+fi
+
+unset GOING_ON_AND_ON_TEAM_YAML_BAK
 ```
