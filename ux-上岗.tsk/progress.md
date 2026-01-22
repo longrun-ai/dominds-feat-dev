@@ -1,0 +1,2 @@
+- 已确认 `ux-issues/` 目录存在（当前已有 `ux-issues/README.md`）
+- 待办：读取现有 `ux-issues/README.md` 与相关 ux-stories/实现文件，基于真实结构补齐 issue 模板与首批 4 张 issue 卡（含复现/期望/定位/验收/owner/优先级）

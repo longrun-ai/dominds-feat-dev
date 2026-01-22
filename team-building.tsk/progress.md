@@ -5,8 +5,10 @@
 - 已盘点测试与质量门槛：以 `tsx` 运行的 tests scripts（`dominds/tests/package.json#scripts`，`dominds/tests/README.md`）；`pnpm -C dominds run lint` 包含 `tsc --noEmit` 与 `prettier format:check`；暂无 Playwright/Jest/Vitest 体系线索。
 - 已盘点“手工发布相关”信息：`pnpm -C dominds run build` 构建 deps/backend/frontend；产物 `dominds/dist/` 与 `dominds/dist/static/`；版本号在 `dominds/package.json#version`；发布前检查线索主要在 `dominds/docs/*`。
 - 已形成按知识边界的负责人切分方案并落地到 `<rtws>/.minds/`：基础 7 域（Runtime、Server/API/WS、WebUI/UX、CLI/TUI、Tooling & Guardrails、QA/Regression Gate、MCP Integration 低频维护），并补充 2 个跨域角色（上下文优化 `prompt`、UX 体验官 `ux`），形成共 9 个长期 agent。
+- 新增需求：增加产品经理（PM）agent，负责统筹 `dominds/docs/*.md` 的设计文档与产品特性总纲，分析评估用户需求归属、梳理特性依赖/约束关系，作为跨域协作与规划的入口。
 - 已写入团队资产：`.minds/team/README.md`、`.minds/team/interfaces.md`、`.minds/team/domains/*.md`（各域职责与覆盖范围）、`.minds/team/process/proposal-template.md`、`.minds/team/process/release-regression-checklist.md`、`.minds/team/process/mcp-engagement.md`。
 - 已补齐可执行团队配置：`.minds/team.yaml` 已从空壳扩展为 9 成员（`runtime/server/webui/cli/tooling/qa/mcp/prompt/ux`），并将 `member.gofor` 统一为中英混合的字符串列表（避免 team.yaml i18n 复杂度）。
 - 已按权限规则配置 toolsets：凡需要修改代码的成员均分配 `ws_mod`；`ux` 额外分配 `ws_read` 与 `team-mgmt` 以便体验与反馈。
 - 已建立硬性流程：每次修改 `.minds/team.yaml` 后必须运行 `!!@team_mgmt_validate_team_cfg`；本轮已多次校验并修复 YAML 解析问题（反引号需加引号），当前校验通过。
 - 已推动手册与可发现性改进（由 `!!@pangu` 落地到 Dominds 源码）：`team_mgmt_manual` 全量章节完成一致性/可复制性审阅与修订（含新增 `fmtCodeBlock` 辅助生成代码块）；并新增 bug 记录拆分文件在 `dominds/docs/bugs/`（manual 输出不回流、`!topic` 机制语法误用导致空白线程/上下文丢失）。
+- 已完成 PM agent 落地：`.minds/team.yaml` 已新增 `pm` 成员，并通过 `!!@team_mgmt_validate_team_cfg` 校验（✅ 未检测到问题）。

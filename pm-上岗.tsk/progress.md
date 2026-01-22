@@ -1,0 +1,4 @@
+- 已完成 `dominds/docs/**` 主干扫描与要点提炼：`design.md`、`mottos.md`、`dialog-system.md`（含 Q4H wire/事件/clear_mind 语义）、`encapsulated-task-doc.md`、`keep-going.md`、`auth.md`、`context-health.md`、`dialog-persistence.md`、`mcp-support.md`、`team-tools-view.md`、`interruption-resumption.md`、`cli-usage.md`、`team-mgmt-toolset.md`、`dev-principles.md`、`OEC-philosophy.md`。
+- 已沉淀个人记忆：`pm/onboarding-dominds-docs.md`（上岗检测检索入口）。
+- 已沉淀 PRD-lite 模板：`pm/prd-lite-template.md`（四件套：分流/依赖/验收/回归）。
+- 当前状态：上岗就绪，等待你的上岗检测提问（无需人类介入即可回答；若涉及非 docs 域实现细节，将诉请对应 owner）。

@@ -4,6 +4,7 @@
 - 要解决什么问题？用户价值是什么？
 
 ## 涉及模块（打勾）
+- [ ] Product Manager (PM)
 - [ ] Runtime / Dialog Engine
 - [ ] Server / API / WS
 - [ ] WebUI / UX
@@ -11,6 +12,12 @@
 - [ ] Tooling & Guardrails
 - [ ] QA / Regression Gate
 - [ ] MCP Integration
+
+## Owner / Dependencies（必须写）
+- Feature owner：
+- 协作域：
+- Dependencies：
+- Rollout/回滚：
 
 ## 接口变更（必须写）
 - API/WS：新增/变更的路径、参数、响应、错误语义
@@ -28,4 +35,4 @@
 ## 里程碑拆分
 - M0：接口冻结
 - M1：最小可用实现
-- M2：回归与文档更新 
+- M2：回归与文档更新

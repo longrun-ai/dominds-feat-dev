@@ -5,6 +5,23 @@ member_defaults:
 default_responder: ux
 
 members:
+  pm:
+    name: Product Manager (PM)
+    toolsets:
+      - ws_read
+      - ws_mod
+      - memory
+    write_dirs:
+      - dominds/docs/**
+    no_write_dirs:
+      - .minds/**
+    gofor:
+      - 'Scope/范围: `dominds/docs/**`（设计文档/机制说明/产品特性总纲）+ 跨域需求分流（不直接 owner 代码实现）'
+      - 'Interfaces/接口: 需求归属判断 + Feature brief；依赖矩阵（server/webui/cli/runtime/qa）；验收口径（交 QA 纳入 gate）'
+      - 'Deliverables/交付: PRD-lite/提案推进；范围拆分与里程碑；依赖/风险/rollout 方案；文档一致性维护'
+      - 'Non-goals/不负责: 直接改 runtime/server/webui/cli 的实现（除非明确授权）；替代域 owner 做技术决策'
+      - 'Regression/回归: 每个 feature 明确回归点与验收口径，推动补齐到 checklist/tests'
+
   runtime:
     name: Runtime / Dialog Engine
     toolsets:

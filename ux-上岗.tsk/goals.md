@@ -1,0 +1,3 @@
+- 扫描 `@ux` 负责范围内的交互与相关实现（WebUI/CLI/WS/API/Runtime/Tools 的端到端体验面），形成可复现、可定位、可验收的 UX 记忆与清单
+- 沉淀上岗可用的输出模板：UX issue 卡片、用户旅程验收清单、跨域协作路由（指向 @server/@webui/@cli/@runtime/@tooling/@qa）
+- 准备接受“上岗检测”提问并能快速给出结论与下一步
