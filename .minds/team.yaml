@@ -120,6 +120,7 @@ members:
 
   ux:
     name: UX 体验官 / Tooling UX Critic
+    diligence-push-max: 0
     toolsets:
       - team-mgmt
       - ws_read
