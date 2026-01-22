@@ -29,6 +29,7 @@
 ## Issue 内容规范
 
 每个 issue 文件应包含：
+
 - TL;DR（摘要 + 严重度 + area + owner）
 - 复现步骤
 - 当前 vs 期望

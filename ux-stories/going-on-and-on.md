@@ -218,14 +218,14 @@ function hasVisibleToken(token) {
 
 Send this instruction to the testee (the exact token is to make assertions deterministic):
 
-````javascript
+```javascript
 checkConsoleErrors({ clear: true, threshold: 0 });
 
 const msgId = await fillAndSend(
   'Keep-going test A1. Reply with EXACTLY this single line, and nothing else:\\n\\n' + 'KG_OK',
 );
 await waitForInputEnabled();
-````
+```
 
 ### A2) Assert: `max-num-prompts: 3` → 3 diligence injections → forced Q4H (budget exhausted)
 
@@ -238,10 +238,7 @@ This validates the new config:
 ```javascript
 const beforeDiligence = countVisibleToken('DILIGENCE_AUTO_SENT');
 
-await waitUntil(
-  () => countVisibleToken('DILIGENCE_AUTO_SENT') === beforeDiligence + 3,
-  60000,
-);
+await waitUntil(() => countVisibleToken('DILIGENCE_AUTO_SENT') === beforeDiligence + 3, 60000);
 
 await waitUntil(() => (snapshotDomindsUI().q4h?.count ?? 0) >= 1, 60000);
 
@@ -249,7 +246,9 @@ await waitUntil(() => {
   const s = snapshotDomindsUI();
   const qs = s.q4h?.questions ?? [];
   return qs.some(
-    (q) => q.callBodyPreview.includes('Keep-going budget exhausted') && q.callBodyPreview.includes('max 3'),
+    (q) =>
+      q.callBodyPreview.includes('Keep-going budget exhausted') &&
+      q.callBodyPreview.includes('max 3'),
   );
 }, 60000);
 
@@ -262,7 +261,7 @@ checkConsoleErrors({ clear: true, threshold: 0 });
   - `DILIGENCE_AUTO_SENT` does not increase by **3**, or
   - no Q4H appears, or
   - the Q4H body does not include `Keep-going budget exhausted (max 3)`
-  within the timeout.
+    within the timeout.
 - Any new console errors appear during the scenario.
 
 **Note (test validity):** If the testee adds any extra explanatory text in A1, re-run A1 with a stricter
@@ -329,10 +328,12 @@ const input = window.__e2e__.getInputArea();
 if (!input) throw new Error('Missing dominds-q4h-input');
 if (typeof input.getQuestions !== 'function') throw new Error('Input missing getQuestions()');
 if (typeof input.selectQuestion !== 'function') throw new Error('Input missing selectQuestion()');
-if (typeof input.getSelectedQuestionId !== 'function') throw new Error('Input missing getSelectedQuestionId()');
+if (typeof input.getSelectedQuestionId !== 'function')
+  throw new Error('Input missing getSelectedQuestionId()');
 
 const qList = input.getQuestions();
-if (!Array.isArray(qList) || qList.length < 1) throw new Error('Expected input.getQuestions() to return >= 1 question');
+if (!Array.isArray(qList) || qList.length < 1)
+  throw new Error('Expected input.getQuestions() to return >= 1 question');
 
 const dlgInfo = window.__e2e__.getCurrentDialogInfo();
 if (!dlgInfo) throw new Error('Missing current dialog info');
@@ -354,7 +355,8 @@ await waitUntil(() => input.getSelectedQuestionId() === q.id, 2000);
 const inputShadow = input?.shadowRoot;
 const wrapper = inputShadow?.querySelector('.input-wrapper');
 if (!(wrapper instanceof HTMLElement)) throw new Error('Missing .input-wrapper');
-if (!wrapper.classList.contains('q4h-active')) throw new Error('Expected .input-wrapper to have q4h-active class');
+if (!wrapper.classList.contains('q4h-active'))
+  throw new Error('Expected .input-wrapper to have q4h-active class');
 
 await window.__e2e__.answerQ4H('yes');
 await waitUntil(() => (window.__e2e__.snapshotDomindsUI().q4h?.count ?? 0) === 0, 15000);
@@ -421,7 +423,7 @@ with **no** extra follow-up from the agent.
 
 These are not required for a basic regression pass, but they map directly to `dominds/docs/keep-going.md`.
 
-**Important:** Run these extensions *before* Scenario B3 / Scenario C (which disable keep-going),
+**Important:** Run these extensions _before_ Scenario B3 / Scenario C (which disable keep-going),
 or re-enable keep-going by restoring the diligence file created in Setup S2.
 
 ### Extension D — Subdialog must not auto-continue
