@@ -70,6 +70,35 @@ Context health 提醒在对话中出现后：
 
 ---
 
+## 诊断结论（2026-01-22）
+
+根因不是 `ReminderOwner` 本身（`dominds/main/tools/context-health.ts` 已实现 `updateReminder/drop/renderReminder`），而是 **reminders 持久化/恢复链路丢失 owner 与 meta**，导致重启后“owned reminder”退化为普通 reminder：
+
+- `dominds/main/persistence.ts` 的 `DialogPersistence._saveReminderState()` 写 `reminders.json` 时只保存了 `content`（以及 UI 用的 id/createdAt/priority），**没有保存 `ownerName` / `meta`**。
+- `dominds/main/persistence.ts` 的 `DialogPersistence.loadReminderState()` 读回来的 reminders **也就无法 rehydrate owner**（`getReminderOwner(ownerName)` 没有输入）。
+- 结果：
+  - 重启后，旧的 context health reminder 变成“无 owner 的快照”，`processReminderUpdates()` 不会 update/drop。
+  - `applyContextHealthMonitor()` 扫 owner 发现“没有现存 owned reminder”，于是又 `addReminder()` 一条新的（形成“旧快照 + 新提醒”并存，甚至刷屏）。
+  - UI 的提醒列表来自 `full_reminders_update` 事件（`dominds/main/dialog.ts: processReminderUpdates()` 发出），展示的是 `content` 快照；当 owner 丢失时，自然不会“随最新文案/状态更新”。
+
+（附带影响：daemon 类 reminders 的 `meta`（pid/command）也会在重启后丢失，前端无法显示 PID。）
+
+---
+
+## 已落地修复（代码）
+
+- **持久化补全**：`reminders.json` 的 schema 扩展为每条 reminder 可选保存：
+  - `ownerName?: string`
+  - `meta?: JsonValue`
+  - 代码：`dominds/main/shared/types/storage.ts`、`dominds/main/persistence.ts`
+- **恢复 rehydrate**：加载 reminders 时按 `ownerName` 通过 registry `getReminderOwner(ownerName)` 还原 owner；同时还原 `meta`。
+- **去重加固**：`applyContextHealthMonitor()` 对 `owner.name === 'context_health'` 的 reminders 做防御性去重（最多保留 1 条），避免历史脏数据/异常路径导致累计。
+  - 代码：`dominds/main/llm/driver.ts`
+- **最小回归脚本**：新增 `dominds/tests/persistence/reminders-owner-meta.ts`，覆盖：
+  - ownerName/meta 的写入与读回
+
+---
+
 ## 验收标准（手工）
 
 1. 同一 dialog 中，context health 提醒最多只有 1 条（不会累计多条重复项）。
