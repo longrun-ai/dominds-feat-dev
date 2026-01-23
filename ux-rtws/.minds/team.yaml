@@ -14,3 +14,4 @@ members:
       - ws_mod
       - memory
       - team_memory
+      - diag
