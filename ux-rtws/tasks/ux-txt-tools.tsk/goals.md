@@ -10,4 +10,4 @@
 - Verify `plan_file_modification` / `apply_file_modification` improved UX output:
   - YAML summary + evidence + match classification
   - unified diff retained
-- Verify `overwrite_file` shows a diff-like-content warning (and still writes literally).
+- Verify `replace_file_contents` shows a diff-like-content warning (and still writes literally).

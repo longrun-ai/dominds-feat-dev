@@ -7,7 +7,7 @@ This UX story validates:
 - `ripgrep_*` navigation tools (files/snippets/count/fixed/search)
 - “easy edit” tools (`append_file`, `insert_after`, `insert_before`, `replace_block`)
 - safer precise edit workflow (`plan_file_modification` → `apply_file_modification`)
-- `overwrite_file` “diff-like content” warning
+- `replace_file_contents` “diff-like content” warning
 
 This test validates Dominds **tool contracts + WebUI surfacing**, not “LLM smartness”.
 
@@ -130,7 +130,6 @@ for (const name of mustHaveRead) {
 
 const mustHaveMod = [
   'read_file',
-  'overwrite_file',
   'replace_file_contents',
   'append_file',
   'insert_after',
@@ -251,10 +250,10 @@ Pass criteria:
 
 ---
 
-## T5) overwrite_file diff-like warning
+## T5) replace_file_contents diff-like warning
 
 ```text
-!?@overwrite_file scratch/e2e-diff-warning.txt
+!?@replace_file_contents scratch/e2e-diff-warning.txt
 !?diff --git a/a.txt b/a.txt
 !?@@ -1,1 +1,1 @@
 !?-old
@@ -263,7 +262,7 @@ Pass criteria:
 
 Pass criteria:
 
-- Output includes a warning that `overwrite_file` writes literally (diff is saved as-is).
+- Output includes a warning that `replace_file_contents` writes literally (diff is saved as-is).
 
 ---
 

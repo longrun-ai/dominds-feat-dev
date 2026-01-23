@@ -20,7 +20,7 @@
 
 ## 命名建议（避免误用）
 
-- 建议将 `overwrite_file` 更名为 `replace_file_contents`。
+- 使用 `replace_file_contents`。
 - 语义：将正文作为**文本内容**原样写入目标文件，**整体替换**旧内容；不解析 diff/patch（例如 `+`/`@@` 等会被按字面写入）。
 - 目的：让“会覆盖旧内容”的风险在调用时更显眼，降低 diff 心智误用概率。
 

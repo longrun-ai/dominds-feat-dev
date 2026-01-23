@@ -118,7 +118,7 @@ const mustHave = [
   'plan_file_modification',
   'apply_file_modification',
   'read_file',
-  'overwrite_file',
+  'replace_file_contents',
 ];
 for (const name of mustHave) {
   if (!wsMod.tools.includes(name)) throw new Error(`ws_mod missing tool: ${name}`);
@@ -148,7 +148,7 @@ await window.__e2e__.waitForInputEnabled();
 Send in chat:
 
 ```text
-!?@overwrite_file scratch/txt-e2e.txt
+!?@replace_file_contents scratch/txt-e2e.txt
 !?hello-1
 !?line-2
 !?line-3
@@ -216,7 +216,7 @@ Pass criteria:
 2. Mutate the same target line via overwrite (any change is fine):
 
 ```text
-!?@overwrite_file scratch/txt-e2e.txt
+!?@replace_file_contents scratch/txt-e2e.txt
 !?DIFFERENT-NOW
 !?hello-2
 !?hello-3
@@ -243,13 +243,13 @@ files (safe under parallel tool execution).
 1. Create two files:
 
 ```text
-!?@overwrite_file scratch/a.txt
+!?@replace_file_contents scratch/a.txt
 !?A0
 !?A1
 ```
 
 ```text
-!?@overwrite_file scratch/b.txt
+!?@replace_file_contents scratch/b.txt
 !?B0
 !?B1
 ```
@@ -301,7 +301,7 @@ remains uniquely matchable.
 1. Create a file:
 
 ```text
-!?@overwrite_file scratch/same.txt
+!?@replace_file_contents scratch/same.txt
 !?L1
 !?L2
 !?L3

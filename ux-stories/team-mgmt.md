@@ -126,7 +126,7 @@ const mustHave = [
   'team_mgmt_manual',
   'team_mgmt_list_dir',
   'team_mgmt_read_file',
-  'team_mgmt_overwrite_file',
+  'team_mgmt_replace_file_contents',
   'team_mgmt_plan_file_modification',
   'team_mgmt_apply_file_modification',
   'team_mgmt_mkdir',
@@ -180,10 +180,10 @@ Pass criteria:
 
 ### T2c) File ops (must stay under `.minds/**`)
 
-1. Overwrite a test file:
+1. Replace contents of a test file:
 
 ```text
-!?@team_mgmt_overwrite_file .minds/team-mgmt-ws-e2e.txt
+!?@team_mgmt_replace_file_contents .minds/team-mgmt-ws-e2e.txt
 !?hello-1
 ```
 

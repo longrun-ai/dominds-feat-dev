@@ -56,7 +56,6 @@ Must include:
 Must include (legacy + new):
 
 - `read_file`
-- `overwrite_file`
 - `replace_file_contents`
 - `append_file`
 - `insert_after`
@@ -105,9 +104,9 @@ Goal: verify the global newline rule:
 - if file doesn’t end with `\n`, tool adds one before writing
 - if body doesn’t end with `\n`, tool adds one
 
-### T2a) Force file EOF to have no trailing newline (using overwrite_file)
+### T2a) Force file EOF to have no trailing newline
 
-Because `overwrite_file` / `replace_file_contents` normalize content to end with `\n`, create an EOF-without-newline file via terminal:
+Because `replace_file_contents` normalizes content to end with `\n`, create an EOF-without-newline file via terminal:
 
 From repo root:
 
@@ -306,12 +305,12 @@ Pass criteria:
 
 ---
 
-## T6) overwrite_file diff-like warning
+## T6) replace_file_contents diff-like warning
 
 Send:
 
 ```text
-!?@overwrite_file scratch/uat-diff-warning.txt
+!?@replace_file_contents scratch/uat-diff-warning.txt
 !?diff --git a/a.txt b/a.txt
 !?@@ -1,1 +1,1 @@
 !?-old
@@ -320,7 +319,7 @@ Send:
 
 Pass criteria:
 
-- Output includes a warning that `overwrite_file` writes literally and will save `+`/`@@` into the file.
+- Output includes a warning that `replace_file_contents` writes literally and will save `+`/`@@` into the file.
 - `!?@read_file scratch/uat-diff-warning.txt` shows the diff text was saved literally.
 
 ---

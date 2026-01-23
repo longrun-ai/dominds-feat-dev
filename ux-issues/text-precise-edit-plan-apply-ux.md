@@ -322,7 +322,7 @@ diff --git a/logs/plan-apply-sandbox.txt b/logs/plan-apply-sandbox.txt
 
 ---
 
-## `overwrite_file`：防 diff 心智误用（与精确编辑协作）
+## `replace_file_contents`：防 diff 心智误用（与精确编辑协作）
 
 ### 要求
 
@@ -331,7 +331,7 @@ diff --git a/logs/plan-apply-sandbox.txt b/logs/plan-apply-sandbox.txt
 
 ### 示例（warning 文案示例）
 
-- “Detected diff-like content. `overwrite_file` writes literally; `+`/`@@` will be saved into the file.”
+- “Detected diff-like content. `replace_file_contents` writes literally; `+`/`@@` will be saved into the file.”
 
 ---
 
