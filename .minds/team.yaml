@@ -1,6 +1,9 @@
 member_defaults:
   provider: codex
   model: gpt-5.2
+  model_params:
+    codex:
+      reasoning_effort: high
 
 default_responder: ux
 
