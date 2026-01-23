@@ -8,9 +8,10 @@ members:
   pm:
     name: Product Manager (PM)
     toolsets:
+      - team_memory
+      - memory
       - ws_read
       - ws_mod
-      - memory
     write_dirs:
       - dominds/docs/**
     no_write_dirs:

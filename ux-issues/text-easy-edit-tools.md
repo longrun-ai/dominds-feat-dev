@@ -540,3 +540,77 @@ summary: 'Move-dir: docs/spec → docs/specs (14 entries).'
 7. `mk_dir`：目录不存在时创建成功；已存在时 `created=false` 且 `ok`
 8. `move_file`：目标父目录存在时移动成功；父目录不存在时失败并提示先 `mk_dir`
 9. `move_dir`：目录整体移动后条目数量一致
+
+---
+
+## Proposal: Replace `replace_block` with `plan_block_replace` / `apply_block_replace`
+
+### Motivation
+
+- `replace_block` is convenient but risky: start/end anchors are often non-unique in real docs, and the tool can accidentally edit the wrong region.
+- Agent ergonomics suffers when edits are not preview-first: users/agents need a diff to verify before applying.
+- We already have a proven safety pattern (`plan_file_modification` / `apply_file_modification`); block replacement should follow the same pattern.
+
+### Decision / Intent
+
+- Deprecate and remove `replace_block`.
+- Introduce `plan_block_replace` + `apply_block_replace` as the only block-anchor editing workflow.
+- Keep `plan/apply_file_modification` as the precision fallback; `plan/apply_block_replace` is the “anchor-based but safe” option.
+
+### Proposed Tool Specs
+
+#### `plan_block_replace`
+
+**Signature**: `!?@plan_block_replace <path> <start_anchor> <end_anchor> [options]`
+**Body**: new content to write into the selected block.
+**Options** (suggested):
+
+- `occurrence=<n|last>`: choose which (start,end) pairing to target when multiple matches exist.
+- `include_anchors=true|false` (default `true`): whether to keep start/end anchor lines in the file.
+- `match=contains|equals` (default `contains`): how anchor lines are matched.
+- `require_unique=true|false` (default `true`): if true, multiple candidates must fail with `ANCHOR_AMBIGUOUS`.
+- `strict=true|false` (default `true`): if true, not found/ambiguous fails; if false, allows fallback behaviors (recommend: always `true` for planning).
+  **Output (YAML)**:
+- `status: ok|error`
+- `mode: plan_block_replace`
+- `path`, `start_anchor`, `end_anchor`, resolved `occurrence`
+- `hunk_id` (TTL-limited), `expires_at`
+- `candidates_count`, `occurrence_resolved`, `range` (start_line/end_line)
+- `unified_diff` (or `diff_preview`) and `evidence_preview` (before/new/after)
+- On error: `error: INVALID_FORMAT|CONTENT_REQUIRED|ANCHOR_NOT_FOUND|ANCHOR_AMBIGUOUS|OCCURRENCE_OUT_OF_RANGE|FAILED` with actionable `summary`
+
+#### `apply_block_replace`
+
+**Signature**: `!?@apply_block_replace !<hunk_id>`
+**Body**: empty.
+**Behavior**:
+
+- Applies the planned block replace if the target region can still be uniquely located (context match).
+- Rejects with `APPLY_REJECTED_*` errors if file changed or target is no longer unique; instructs user to re-plan.
+  **Output (YAML)**:
+- `status: ok|error`
+- `mode: apply_block_replace`
+- `path`, `hunk_id`, applied `range`
+- `normalized` details + `evidence_preview`
+
+### UX Acceptance Criteria
+
+- Users can always see what will change before writing.
+- Ambiguous anchors never cause silent writes; they fail with candidate counts and next-step guidance.
+- Workflow mirrors `plan_file_modification` / `apply_file_modification` (same TTL, same apply queue, same rejection semantics).
+- Clear zh/en messaging (no zh branch returning English-only summaries).
+
+### Owner
+
+- @tooling (implementation in `dominds/main/tools/txt.ts` and tool registry)
+- @qa (add/extend regression coverage for plan/apply and rejection cases)
+
+### Minimal Regression Checklist
+
+- Plan succeeds on unique anchors and returns a diff + hunk id.
+- Apply succeeds immediately after plan.
+- Apply rejects if the file changes between plan and apply.
+- Plan fails on ambiguous anchors with `ANCHOR_AMBIGUOUS` and candidate count.
+- Plan fails on missing anchors with `ANCHOR_NOT_FOUND`.
+- Occurrence out of range produces `OCCURRENCE_OUT_OF_RANGE`.
+- Empty body fails with `CONTENT_REQUIRED`.
