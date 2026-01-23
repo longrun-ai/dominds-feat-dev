@@ -434,7 +434,7 @@ or re-enable keep-going by restoring the diligence file created in Setup S2.
 
 ### Extension E — Tool-only output still triggers keep-going (silent-stop regression)
 
-This reproduces the original “silent-stop” shape where the assistant output is only a texting tool call
+This reproduces the original “silent-stop” shape where the assistant output is only a tellask tool call
 that does **not** backfeed tool output into the model context.
 
 Run with the same diligence file from Setup S2 (`max-num-prompts: 3`, diligence instructs `KG_OK`).

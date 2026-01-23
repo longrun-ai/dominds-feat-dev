@@ -1,2 +1,2 @@
-- 已扫描并记录（写入个人记忆 `tooling/*`）：tools registry/builtins、tool 类型与参数校验、access control + `*.tsk/` 封装拒绝语义、结构化日志、MCP supervisor（reload/watch/poll、tool 暴露过滤/transform、collision 处理、lease 机制）、MCP stdio client、texting 文件工具并发 apply 队列、memory/env/fs/ctrl 工具 guardrails、冒烟/回归要点。
+- 已扫描并记录（写入个人记忆 `tooling/*`）：tools registry/builtins、tool 类型与参数校验、access control + `*.tsk/` 封装拒绝语义、结构化日志、MCP supervisor（reload/watch/poll、tool 暴露过滤/transform、collision 处理、lease 机制）、MCP stdio client、tellask 文件工具并发 apply 队列、memory/env/fs/ctrl 工具 guardrails、冒烟/回归要点。
 - 待办：进入上岗检测模式（接受提问；必要时可继续定点扫描补充记忆）。

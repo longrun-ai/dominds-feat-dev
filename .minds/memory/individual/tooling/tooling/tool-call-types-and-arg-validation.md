@@ -1,19 +1,19 @@
 # Tool type & 参数校验（func / texter）
-关键词：`Tool` `FuncTool` `TextingTool` `argsValidation` `validateArgs`
+关键词：`Tool` `FuncTool` `TellaskTool` `argsValidation` `validateArgs`
 
 - `dominds/main/tool.ts`
-  - `Tool = FuncTool | TextingTool`
+  - `Tool = FuncTool | TellaskTool`
   - `FuncTool`：
     - `type: 'func'`
     - `name`, `description?`, `descriptionI18n?`
     - `parameters: JsonSchema`
     - `argsValidation?: 'dominds' | 'passthrough'`
     - `call(dlg, caller, args): Promise<string>`
-  - `TextingTool`：
+  - `TellaskTool`：
     - `type: 'texter'`
     - `name`, `usageDescription`, `usageDescriptionI18n?`, `backfeeding: boolean`
-    - `call(dlg, caller, headLine, inputBody): Promise<TextingToolCallResult>`
-  - `TextingToolCallResult`：
+    - `call(dlg, caller, headLine, inputBody): Promise<TellaskToolCallResult>`
+  - `TellaskToolCallResult`：
     - `{ status:'completed', result?, messages? }` 或 `{ status:'failed', result, messages? }`
   - 参数校验：
     - `validateArgs(schema, args)`：Dominds 自带的“最小校验器”，只做 best-effort（对象根、required、properties、additionalProperties=false 时拒绝未知字段、对常见 `type` 做递归验证）。
