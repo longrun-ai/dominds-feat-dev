@@ -127,7 +127,6 @@ members:
       - ws_mod
       - memory
       - team_memory
-      - diag
     gofor:
       - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
       - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'
