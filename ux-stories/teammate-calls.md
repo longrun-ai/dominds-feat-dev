@@ -1,4 +1,4 @@
-# Dominds WebUI E2E: Teammate Calls to `!!@pangu` - For e2e-browser-tester Agent
+# Dominds WebUI E2E: Teammate Calls to `!?@pangu` - For e2e-browser-tester Agent
 
 You are the **tester agent** standing in for a human user. Your role is to validate that **dominds** provides flawless agentic infrastructure for teammate call delegation. The testee should **cooperate** with your directions to help validate dominds features.
 
@@ -16,8 +16,8 @@ This test validates **dominds teammate call infrastructure**, not the testee age
 
 The testee, when properly guided, must be able to:
 
-- Execute oneshot teammate calls to `!!@pangu` for single env var queries (TYPE C - transient subdialog)
-- Execute topic-based teammate calls to `!!@pangu` for multiple related queries (TYPE B - registered subdialog)
+- Execute oneshot teammate calls to `!?@pangu` for single env var queries (TYPE C - transient subdialog)
+- Execute topic-based teammate calls to `!?@pangu` for multiple related queries (TYPE B - registered subdialog)
 - Maintain context across multiple topic-based calls within the same registered subdialog
 - Properly handle subdialog completion and response supply to supdialog
 
@@ -34,7 +34,7 @@ The testee, when properly guided, must be able to:
 
 - **Assert infra, not prose** - Pass/fail must be based on UI state + teammate call bubbles, not the testee’s summary.
 - **Time-bound every step** - If `waitForTeammateResponse()` or `waitForPendingTeammateCalls()` does not resolve within the allowed timeout, treat as infra failure.
-- **One retry for infra gaps only** - If no teammate response or wrong callsite, immediately retry once with explicit `!!@pangu` call + tool-formatted instruction and move on.
+- **One retry for infra gaps only** - If no teammate response or wrong callsite, immediately retry once with explicit `!?@pangu` call + tool-formatted instruction and move on.
 - **Compliance nudges are separate** - If the testee responds but does not fully comply (formatting, missing confirmation, extra lines, etc.), use the _Compliance Nudge Loop_ below (up to 3 nudges).
 - **Check console errors after every action** - Catch silent UI/protocol breakage early.
 - **Control noise** - Keep prompts short and enforce “one tool call only”.
@@ -129,7 +129,7 @@ if (!pendingDone || !responseReady) {
   const retryTeammateStart = getTeammateMessageCount();
   const retryCallSiteBefore = getLatestTeammateCallSiteId();
   const retryId = await fillAndSend(
-    'Retry: !!@pangu please run shell_cmd command="echo $HOME". Use only one shell_cmd call.',
+    'Retry: !?@pangu please run shell_cmd command="echo $HOME". Use only one shell_cmd call.',
   );
 
   const retryCallSiteId = await waitForTeammateCallSiteId({
@@ -157,7 +157,7 @@ if (!pendingDone || !responseReady) {
 **Fallback: Missing or Wrong Teammate Call**
 
 If the teammate call site does not appear (or appears without `@pangu`), retry once with
-an explicit `!!@pangu` directive and a single tool-formatted instruction. Do not keep re-prompting.
+an explicit `!?@pangu` directive and a single tool-formatted instruction. Do not keep re-prompting.
 
 ---
 
@@ -334,7 +334,7 @@ If these conditions aren't met → dominds infrastructure bug, stop.
 
 **Goal:** Ensure the testee understands the test setup and can articulate it correctly in its own words.
 
-**Important:** Avoid starting a line at column 0 with `!!@` here to prevent unintended teammate calls. Use words like “Pangu” instead of `@pangu` / `!!@pangu`.
+**Important:** Avoid starting a line at column 0 with `!?@` here to prevent unintended teammate calls. Use words like “Pangu” instead of `@pangu` / `!?@pangu`.
 
 ```javascript
 const preflightStart = await snapshotDomindsUI();
@@ -343,7 +343,7 @@ const msgId = await fillAndSend(
     'In your own words, explain how you will behave during this test. ' +
     'Cover: (1) you will cooperate with instructions, (2) you will only contact the Pangu teammate when explicitly instructed, ' +
     '(3) you will use exactly one tool action when requested, (4) you will not call any teammates or tools during calibration. ' +
-    'Do not use the !!@ prefix.',
+    'Do not use the !?@ prefix.',
 );
 const completed = await waitStreamingComplete(msgId, 120000);
 await waitForInputEnabled();
@@ -362,7 +362,7 @@ const preflightErrors = checkConsoleErrors();
 
 **Advisory template (use if calibration fails):**
 
-- Suggest stronger prompt constraints, e.g. “Do not call any teammates or tools unless explicitly asked; never emit the !!@ prefix or !topic.”
+- Suggest stronger prompt constraints, e.g. “Do not call any teammates or tools unless explicitly asked; never emit the !?@ prefix or !topic.”
 - Suggest a single-sentence checklist that the testee must repeat verbatim before proceeding.
 - Suggest adding a final confirmation question: “Do you agree? Reply only with ‘YES’.”
 
@@ -372,7 +372,7 @@ const preflightErrors = checkConsoleErrors();
 
 **Goal:** Validate a **user-initiated** teammate call (the tester triggers the call directly).
 
-**Important:** This is intentionally a direct `!!@pangu` call from the tester (human). The call
+**Important:** This is intentionally a direct `!?@pangu` call from the tester (human). The call
 text is delivered straight to the pangu subdialog (no intermediary instruction step). Expect
 the call origin to show **Human → @pangu** if your UI exposes it.
 
@@ -381,7 +381,7 @@ the call origin to show **Human → @pangu** if your UI exposes it.
 const teammateStart = getTeammateMessageCount();
 const callSiteBefore = getLatestTeammateCallSiteId();
 const msgId = await fillAndSend(
-  '!!@pangu Please run shell_cmd command="echo $HOME". Use exactly one tool call and reply with the HOME value only.',
+  '!?@pangu Please run shell_cmd command="echo $HOME". Use exactly one tool call and reply with the HOME value only.',
 );
 
 const callSiteId = await waitForTeammateCallSiteId({
@@ -442,7 +442,7 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 ```javascript
 // 2. Send the prompt
 const msgId = await fillAndSend(
-  'Current dialog responder: issue a teammate call to the pangu teammate (mention `!!@pangu` without `!topic`) ' +
+  'Current dialog responder: issue a teammate call to the pangu teammate (mention `!?@pangu` without `!topic`) ' +
     'to query the HOME environment variable. ' +
     'Roles: root dialog responder sends the teammate call; pangu runs shell_cmd; tester/human runs nothing. ' +
     'Use shell_cmd with command="echo $HOME". Use only one shell_cmd call, no extra commands.',
@@ -537,29 +537,29 @@ const subdialogState = {
 
 ---
 
-### Scenario A2: Batch `!!@change_mind` + Teammate Call in One Message (Mixed Actions)
+### Scenario A2: Batch `!?@change_mind` + Teammate Call in One Message (Mixed Actions)
 
-**Goal:** Validate that dominds can process **multiple** `!!@change_mind` updates (multiple sections) and a **teammate call** in the **same user message**, without dropping/merging actions or corrupting subdialog routing.
+**Goal:** Validate that dominds can process **multiple** `!?@change_mind` updates (multiple sections) and a **teammate call** in the **same user message**, without dropping/merging actions or corrupting subdialog routing.
 
 This is a “mixed actions” stress case:
 
 - Multiple task-doc section updates (Goals/Constraints/Progress)
-- A teammate call to `!!@pangu` (TYPE C)
+- A teammate call to `!?@pangu` (TYPE C)
 - All triggered from a single send (one user message)
 
 **Important notes:**
 
-- `!!@change_mind` for `*.tsk/` still requires **exactly one** selector per call. This scenario uses **multiple calls** in one message.
-- The user message must **not** begin with `!!@pangu` (otherwise you’ve turned it into a **direct user-initiated** teammate call and you’re no longer testing “responder delegates to teammate”).
+- `!?@change_mind` for `*.tsk/` still requires **exactly one** selector per call. This scenario uses **multiple calls** in one message.
+- The user message must **not** begin with `!?@pangu` (otherwise you’ve turned it into a **direct user-initiated** teammate call and you’re no longer testing “responder delegates to teammate”).
 
 #### Steps
 
-1. Capture a baseline snapshot (`pre`) and record the current round indicator (should remain stable; `!!@change_mind` must not reset rounds).
+1. Capture a baseline snapshot (`pre`) and record the current round indicator (should remain stable; `!?@change_mind` must not reset rounds).
 2. Send exactly **one** user message instructing the responder to:
-   1. Call `!!@change_mind !goals` with a new goals list
-   2. Call `!!@change_mind !constraints` with a new constraints list
-   3. Call `!!@change_mind !progress` with a new progress list
-   4. Then issue a teammate call to `!!@pangu` (no `!topic`) to run exactly one `shell_cmd` with `command="echo $HOME"`, and return the HOME value
+   1. Call `!?@change_mind !goals` with a new goals list
+   2. Call `!?@change_mind !constraints` with a new constraints list
+   3. Call `!?@change_mind !progress` with a new progress list
+   4. Then issue a teammate call to `!?@pangu` (no `!topic`) to run exactly one `shell_cmd` with `command="echo $HOME"`, and return the HOME value
 3. Wait for all teammate calls to complete and input to re-enable.
 4. Verify in UI:
    - There is **one** assistant turn that contains **three** successful `@change_mind` tool bubbles (one per selector) and a visible `@pangu` teammate call + response.
@@ -575,15 +575,15 @@ This is a “mixed actions” stress case:
 
 ```text
 In one response, do these steps in order:
-1) Update the task doc goals via !!@change_mind !goals to:
+1) Update the task doc goals via !?@change_mind !goals to:
 - Confirm teammate routing works under mixed actions.
 - Confirm task-doc updates work under mixed actions.
-2) Update constraints via !!@change_mind !constraints to:
+2) Update constraints via !?@change_mind !constraints to:
 - Use one selector per call.
-- No direct user-initiated !!@pangu call.
-3) Update progress via !!@change_mind !progress to:
+- No direct user-initiated !?@pangu call.
+3) Update progress via !?@change_mind !progress to:
 - Started mixed-action verification.
-4) Then delegate to !!@pangu (no !topic): run exactly one shell_cmd command="echo $HOME" and reply with HOME only.
+4) Then delegate to !?@pangu (no !topic): run exactly one shell_cmd command="echo $HOME" and reply with HOME only.
 ```
 
 **Pass Criteria (A2):**
@@ -624,7 +624,7 @@ const ready = {
 
 ### Scenario B1: Establish Registered Subdialog Context
 
-**Goal:** Test TYPE B teammate call (`!!@pangu !topic env-check`)
+**Goal:** Test TYPE B teammate call (`!?@pangu !topic env-check`)
 
 ```javascript
 // 1. Verify input ready
@@ -640,7 +640,7 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 ```javascript
 // 2. Send the prompt
 const msgId = await fillAndSend(
-  'Use the pangu teammate with topic env-check (mention `!!@pangu !topic env-check`) to establish a registered subdialog context. ' +
+  'Use the pangu teammate with topic env-check (mention `!?@pangu !topic env-check`) to establish a registered subdialog context. ' +
     'Roles: root dialog responder instructs pangu; pangu runs shell_cmd; tester/human runs nothing. ' +
     'In that call, instruct pangu to run shell_cmd command="echo $USER" (no @ prefix). ' +
     'Only pangu should execute the tool; you must not run shell_cmd yourself. ' +
@@ -728,7 +728,7 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 ```javascript
 // 2. Send second query in same topic
 const msgId2 = await fillAndSend(
-  'Again use the pangu teammate with topic env-check (mention `!!@pangu !topic env-check`) to query the PATH environment variable. ' +
+  'Again use the pangu teammate with topic env-check (mention `!?@pangu !topic env-check`) to query the PATH environment variable. ' +
     'Roles: root dialog responder instructs pangu; pangu runs shell_cmd; tester/human runs nothing. ' +
     'In that call, instruct pangu to run shell_cmd command="echo $PATH" (no @ prefix). ' +
     'Only pangu should execute the tool; you must not run shell_cmd yourself. ' +
@@ -801,7 +801,7 @@ const errorsB2 = checkConsoleErrors();
 const teammateStart = getTeammateMessageCount();
 const callSiteBefore = getLatestTeammateCallSiteId();
 const msgId3 = await fillAndSend(
-  'Query the SHELL environment variable using the pangu teammate with topic env-check (mention `!!@pangu !topic env-check`). ' +
+  'Query the SHELL environment variable using the pangu teammate with topic env-check (mention `!?@pangu !topic env-check`). ' +
     'Roles: root dialog responder instructs pangu; pangu runs shell_cmd; tester/human runs nothing. ' +
     'In that call, instruct pangu to run shell_cmd command="echo $SHELL" (no @ prefix). ' +
     'Only pangu should execute the tool; you must not run shell_cmd yourself. ' +
@@ -902,7 +902,7 @@ const bootErrors = checkConsoleErrors();
 
 ### Scenario C1: Create a Registered Subdialog for Doc Scan (Type B)
 
-**Goal:** Create a `!!@pangu !topic` subdialog, instruct it to list document files, and explicitly
+**Goal:** Create a `!?@pangu !topic` subdialog, instruct it to list document files, and explicitly
 encourage a clarification supcall about file extensions (do not guess).
 
 ```javascript
@@ -911,8 +911,8 @@ const teammateStart = getTeammateMessageCount();
 const callSiteBefore = getLatestTeammateCallSiteId();
 
 const msgId = await fillAndSend(
-  'Follow the task doc strictly. Create the registered pangu subdialog with topic "doc-scan" using only `!!@pangu !topic doc-scan`. ' +
-    'Pangu must ask the parent for extensions via a Type A supcall using `!!@super` (NO `!topic`) before listing (no guessing), then list files using those extensions. ' +
+  'Follow the task doc strictly. Create the registered pangu subdialog with topic "doc-scan" using only `!?@pangu !topic doc-scan`. ' +
+    'Pangu must ask the parent for extensions via a Type A supcall using `!?@super` (NO `!topic`) before listing (no guessing), then list files using those extensions. ' +
     'Only the call line should contain the teammate handle. ' +
     'Roles: root dialog responder issues the pangu call; pangu runs tools; tester/human runs nothing. ' +
     'Use exactly one tool call. Do not run tools yourself.',
@@ -1053,7 +1053,7 @@ if (!alreadyAsked) {
       i,
       'Missing Type A supdialog call',
       'Reply ONLY with a Type A supdialog call using the primary syntax (NO `!topic`). ' +
-        'Call format: `!!@super Which document file extensions should I include? I assume .md; should I include others like .txt or .rst?`',
+        'Call format: `!?@super Which document file extensions should I include? I assume .md; should I include others like .txt or .rst?`',
     );
     pendingDone = nudgeState.pendingDone;
     responseReady = nudgeState.responseReady;
@@ -1154,7 +1154,7 @@ window.__scenarioC.c2 = {
 _Compliance Nudge Loop_ (up to 3 nudges). Example correction:
 
 ```
-Correction: Reply ONLY with a Type A supdialog call (NO `!topic`): `!!@super Which document file extensions should I include? I assume .md; should I include others like .txt or .rst?` No other text.
+Correction: Reply ONLY with a Type A supdialog call (NO `!topic`): `!?@super Which document file extensions should I include? I assume .md; should I include others like .txt or .rst?` No other text.
 ```
 
 **Pass Criteria (C2):**

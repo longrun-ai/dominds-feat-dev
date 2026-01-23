@@ -77,18 +77,18 @@ Pass criteria:
 Send:
 
 ```text
-!!@replace_file_contents scratch/uat-txt-tools.txt
-L1 hello
-L2 anchor: A
-L3 keep
-L4 anchor: B
-L5 tail
+!?@replace_file_contents scratch/uat-txt-tools.txt
+!?L1 hello
+!?L2 anchor: A
+!?L3 keep
+!?L4 anchor: B
+!?L5 tail
 ```
 
 Then:
 
 ```text
-!!@read_file scratch/uat-txt-tools.txt
+!?@read_file scratch/uat-txt-tools.txt
 ```
 
 Pass criteria:
@@ -119,14 +119,14 @@ printf 'ONE-LINE-NO-TRAILING-NL' > ux-rtws/scratch/uat-eof-no-nl.txt
 Then append (body intentionally without trailing newline):
 
 ```text
-!!@append_file scratch/uat-eof-no-nl.txt
-APPENDED-1
+!?@append_file scratch/uat-eof-no-nl.txt
+!?APPENDED-1
 ```
 
 Then:
 
 ```text
-!!@read_file scratch/uat-eof-no-nl.txt
+!?@read_file scratch/uat-eof-no-nl.txt
 ```
 
 Pass criteria:
@@ -141,15 +141,15 @@ Pass criteria:
 ### T3a) insert_after (unique anchor)
 
 ```text
-!!@insert_after scratch/uat-txt-tools.txt "anchor: A" occurrence=1 strict=true
-AFTER-A-1
-AFTER-A-2
+!?@insert_after scratch/uat-txt-tools.txt "anchor: A" occurrence=1 strict=true
+!?AFTER-A-1
+!?AFTER-A-2
 ```
 
 Then:
 
 ```text
-!!@read_file scratch/uat-txt-tools.txt
+!?@read_file scratch/uat-txt-tools.txt
 ```
 
 Pass criteria:
@@ -159,14 +159,14 @@ Pass criteria:
 ### T3b) insert_before (unique anchor)
 
 ```text
-!!@insert_before scratch/uat-txt-tools.txt "anchor: B" occurrence=1 strict=true
-BEFORE-B-1
+!?@insert_before scratch/uat-txt-tools.txt "anchor: B" occurrence=1 strict=true
+!?BEFORE-B-1
 ```
 
 Then:
 
 ```text
-!!@read_file scratch/uat-txt-tools.txt
+!?@read_file scratch/uat-txt-tools.txt
 ```
 
 Pass criteria:
@@ -178,15 +178,15 @@ Pass criteria:
 Create ambiguity (two identical anchors):
 
 ```text
-!!@insert_after scratch/uat-txt-tools.txt "anchor: A" occurrence=1 strict=true
-anchor: A
+!?@insert_after scratch/uat-txt-tools.txt "anchor: A" occurrence=1 strict=true
+!?anchor: A
 ```
 
 Now attempt insert without occurrence:
 
 ```text
-!!@insert_after scratch/uat-txt-tools.txt "anchor: A"
-SHOULD-FAIL
+!?@insert_after scratch/uat-txt-tools.txt "anchor: A"
+!?SHOULD-FAIL
 ```
 
 Pass criteria:
@@ -198,12 +198,12 @@ Pass criteria:
 Because `replace_block` should reject nested/ambiguous anchors, reset the file back to the baseline (single `anchor: A` / `anchor: B`) before T4:
 
 ```text
-!!@replace_file_contents scratch/uat-txt-tools.txt
-L1 hello
-L2 anchor: A
-L3 keep
-L4 anchor: B
-L5 tail
+!?@replace_file_contents scratch/uat-txt-tools.txt
+!?L1 hello
+!?L2 anchor: A
+!?L3 keep
+!?L4 anchor: B
+!?L5 tail
 ```
 
 ---
@@ -213,15 +213,15 @@ L5 tail
 ### T4a) Replace between anchors, preserve anchors (default)
 
 ```text
-!!@replace_block scratch/uat-txt-tools.txt "anchor: A" "anchor: B" occurrence=1 include_anchors=true
-BLOCK-NEW-1
-BLOCK-NEW-2
+!?@replace_block scratch/uat-txt-tools.txt "anchor: A" "anchor: B" occurrence=1 include_anchors=true
+!?BLOCK-NEW-1
+!?BLOCK-NEW-2
 ```
 
 Then:
 
 ```text
-!!@read_file scratch/uat-txt-tools.txt
+!?@read_file scratch/uat-txt-tools.txt
 ```
 
 Pass criteria:
@@ -240,8 +240,8 @@ If you can easily craft nested anchors, do so and confirm the tool fails with a 
 ### T5a) Plan must return location evidence (before/range/after)
 
 ```text
-!!@plan_file_modification scratch/uat-txt-tools.txt 1~1 !uat1
-L1 HELLO-CHANGED
+!?@plan_file_modification scratch/uat-txt-tools.txt 1~1 !uat1
+!?L1 HELLO-CHANGED
 ```
 
 Pass criteria:
@@ -256,7 +256,7 @@ Pass criteria:
 ### T5b) Apply must return apply evidence + context_match (exact/fuzz)
 
 ```text
-!!@apply_file_modification !uat1
+!?@apply_file_modification !uat1
 ```
 
 Pass criteria:
@@ -271,21 +271,21 @@ Pass criteria:
 1) Plan a change against a line that you will move:
 
 ```text
-!!@plan_file_modification scratch/uat-txt-tools.txt 2~2 !uat2
-LINE-TO-REPLACE
+!?@plan_file_modification scratch/uat-txt-tools.txt 2~2 !uat2
+!?LINE-TO-REPLACE
 ```
 
 2) Move the target content to a different location (any edit that preserves the old line text once in the file), e.g.:
 
 ```text
-!!@insert_before scratch/uat-txt-tools.txt "L1 HELLO-CHANGED" occurrence=1 strict=true
-L2 anchor: MOVED
+!?@insert_before scratch/uat-txt-tools.txt "L1 HELLO-CHANGED" occurrence=1 strict=true
+!?L2 anchor: MOVED
 ```
 
 3) Apply:
 
 ```text
-!!@apply_file_modification !uat2
+!?@apply_file_modification !uat2
 ```
 
 Pass criteria:
@@ -297,7 +297,7 @@ Pass criteria:
 Create multiple identical copies of the planned old-lines so the target becomes ambiguous (e.g. duplicate the exact old line in multiple places), then:
 
 ```text
-!!@apply_file_modification !uat2
+!?@apply_file_modification !uat2
 ```
 
 Pass criteria:
@@ -311,17 +311,17 @@ Pass criteria:
 Send:
 
 ```text
-!!@overwrite_file scratch/uat-diff-warning.txt
-diff --git a/a.txt b/a.txt
-@@ -1,1 +1,1 @@
--old
-+new
+!?@overwrite_file scratch/uat-diff-warning.txt
+!?diff --git a/a.txt b/a.txt
+!?@@ -1,1 +1,1 @@
+!?-old
+!?+new
 ```
 
 Pass criteria:
 
 - Output includes a warning that `overwrite_file` writes literally and will save `+`/`@@` into the file.
-- `!!@read_file scratch/uat-diff-warning.txt` shows the diff text was saved literally.
+- `!?@read_file scratch/uat-diff-warning.txt` shows the diff text was saved literally.
 
 ---
 
@@ -330,7 +330,7 @@ Pass criteria:
 ### T7a) ripgrep_files for “where is it”
 
 ```text
-!!@ripgrep_files "HELLO-CHANGED" scratch
+!?@ripgrep_files "HELLO-CHANGED" scratch
 ```
 
 Pass criteria:
@@ -340,7 +340,7 @@ Pass criteria:
 ### T7b) ripgrep_snippets for “line numbers + context”
 
 ```text
-!!@ripgrep_snippets "HELLO-CHANGED" scratch context_before=1 context_after=1 max_results=10 fixed_strings=true
+!?@ripgrep_snippets "HELLO-CHANGED" scratch context_before=1 context_after=1 max_results=10 fixed_strings=true
 ```
 
 Pass criteria:
@@ -350,7 +350,7 @@ Pass criteria:
 ### T7c) ripgrep_fixed (literal match helpers)
 
 ```text
-!!@ripgrep_fixed "@@ -1,1" scratch mode=snippets
+!?@ripgrep_fixed "@@ -1,1" scratch mode=snippets
 ```
 
 Pass criteria:
@@ -360,7 +360,7 @@ Pass criteria:
 ### T7d) ripgrep_count for residue check
 
 ```text
-!!@ripgrep_count "anchor:" scratch fixed_strings=true
+!?@ripgrep_count "anchor:" scratch fixed_strings=true
 ```
 
 Pass criteria:

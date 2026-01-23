@@ -15,7 +15,7 @@
   - tooling/guardrails（@tooling）：
   - qa/gate（@qa）：
 - **影响面**：
-  - 是否影响 `*.tsk/` / `!!@change_mind` / `!!@clear_mind` 语义？
+  - 是否影响 `*.tsk/` / `!?@change_mind` / `!?@clear_mind` 语义？
   - 是否影响 Q4H、subdialog、keep-going、reminders、Problems？
   - 是否影响 `.minds/*` 配置面（team/llm/mcp）？
 
@@ -26,8 +26,8 @@
   - 文件/持久化：`.dialogs/**`、`.minds/**`（是否需要 `latest.yaml`、是否新增 index）
 - **关键语义对齐点（写成可测试句）**：
   - Backend-driven：前端不驱动状态机，只订阅事件/发请求。
-  - Q4H：`!!@human`/`!!@ask_human` → `q4h.yaml` index + `questions_count_update`；答复包需带 `questionId`。
-  - `*.tsk/`：通用文件工具不得读写；只允许 `!!@change_mind` 修改单一分段全文。
+  - Q4H：`!?@human` → `q4h.yaml` index + `questions_count_update`；答复包需带 `questionId`。
+  - `*.tsk/`：通用文件工具不得读写；只允许 `!?@change_mind` 修改单一分段全文。
   - MCP：tool name 需满足 `^[a-zA-Z0-9_-]{1,64}$`；热更新 last-known-good；问题走 Problems。
 - **权限/安全**：
   - Auth：dev/prod、HTTP Bearer、WS `Sec-WebSocket-Protocol: dominds-auth.<key>`、WebUI `?auth=` 行为。
@@ -44,7 +44,7 @@
   - blocked（需用户输入）时是否禁止 Continue？
 
 ## 4) 回归点（Smoke / Regression Checklist）
-- **Task doc**：`!!@change_mind` 不触发 round reset；`!!@clear_mind` 清 Q4H 保留 reminders/registry。
+- **Task doc**：`!?@change_mind` 不触发 round reset；`!?@clear_mind` 清 Q4H 保留 reminders/registry。
 - **Q4H**：提出/展示/回答/清除链路（含 subdialog Q4H）。
 - **keep-going**：root-only；budget 耗尽→强制 Q4H；空 diligence 禁用。
 - **Auth**：dev mode 无效；prod 三态（unset/random、empty/disable、non-empty/enabled）；WebUI `?auth=` 不读写 localStorage。

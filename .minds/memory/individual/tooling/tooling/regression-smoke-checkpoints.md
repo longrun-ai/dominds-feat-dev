@@ -7,7 +7,7 @@
 
 - Task Doc 封装拒绝：
   - `dominds/main/access-control.ts:isEncapsulatedTaskPath` + `hasReadAccess/hasWriteAccess`：任何通用文件工具触达 `*.tsk/` 都应被拒绝。
-  - `getAccessDeniedMessage(..., zh/en)` 应包含 “用 `!!@change_mind !goals|!constraints|!progress` 更新分段” 的指引。
+  - `getAccessDeniedMessage(..., zh/en)` 应包含 “用 `!?@change_mind !goals|!constraints|!progress` 更新分段” 的指引。
 
 - MCP 过滤与冲突：
   - 过滤：`mcp/tool-names.ts:decideToolExposure`（whitelist/blacklist + `*` wildcard）。

@@ -1,5 +1,5 @@
 - 已创建差遣牒三个分段（goals/constraints/progress），并记录本轮任务目标与边界。
-- 已完成对 `dominds/` 的代码+文档扫描（由 `!!@pangu` 回传结构化摘要），明确项目形态为 Node.js + TypeScript + pnpm workspace，包含 backend/server+ws、WebUI（Vite SPA）、CLI、MCP 集成、tests 脚本集合、docs 等。
+- 已完成对 `dominds/` 的代码+文档扫描（由 `!?@pangu` 回传结构化摘要），明确项目形态为 Node.js + TypeScript + pnpm workspace，包含 backend/server+ws、WebUI（Vite SPA）、CLI、MCP 集成、tests 脚本集合、docs 等。
 - 已识别模块边界与关键目录：`dominds/main/`（server/cli/llm/mcp/tools/shared/utils/minds）、`dominds/webapp/`（前端）、`dominds/tests/`（脚本式 QA）、`dominds/docs/`（机制/使用说明）、`dominds/codex-auth/`（auth 包）。
 - 已识别关键入口点：CLI `dominds/main/cli.ts`（发布 bin 指向 `dist/cli.js`）；后端 `dominds/main/server.ts` + 路由 `dominds/main/server/api-routes.ts` + WS `dominds/main/server/websocket-handler.ts`；前端入口 `dominds/webapp/index.html`（proxy `/api`&`/ws`）。
 - 已盘点测试与质量门槛：以 `tsx` 运行的 tests scripts（`dominds/tests/package.json#scripts`，`dominds/tests/README.md`）；`pnpm -C dominds run lint` 包含 `tsc --noEmit` 与 `prettier format:check`；暂无 Playwright/Jest/Vitest 体系线索。
@@ -9,6 +9,6 @@
 - 已写入团队资产：`.minds/team/README.md`、`.minds/team/interfaces.md`、`.minds/team/domains/*.md`（各域职责与覆盖范围）、`.minds/team/process/proposal-template.md`、`.minds/team/process/release-regression-checklist.md`、`.minds/team/process/mcp-engagement.md`。
 - 已补齐可执行团队配置：`.minds/team.yaml` 已从空壳扩展为 9 成员（`runtime/server/webui/cli/tooling/qa/mcp/prompt/ux`），并将 `member.gofor` 统一为中英混合的字符串列表（避免 team.yaml i18n 复杂度）。
 - 已按权限规则配置 toolsets：凡需要修改代码的成员均分配 `ws_mod`；`ux` 额外分配 `ws_read` 与 `team-mgmt` 以便体验与反馈。
-- 已建立硬性流程：每次修改 `.minds/team.yaml` 后必须运行 `!!@team_mgmt_validate_team_cfg`；本轮已多次校验并修复 YAML 解析问题（反引号需加引号），当前校验通过。
-- 已推动手册与可发现性改进（由 `!!@pangu` 落地到 Dominds 源码）：`team_mgmt_manual` 全量章节完成一致性/可复制性审阅与修订（含新增 `fmtCodeBlock` 辅助生成代码块）；并新增 bug 记录拆分文件在 `dominds/docs/bugs/`（manual 输出不回流、`!topic` 机制语法误用导致空白线程/上下文丢失）。
-- 已完成 PM agent 落地：`.minds/team.yaml` 已新增 `pm` 成员，并通过 `!!@team_mgmt_validate_team_cfg` 校验（✅ 未检测到问题）。
+- 已建立硬性流程：每次修改 `.minds/team.yaml` 后必须运行 `!?@team_mgmt_validate_team_cfg`；本轮已多次校验并修复 YAML 解析问题（反引号需加引号），当前校验通过。
+- 已推动手册与可发现性改进（由 `!?@pangu` 落地到 Dominds 源码）：`team_mgmt_manual` 全量章节完成一致性/可复制性审阅与修订（含新增 `fmtCodeBlock` 辅助生成代码块）；并新增 bug 记录拆分文件在 `dominds/docs/bugs/`（manual 输出不回流、`!topic` 机制语法误用导致空白线程/上下文丢失）。
+- 已完成 PM agent 落地：`.minds/team.yaml` 已新增 `pm` 成员，并通过 `!?@team_mgmt_validate_team_cfg` 校验（✅ 未检测到问题）。

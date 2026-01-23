@@ -148,37 +148,37 @@ await window.__e2e__.waitForInputEnabled();
 Send in chat:
 
 ```text
-!!@overwrite_file scratch/txt-e2e.txt
-hello-1
-line-2
-line-3
-tail
+!?@overwrite_file scratch/txt-e2e.txt
+!?hello-1
+!?line-2
+!?line-3
+!?tail
 ```
 
 Then:
 
 ```text
-!!@read_file scratch/txt-e2e.txt
+!?@read_file scratch/txt-e2e.txt
 ```
 
 Then plan a replacement (fixed id so the test doesn’t need to parse tool output):
 
 ```text
-!!@plan_file_modification scratch/txt-e2e.txt 2~3 !e2e1
-hello-2
-hello-3
+!?@plan_file_modification scratch/txt-e2e.txt 2~3 !e2e1
+!?hello-2
+!?hello-3
 ```
 
 Then apply:
 
 ```text
-!!@apply_file_modification !e2e1
+!?@apply_file_modification !e2e1
 ```
 
 Then confirm:
 
 ```text
-!!@read_file scratch/txt-e2e.txt
+!?@read_file scratch/txt-e2e.txt
 ```
 
 Pass criteria:
@@ -197,7 +197,7 @@ Pass criteria:
 Re-apply (expected failure):
 
 ```text
-!!@apply_file_modification !e2e1
+!?@apply_file_modification !e2e1
 ```
 
 Pass criteria:
@@ -209,24 +209,24 @@ Pass criteria:
 1. Plan a hunk but don’t apply it yet:
 
 ```text
-!!@plan_file_modification scratch/txt-e2e.txt 1~1 !e2e2
-HELLO-CHANGED
+!?@plan_file_modification scratch/txt-e2e.txt 1~1 !e2e2
+!?HELLO-CHANGED
 ```
 
 2. Mutate the same target line via overwrite (any change is fine):
 
 ```text
-!!@overwrite_file scratch/txt-e2e.txt
-DIFFERENT-NOW
-hello-2
-hello-3
-tail
+!?@overwrite_file scratch/txt-e2e.txt
+!?DIFFERENT-NOW
+!?hello-2
+!?hello-3
+!?tail
 ```
 
 3. Try to apply the stale plan (expected failure):
 
 ```text
-!!@apply_file_modification !e2e2
+!?@apply_file_modification !e2e2
 ```
 
 Pass criteria:
@@ -243,44 +243,44 @@ files (safe under parallel tool execution).
 1. Create two files:
 
 ```text
-!!@overwrite_file scratch/a.txt
-A0
-A1
+!?@overwrite_file scratch/a.txt
+!?A0
+!?A1
 ```
 
 ```text
-!!@overwrite_file scratch/b.txt
-B0
-B1
+!?@overwrite_file scratch/b.txt
+!?B0
+!?B1
 ```
 
 2. Plan one hunk for each file:
 
 ```text
-!!@plan_file_modification scratch/a.txt 2~2 !a1
-A2
+!?@plan_file_modification scratch/a.txt 2~2 !a1
+!?A2
 ```
 
 ```text
-!!@plan_file_modification scratch/b.txt 2~2 !b1
-B2
+!?@plan_file_modification scratch/b.txt 2~2 !b1
+!?B2
 ```
 
 3. Apply both in one message:
 
 ```text
-!!@apply_file_modification !a1
-!!@apply_file_modification !b1
+!?@apply_file_modification !a1
+!?@apply_file_modification !b1
 ```
 
 4. Confirm:
 
 ```text
-!!@read_file scratch/a.txt
+!?@read_file scratch/a.txt
 ```
 
 ```text
-!!@read_file scratch/b.txt
+!?@read_file scratch/b.txt
 ```
 
 Pass criteria:
@@ -301,38 +301,38 @@ remains uniquely matchable.
 1. Create a file:
 
 ```text
-!!@overwrite_file scratch/same.txt
-L1
-L2
-L3
-L4
+!?@overwrite_file scratch/same.txt
+!?L1
+!?L2
+!?L3
+!?L4
 ```
 
 2. Plan two hunks against the original file (in separate messages so the hunk creation order is
    unambiguous):
 
 ```text
-!!@plan_file_modification scratch/same.txt 2~2 !h1
-L2a
-L2b
+!?@plan_file_modification scratch/same.txt 2~2 !h1
+!?L2a
+!?L2b
 ```
 
 ```text
-!!@plan_file_modification scratch/same.txt 4~4 !h2
-L4x
+!?@plan_file_modification scratch/same.txt 4~4 !h2
+!?L4x
 ```
 
 3. Apply both in **one** message:
 
 ```text
-!!@apply_file_modification !h1
-!!@apply_file_modification !h2
+!?@apply_file_modification !h1
+!?@apply_file_modification !h2
 ```
 
 4. Confirm:
 
 ```text
-!!@read_file scratch/same.txt
+!?@read_file scratch/same.txt
 ```
 
 Pass criteria:
@@ -349,8 +349,8 @@ Note:
 ## Cleanup (optional)
 
 ```text
-!!@rm_file scratch/txt-e2e.txt
-!!@rm_file scratch/a.txt
-!!@rm_file scratch/b.txt
-!!@rm_file scratch/same.txt
+!?@rm_file scratch/txt-e2e.txt
+!?@rm_file scratch/a.txt
+!?@rm_file scratch/b.txt
+!?@rm_file scratch/same.txt
 ```

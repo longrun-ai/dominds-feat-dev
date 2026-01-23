@@ -1,6 +1,6 @@
 #!/usr/bin/env markdown
 
-# Dominds WebUI E2E: Text Tools (ripgrep_* + easy-edit + plan/apply UX) — For UX testing via dev-server rtws
+# Dominds WebUI E2E: Text Tools (ripgrep\_\* + easy-edit + plan/apply UX) — For UX testing via dev-server rtws
 
 This UX story validates:
 
@@ -180,46 +180,46 @@ Pass criteria:
 Send in chat:
 
 ```text
-!!@replace_file_contents scratch/e2e-txt-tools.txt
-L1 hello
-L2 anchor: A
-L3 keep
-L4 anchor: B
-L5 tail
+!?@replace_file_contents scratch/e2e-txt-tools.txt
+!?L1 hello
+!?L2 anchor: A
+!?L3 keep
+!?L4 anchor: B
+!?L5 tail
 ```
 
 Then:
 
 ```text
-!!@append_file scratch/e2e-txt-tools.txt
-APPEND-1
+!?@append_file scratch/e2e-txt-tools.txt
+!?APPEND-1
 ```
 
 Then:
 
 ```text
-!!@insert_after scratch/e2e-txt-tools.txt "anchor: A" occurrence=1 strict=true
-AFTER-A
+!?@insert_after scratch/e2e-txt-tools.txt "anchor: A" occurrence=1 strict=true
+!?AFTER-A
 ```
 
 Then:
 
 ```text
-!!@insert_before scratch/e2e-txt-tools.txt "anchor: B" occurrence=1 strict=true
-BEFORE-B
+!?@insert_before scratch/e2e-txt-tools.txt "anchor: B" occurrence=1 strict=true
+!?BEFORE-B
 ```
 
 Then:
 
 ```text
-!!@replace_block scratch/e2e-txt-tools.txt "anchor: A" "anchor: B" occurrence=1 include_anchors=true
-BLOCK-NEW
+!?@replace_block scratch/e2e-txt-tools.txt "anchor: A" "anchor: B" occurrence=1 include_anchors=true
+!?BLOCK-NEW
 ```
 
 Finally:
 
 ```text
-!!@read_file scratch/e2e-txt-tools.txt
+!?@read_file scratch/e2e-txt-tools.txt
 ```
 
 Pass criteria:
@@ -234,14 +234,14 @@ Pass criteria:
 Plan with a fixed id:
 
 ```text
-!!@plan_file_modification scratch/e2e-txt-tools.txt 1~1 !e2e_txt1
-L1 HELLO-CHANGED
+!?@plan_file_modification scratch/e2e-txt-tools.txt 1~1 !e2e_txt1
+!?L1 HELLO-CHANGED
 ```
 
 Apply:
 
 ```text
-!!@apply_file_modification !e2e_txt1
+!?@apply_file_modification !e2e_txt1
 ```
 
 Pass criteria:
@@ -254,11 +254,11 @@ Pass criteria:
 ## T5) overwrite_file diff-like warning
 
 ```text
-!!@overwrite_file scratch/e2e-diff-warning.txt
-diff --git a/a.txt b/a.txt
-@@ -1,1 +1,1 @@
--old
-+new
+!?@overwrite_file scratch/e2e-diff-warning.txt
+!?diff --git a/a.txt b/a.txt
+!?@@ -1,1 +1,1 @@
+!?-old
+!?+new
 ```
 
 Pass criteria:
@@ -267,22 +267,22 @@ Pass criteria:
 
 ---
 
-## T6) ripgrep_* navigation
+## T6) ripgrep\_\* navigation
 
 ```text
-!!@ripgrep_files "HELLO-CHANGED" scratch
+!?@ripgrep_files "HELLO-CHANGED" scratch
 ```
 
 ```text
-!!@ripgrep_snippets "HELLO-CHANGED" scratch fixed_strings=true context_before=1 context_after=1 max_results=10
+!?@ripgrep_snippets "HELLO-CHANGED" scratch fixed_strings=true context_before=1 context_after=1 max_results=10
 ```
 
 ```text
-!!@ripgrep_fixed "@@ -1,1" scratch mode=snippets
+!?@ripgrep_fixed "@@ -1,1" scratch mode=snippets
 ```
 
 ```text
-!!@ripgrep_count "anchor:" scratch fixed_strings=true
+!?@ripgrep_count "anchor:" scratch fixed_strings=true
 ```
 
 Pass criteria:

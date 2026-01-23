@@ -13,7 +13,7 @@
     - 黑名单优先：`no_read_dirs` / `no_write_dirs` 命中则 deny。
     - 白名单：`read_dirs` / `write_dirs` 为空 => 默认 allow；不为空但都不命中 => deny。
   - `getAccessDeniedMessage(operation, targetPath, language)`
-    - 统一格式化拒绝消息；当路径属于 `*.tsk/` 时，会追加引导：用 `!!@change_mind !goals|!constraints|!progress` 更新分段（见 `access-control.ts:249` 以后）。
+    - 统一格式化拒绝消息；当路径属于 `*.tsk/` 时，会追加引导：用 `!?@change_mind !goals|!constraints|!progress` 更新分段（见 `access-control.ts:249` 以后）。
 
 - 具体工具使用：
   - `dominds/main/tools/fs.ts` / `dominds/main/tools/txt.ts` / `dominds/main/tools/mem.ts` 在执行前调用 `hasReadAccess`/`hasWriteAccess`，并用 `getAccessDeniedMessage` 产出用户可见错误文本。

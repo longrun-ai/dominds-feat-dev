@@ -1,4 +1,4 @@
-# fs texting 工具（list_dir/rm_dir/rm_file）访问控制与输出
+# fs texter 工具（list_dir/rm_dir/rm_file）访问控制与输出
 关键词：`list_dir` `rm_dir` `rm_file` `hasReadAccess` `hasWriteAccess`
 
 - `dominds/main/tools/fs.ts`

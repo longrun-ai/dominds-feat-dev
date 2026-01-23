@@ -7,10 +7,10 @@
 ## 核心设计哲学（design.md / mottos.md）
 - 根因：LLM“迷失”通常是**关注点过多/认知过载**而非 token 不够。
 - 关键策略：**主动心智卫生**（频繁清噪/重置），而非依赖“压缩总结”。
-- 中枢结构：Task-centered focus（任务文档为单一真相源），将长期稳定信息沉淀到 task doc / reminders，必要时用 `!!@clear_mind` 清理对话噪声。
+- 中枢结构：Task-centered focus（任务文档为单一真相源），将长期稳定信息沉淀到 task doc / reminders，必要时用 `!?@clear_mind` 清理对话噪声。
 - Fresh Boots Reasoning（FBR）要点：
-  - 默认用 `!!@self`（TYPE C transient）做一次性“新靴子推理”，只带 task doc + 子问题。
-  - `!!@self !topic <topic-id>`（TYPE B 注册型）应少用，仅当明确需要可恢复的长期 workspace。
+  - 默认用 `!?@self`（TYPE C transient）做一次性“新靴子推理”，只带 task doc + 子问题。
+  - `!?@self !topic <topic-id>`（TYPE B 注册型）应少用，仅当明确需要可恢复的长期 workspace。
 
 ## 对话系统：驱动/协作/挂起（dialog-system.md）
 - Backend-driven：对话驱动是**后端协程**的唯一职责；前端只订阅事件/发布通道，不负责驱动状态机。
@@ -20,17 +20,17 @@
   - Subdialog registry（per root）`agentId!topicId → Subdialog`（仅 TYPE B 注册型）
 - 每个 Dialog 有 mutex，保证同一时刻只有一个协程驱动，避免竞态。
 - Teammate call 三类型：
-  - TYPE A：`!!@super`（子对话呼叫直接父对话；禁止 `!topic`）
-  - TYPE B：`!!@agentId !topic topicId`（注册型，可恢复；key=`agentId!topicId`）
+  - TYPE A：`!?@super`（子对话呼叫直接父对话；禁止 `!topic`）
+  - TYPE B：`!?@agentId !topic topicId`（注册型，可恢复；key=`agentId!topicId`）
     - 复用时会更新“当前 caller dialog id + callInfo”，保证回传路由到**最新 caller**
     - 每次 TYPE B 调用都会把 parent 的 `headLine/callBody` 作为新 user msg 追加进 subdialog
-  - TYPE C：`!!@agentId`（临时子对话，不注册）
+  - TYPE C：`!?@agentId`（临时子对话，不注册）
 - Q4H：
-  - 通过 `!!@human`/`!!@ask_human` 触发；driver 检测到首个 mention 为 `human/ask_human` 就 suspend
+  - 通过 `!?@human` 触发；driver 检测到首个 mention 为 `human` 就 suspend
   - 索引在 `q4h.yaml`（仅索引，source-of-truth 在消息记录）
   - UI 通过 `questions_count_update` 事件获知，并读取 q4h.yaml 展示
   - 用户答复用 WS 包 `drive_dialog_by_user_answer`（带 `questionId`；后端先清 q4h 再 resume）
-  - `!!@clear_mind` 会清掉 Q4H 索引（但保留 reminders、保留 Type B registry）
+  - `!?@clear_mind` 会清掉 Q4H 索引（但保留 reminders、保留 Type B registry）
 - 典型存储路径（workspace 相对路径）：
   - `.dialogs/run/<root-id>/dialog.yaml`
   - `.dialogs/run/<root-id>/latest.yaml`
@@ -41,7 +41,7 @@
 
 ## 封装差遣牒（encapsulated-task-doc.md）
 - 任务文档是 `*.tsk/` 目录包：`goals.md` / `constraints.md` / `progress.md`（都要求存在）。
-- `!!@change_mind`：一次只能替换**一个**分段的全文；不会触发 round reset。
+- `!?@change_mind`：一次只能替换**一个**分段的全文；不会触发 round reset。
 - `**/*.tsk/` 对通用文件工具**完全禁止**读写/列目录；只能通过显式 task-doc 操作管理。
 
 ## Keep-going：根对话自动续航（keep-going.md）
@@ -107,7 +107,7 @@
 - 关键建议：
   - `member_defaults.provider` / `member_defaults.model` 必填；成员对象用 prototype fallback（`Object.setPrototypeOf`）继承 defaults。
   - 目录规则由 `matchesPattern()`（`dominds/main/access-control.ts`）评估，支持 `*`、`**`；deny-list（`no_*`）优先于 allow-list（`*_dirs`）。
-  - 普通成员默认 deny `.minds/**` 写（`no_write_dirs: ['.minds/**']`），团队管理交给 `team-mgmt` 工具与 `!!@team_mgmt_manual`。
+  - 普通成员默认 deny `.minds/**` 写（`no_write_dirs: ['.minds/**']`），团队管理交给 `team-mgmt` 工具与 `!?@team_mgmt_manual`。
   - minds 文件：`.minds/team/<id>/{persona,knowledge,lessons}.md` 由 `dominds/main/minds/load.ts` 读取。
 - Bootstrap：shadow `fuxi` 负责 team-mgmt（不应给 broad `ws_mod`），shadow `pangu` 给 broad workspace toolsets（不应给 team-mgmt）。
 

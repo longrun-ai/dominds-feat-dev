@@ -162,7 +162,7 @@ await window.__e2e__.waitForInputEnabled();
 Send in chat:
 
 ```text
-!!@team_mgmt_manual !topics
+!?@team_mgmt_manual !topics
 ```
 
 Wait for completion:
@@ -183,37 +183,37 @@ Pass criteria:
 1. Overwrite a test file:
 
 ```text
-!!@team_mgmt_overwrite_file .minds/team-mgmt-ws-e2e.txt
-hello-1
+!?@team_mgmt_overwrite_file .minds/team-mgmt-ws-e2e.txt
+!?hello-1
 ```
 
 2. Read it back:
 
 ```text
-!!@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
+!?@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
 ```
 
 3. Plan + apply an edit (use a fixed hunk id so the test doesn’t need to parse tool output):
 
 ```text
-!!@team_mgmt_plan_file_modification .minds/team-mgmt-ws-e2e.txt 1~1 !e2e1
-hello-2
+!?@team_mgmt_plan_file_modification .minds/team-mgmt-ws-e2e.txt 1~1 !e2e1
+!?hello-2
 ```
 
 ```text
-!!@team_mgmt_apply_file_modification !e2e1
+!?@team_mgmt_apply_file_modification !e2e1
 ```
 
 4. Confirm:
 
 ```text
-!!@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
+!?@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
 ```
 
 5. Clean up:
 
 ```text
-!!@team_mgmt_rm_file .minds/team-mgmt-ws-e2e.txt
+!?@team_mgmt_rm_file .minds/team-mgmt-ws-e2e.txt
 ```
 
 Pass criteria:
@@ -227,7 +227,7 @@ Pass criteria:
 Send in chat (expected failure):
 
 ```text
-!!@team_mgmt_read_file ../package.json
+!?@team_mgmt_read_file ../package.json
 ```
 
 Pass criteria:
@@ -252,7 +252,7 @@ await window.__e2e__.waitForInputEnabled();
 Send in chat:
 
 ```text
-!!@list_dir .minds
+!?@list_dir .minds
 ```
 
 Pass criteria:
@@ -269,5 +269,5 @@ If any artifacts remain under `.minds/`, remove them using **team-mgmt tools** f
 Suggested cleanup:
 
 ```text
-!!@team_mgmt_rm_file .minds/team-mgmt-ws-e2e.txt
+!?@team_mgmt_rm_file .minds/team-mgmt-ws-e2e.txt
 ```
