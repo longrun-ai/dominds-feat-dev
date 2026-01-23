@@ -1,3 +1,16 @@
 member_defaults:
   provider: codex
   model: gpt-5.2-codex
+
+default_responder: ux
+
+members:
+  ux:
+    name: UX 体验官 / Tooling UX Critic
+    model: gpt-5.2
+    diligence-push-max: 0
+    toolsets:
+      - ws_read
+      - ws_mod
+      - memory
+      - team_memory
