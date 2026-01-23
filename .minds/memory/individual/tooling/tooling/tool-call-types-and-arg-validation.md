@@ -1,4 +1,4 @@
-# Tool type & 参数校验（func / texter）
+# Tool type & 参数校验（func / tellask）
 关键词：`Tool` `FuncTool` `TellaskTool` `argsValidation` `validateArgs`
 
 - `dominds/main/tool.ts`
@@ -10,7 +10,7 @@
     - `argsValidation?: 'dominds' | 'passthrough'`
     - `call(dlg, caller, args): Promise<string>`
   - `TellaskTool`：
-    - `type: 'texter'`
+    - `type: 'tellask'`
     - `name`, `usageDescription`, `usageDescriptionI18n?`, `backfeeding: boolean`
     - `call(dlg, caller, headLine, inputBody): Promise<TellaskToolCallResult>`
   - `TellaskToolCallResult`：

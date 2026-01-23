@@ -2,7 +2,7 @@
 关键词：`read_file` `overwrite_file` `plan_file_modification` `apply_file_modification` `PLANNED_MOD_TTL_MS` `fileApplyQueues`
 
 - `dominds/main/tools/txt.ts`
-  - 提供 4 个 texter tool：`read_file` / `overwrite_file` / `plan_file_modification` / `apply_file_modification`（在 `builtins.ts` 注册）。
+  - 提供 4 个 tellask tool：`read_file` / `overwrite_file` / `plan_file_modification` / `apply_file_modification`（在 `builtins.ts` 注册）。
   - 访问控制：
     - 统一走 `hasReadAccess` / `hasWriteAccess` + `getAccessDeniedMessage`（间接继承对 `*.tsk/` 的封装拒绝）。
     - `ensureInsideWorkspace(rel)` 也做一次 workspace 前缀校验（抛错 "Path must be within workspace"）。
