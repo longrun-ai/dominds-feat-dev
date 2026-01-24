@@ -1,12 +1,16 @@
 #!/usr/bin/env markdown
 
-# Dominds WebUI E2E: Text Tools (ripgrep\_\* + easy-edit + plan/apply UX) — For UX testing via dev-server rtws
+# Dominds WebUI E2E: Text Tools (ripgrep\_\* + easy-edit + preview/apply UX) — For UX testing via dev-server rtws
 
 This UX story validates:
 
 - `ripgrep_*` navigation tools (files/snippets/count/fixed/search)
-- “easy edit” tools (`append_file`, `insert_after`, `insert_before`, `replace_block`)
-- safer precise edit workflow (`plan_file_modification` → `apply_file_modification`)
+- preview-first edit workflow (`preview_*` → `apply_file_modification`), including:
+  - `preview_file_append`
+  - `preview_insert_after`
+  - `preview_insert_before`
+  - `preview_block_replace`
+  - `preview_file_modification`
 - `replace_file_contents` “diff-like content” warning
 
 This test validates Dominds **tool contracts + WebUI surfacing**, not “LLM smartness”.
@@ -131,11 +135,11 @@ for (const name of mustHaveRead) {
 const mustHaveMod = [
   'read_file',
   'replace_file_contents',
-  'append_file',
-  'insert_after',
-  'insert_before',
-  'replace_block',
-  'plan_file_modification',
+  'preview_file_modification',
+  'preview_file_append',
+  'preview_insert_after',
+  'preview_insert_before',
+  'preview_block_replace',
   'apply_file_modification',
   ...mustHaveRead,
 ];
@@ -174,9 +178,9 @@ Pass criteria:
 
 ---
 
-## T3) Easy-edit tools: replace → append → insert_after/before → replace_block
+## T3) Preview-first edit tools: replace → preview+apply append → preview+apply insert → preview+apply block_replace
 
-Send in chat:
+Send in chat (each block is a separate message):
 
 ```text
 !?@replace_file_contents scratch/e2e-txt-tools.txt
@@ -187,32 +191,56 @@ Send in chat:
 !?L5 tail
 ```
 
-Then:
+Then plan append:
 
 ```text
-!?@append_file scratch/e2e-txt-tools.txt
+!?@preview_file_append scratch/e2e-txt-tools.txt !e2e_append1
 !?APPEND-1
 ```
 
-Then:
+Apply:
 
 ```text
-!?@insert_after scratch/e2e-txt-tools.txt "anchor: A" occurrence=1 strict=true
+!?@apply_file_modification !e2e_append1
+```
+
+Then plan insert-after:
+
+```text
+!?@preview_insert_after scratch/e2e-txt-tools.txt "anchor: A" occurrence=1 !e2e_after_a1
 !?AFTER-A
 ```
 
-Then:
+Apply:
 
 ```text
-!?@insert_before scratch/e2e-txt-tools.txt "anchor: B" occurrence=1 strict=true
+!?@apply_file_modification !e2e_after_a1
+```
+
+Then plan insert-before:
+
+```text
+!?@preview_insert_before scratch/e2e-txt-tools.txt "anchor: B" occurrence=1 !e2e_before_b1
 !?BEFORE-B
 ```
 
-Then:
+Apply:
 
 ```text
-!?@replace_block scratch/e2e-txt-tools.txt "anchor: A" "anchor: B" occurrence=1 include_anchors=true
+!?@apply_file_modification !e2e_before_b1
+```
+
+Then plan block-replace:
+
+```text
+!?@preview_block_replace scratch/e2e-txt-tools.txt "anchor: A" "anchor: B" occurrence=1 include_anchors=true
 !?BLOCK-NEW
+```
+
+Apply (copy `hunk_id` from the plan YAML):
+
+```text
+!?@apply_file_modification !<hunk_id>
 ```
 
 Finally:
@@ -223,17 +251,18 @@ Finally:
 
 Pass criteria:
 
-- Each tool returns a YAML block with the expected fields (`normalized`, evidence preview, counts).
+- Each plan tool returns a YAML block with the expected fields (`normalized`, evidence preview, counts).
+- Each apply returns YAML with `context_match` + `apply_evidence`.
 - Readback confirms anchors preserved and content inserted in the intended locations.
 
 ---
 
-## T4) plan/apply: YAML evidence + unified diff retained
+## T4) preview/apply: YAML evidence + unified diff retained
 
 Plan with a fixed id:
 
 ```text
-!?@plan_file_modification scratch/e2e-txt-tools.txt 1~1 !e2e_txt1
+!?@preview_file_modification scratch/e2e-txt-tools.txt 1~1 !e2e_txt1
 !?L1 HELLO-CHANGED
 ```
 
@@ -246,7 +275,7 @@ Apply:
 Pass criteria:
 
 - Plan output includes a ` ```yaml ` block with `evidence` + `summary`, and still shows the unified diff.
-- Apply output includes `context_match` and applied evidence, and still shows the unified diff.
+- Apply output includes `context_match` and `apply_evidence`, and still shows the unified diff.
 
 ---
 

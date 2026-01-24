@@ -127,10 +127,11 @@ const mustHave = [
   'team_mgmt_list_dir',
   'team_mgmt_read_file',
   'team_mgmt_replace_file_contents',
-  'team_mgmt_plan_file_modification',
+  'team_mgmt_preview_file_modification',
   'team_mgmt_apply_file_modification',
   'team_mgmt_mkdir',
-  'team_mgmt_move_path',
+  'team_mgmt_move_file',
+  'team_mgmt_move_dir',
   'team_mgmt_rm_file',
   'team_mgmt_rm_dir',
 ];
@@ -193,10 +194,10 @@ Pass criteria:
 !?@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
 ```
 
-3. Plan + apply an edit (use a fixed hunk id so the test doesn’t need to parse tool output):
+3. Preview + apply an edit (use a fixed hunk id so the test doesn’t need to parse tool output):
 
 ```text
-!?@team_mgmt_plan_file_modification .minds/team-mgmt-ws-e2e.txt 1~1 !e2e1
+!?@team_mgmt_preview_file_modification .minds/team-mgmt-ws-e2e.txt 1~1 !e2e1
 !?hello-2
 ```
 
