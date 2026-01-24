@@ -1,0 +1,6 @@
+- 已落盘 UX issue：`ux-issues/ws-mod-docs-and-overwrite-guardrails.md`（P1，Owner @tooling）。
+- 方向已定：`replace_file_contents` 彻底删除（无兼容层/alias），替换为 `overwrite_entire_file`。
+- 护栏参数最终决定：入参使用扁平 `known_old_total_lines/known_old_total_bytes`（诉请友好）；对外语义/输出仍以 `known_old_stats`（旧文件快照，可扩展 mtime/hash/encoding）呈现，便于错误回显与未来扩展。
+- `content_format` 作为显式意图参数：当 `content_format='diff'|'patch'` 时允许写入 diff/patch 字面量；未指定时仅对强特征 diff/patch 触发默认拒绝（避免误伤 Markdown 列表）。
+- 增补 prompt-level 建议：仅在“新内容 < 100 行（或明确重置/生成物）”时使用 `overwrite_entire_file`，否则优先 preview/apply。
+- 索引已更新：`ux-issues/README.md:44` 已加入该 issue。

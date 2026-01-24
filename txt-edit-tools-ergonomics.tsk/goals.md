@@ -1,0 +1,4 @@
+- 基于现有实现与文档（`dominds/main/tools/prompts/ws_mod.*`、`dominds/docs/txt-editing-tools.md`）做一次端到端可用性校对。
+- 把发现沉淀为“可复现、可定位、可验收”的 UX issue 文档（落到 `ux-issues/`）。
+- 聚焦：`hunk_id` 生命周期心智模型（含 TTL）、`replace_file_contents`（直写整文件覆盖）护栏/命名/参数设计、默认选项语义一致性。
+- 明确：两轮消息（preview→apply）是刻意防呆，不把它当问题。
