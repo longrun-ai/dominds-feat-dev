@@ -1,4 +1,4 @@
 - 不对 `*.tsk/` 使用通用文件工具；只用 `!?@change_mind` 维护差遣牒分段。
 - 两轮消息（preview→apply）保留为硬约束；不提出“合并为单轮”的方案。
 - 以当前实现为准：hunk TTL 约 1 小时、自动清理；未使用 hunks 不应有副作用。
-- `replace_file_contents` 的优化方向：改名以降低误解 + 增加 `expect_lines/expect_bytes` 等对账参数 + diff-like 内容默认拒绝（仅强特征触发，避免误伤 Markdown 项目符号）。
+- `overwrite_entire_file`（函数工具）必须带 `known_old_total_lines/known_old_total_bytes` 对账参数；正文疑似 diff/patch 且未声明 `content_format='diff'|'patch'` 时默认拒绝（仅强特征触发，避免误伤 Markdown 项目符号）。

@@ -11,7 +11,7 @@ This UX story validates:
   - `preview_insert_before`
   - `preview_block_replace`
   - `preview_file_modification`
-- `replace_file_contents` “diff-like content” warning
+- `overwrite_entire_file` guardrails (diff/patch default-refuse; explicit opt-in via `content_format`)
 
 This test validates Dominds **tool contracts + WebUI surfacing**, not “LLM smartness”.
 
@@ -134,7 +134,7 @@ for (const name of mustHaveRead) {
 
 const mustHaveMod = [
   'read_file',
-  'replace_file_contents',
+  'overwrite_entire_file',
   'preview_file_modification',
   'preview_file_append',
   'preview_insert_after',
@@ -178,17 +178,23 @@ Pass criteria:
 
 ---
 
-## T3) Preview-first edit tools: replace → preview+apply append → preview+apply insert → preview+apply block_replace
+## T3) Preview-first edit tools: init (create) → preview+apply append → preview+apply insert → preview+apply block_replace
 
 Send in chat (each block is a separate message):
 
 ```text
-!?@replace_file_contents scratch/e2e-txt-tools.txt
+!?@preview_file_append scratch/e2e-txt-tools.txt create=true !e2e_init0
 !?L1 hello
 !?L2 anchor: A
 !?L3 keep
 !?L4 anchor: B
 !?L5 tail
+```
+
+Apply:
+
+```text
+!?@apply_file_modification !e2e_init0
 ```
 
 Then plan append:
@@ -279,19 +285,40 @@ Pass criteria:
 
 ---
 
-## T5) replace_file_contents diff-like warning
+## T5) overwrite_entire_file guardrails (function tool)
+
+1) Create a small seed file (deterministic old stats):
 
 ```text
-!?@replace_file_contents scratch/e2e-diff-warning.txt
-!?diff --git a/a.txt b/a.txt
-!?@@ -1,1 +1,1 @@
-!?-old
-!?+new
+!?@preview_file_append scratch/e2e-diff-warning.txt create=true !e2e_seed_diff1
+!?seed
 ```
+
+```text
+!?@apply_file_modification !e2e_seed_diff1
+```
+
+2) Ask the agent to call the **function tool** `overwrite_entire_file` with old stats = `known_old_total_lines=1` and `known_old_total_bytes=5`, and content as a diff — but **do not** provide `content_format`:
+
+```text
+Call the function tool overwrite_entire_file with:
+- path: scratch/e2e-diff-warning.txt
+- known_old_total_lines: 1
+- known_old_total_bytes: 5
+- content: |
+    diff --git a/a.txt b/a.txt
+    @@ -1,1 +1,1 @@
+    -old
+    +new
+Do not set content_format.
+```
+
+3) Repeat, but set `content_format='diff'`, then confirm by `!?@read_file scratch/e2e-diff-warning.txt`.
 
 Pass criteria:
 
-- Output includes a warning that `replace_file_contents` writes literally (diff is saved as-is).
+- Without `content_format`, the call is rejected as “diff/patch-like content”.
+- With `content_format='diff'`, the call succeeds and the diff text is written literally.
 
 ---
 

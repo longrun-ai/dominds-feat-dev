@@ -126,7 +126,7 @@ const mustHave = [
   'team_mgmt_manual',
   'team_mgmt_list_dir',
   'team_mgmt_read_file',
-  'team_mgmt_replace_file_contents',
+  'team_mgmt_overwrite_entire_file',
   'team_mgmt_preview_file_modification',
   'team_mgmt_apply_file_modification',
   'team_mgmt_mkdir',
@@ -181,37 +181,48 @@ Pass criteria:
 
 ### T2c) File ops (must stay under `.minds/**`)
 
-1. Replace contents of a test file:
+1. Create a test file via preview/apply (deterministic):
 
 ```text
-!?@team_mgmt_replace_file_contents .minds/team-mgmt-ws-e2e.txt
+!?@team_mgmt_preview_file_append .minds/team-mgmt-ws-e2e.txt create=true !e2e_init
 !?hello-1
 ```
 
-2. Read it back:
+```text
+!?@team_mgmt_apply_file_modification !e2e_init
+```
+
+2. Overwrite it via the guarded exception tool (note the fixed old stats for `hello-1\n` = 1 line, 8 bytes):
+
+```text
+!?@team_mgmt_overwrite_entire_file .minds/team-mgmt-ws-e2e.txt known_old_total_lines=1 known_old_total_bytes=8
+!?hello-2
+```
+
+3. Read it back:
 
 ```text
 !?@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
 ```
 
-3. Preview + apply an edit (use a fixed hunk id so the test doesn’t need to parse tool output):
+4. Preview + apply an edit (use a fixed hunk id so the test doesn’t need to parse tool output):
 
 ```text
 !?@team_mgmt_preview_file_modification .minds/team-mgmt-ws-e2e.txt 1~1 !e2e1
-!?hello-2
+!?hello-3
 ```
 
 ```text
 !?@team_mgmt_apply_file_modification !e2e1
 ```
 
-4. Confirm:
+5. Confirm:
 
 ```text
 !?@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
 ```
 
-5. Clean up:
+6. Clean up:
 
 ```text
 !?@team_mgmt_rm_file .minds/team-mgmt-ws-e2e.txt
@@ -220,7 +231,7 @@ Pass criteria:
 Pass criteria:
 
 - All tool calls complete.
-- Readback shows `hello-2`.
+- Readback shows `hello-3`.
 - No console errors.
 
 ### T2d) Negative scope check: reject paths outside `.minds/**`
