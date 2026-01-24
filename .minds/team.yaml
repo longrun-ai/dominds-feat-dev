@@ -17,9 +17,12 @@ members:
       - ws_read
       - ws_mod
     write_dirs:
-      - dominds/docs/**
+      - docs/
+      - dominds/docs/
+      - ux-issues/
+      - scratching/
     no_write_dirs:
-      - .minds/**
+      - .minds/
     gofor:
       - 'Scope/范围: `dominds/docs/**`（设计文档/机制说明/产品特性总纲）+ 跨域需求分流（不直接 owner 代码实现）'
       - 'Interfaces/接口: 需求归属判断 + Feature brief；依赖矩阵（server/webui/cli/runtime/qa）；验收口径（交 QA 纳入 gate）'
