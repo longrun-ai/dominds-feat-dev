@@ -1,3 +1,0 @@
-- 扫描 `dominds/main/tools/**`、tools registry、guardrails/policies、以及与 tooling 相关的 MCP/权限钩子代码
-- 提炼可回指到文件/符号的“有效记忆”，覆盖：工具注册/契约、权限与拒绝语义、审计日志、MCP 暴露与映射、回归/冒烟验证点
-- 为“上岗检测”准备可复述的要点与排错路径

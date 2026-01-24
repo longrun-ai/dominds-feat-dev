@@ -10,7 +10,7 @@ default_responder: ux
 members:
   pm:
     name: Product Manager (PM)
-    diligence-push-max: 0
+    diligence-push-max: 3
     toolsets:
       - team_memory
       - memory
