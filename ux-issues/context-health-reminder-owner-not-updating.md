@@ -87,6 +87,28 @@ Context health 提醒在对话中出现后：
 
 ## 已落地修复（代码）
 
+## 现状检查（2026-01-25）
+
+- 设计上：context health reminder 应为 owned reminder，并在 clear condition 后由 owner 自动 drop；用户/agent 不需要也不应该依赖“手工 delete_reminder”来清理。
+- 现实中：系统提示仍存在“我应判断它是否仍然相关；如果不相关，应立即调用 delete_reminder …”的泛化文案（适用于普通 reminders），容易误导为“手动删除是正确/必要的路径”。
+
+### 发现：系统提示仍建议手工 delete（与 owned reminder 心智冲突）
+
+- 相关文案位置：`dominds/main/shared/i18n/driver-messages.ts:23` 的 `formatReminderItemGuide()`。
+- 当前输出会对每条 reminder（不区分 owned vs 非 owned）都附加“如不相关应 delete_reminder”的指引。
+
+### 建议（产品/UX 层）
+
+- 对 owned reminders（有 ownerName 的提醒），在渲染时不再附加“请 delete_reminder 清理”的指引，改为：
+  - 明确该提醒由 owner 管理，会在条件恢复后自动更新/消失。
+  - 若需要强制清理，提供替代建议（例如改用 `clear_mind` 开新回合），而不是引导 delete。
+- 对非 owned reminders，保留当前 delete_reminder 指引即可。
+
+### 验收点
+
+- [ ] owned reminders（例如 `context_health`）在 UI/assistant 输出中不再出现“请 delete_reminder”式的误导文案。
+- [ ] non-owned reminders 仍保持可手动 delete_reminder 的指引与行为。
+
 - **持久化补全**：`reminders.json` 的 schema 扩展为每条 reminder 可选保存：
   - `ownerName?: string`
   - `meta?: JsonValue`
