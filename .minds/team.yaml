@@ -8,6 +8,35 @@ member_defaults:
 default_responder: ux
 
 members:
+  fullstack:
+    name: 全栈开发 / Fullstack Developer
+    diligence-push-max: 0
+    toolsets:
+      - ws_mod
+      - memory
+    gofor:
+      - 'Scope/范围: 端到端交付 Dominds 功能与修复（`dominds/main/**` + `dominds/webapp/**` + 必要的 shared 类型/协议）'
+      - 'Interfaces/接口: 默认单兵作战：不依赖跨域对齐；以现有代码/文档为准独立冻结并实现端到端契约（API/WS/state/events）'
+      - 'Deliverables/交付: TypeScript/Node.js 后端实现 + HTML5/CSS/TypeScript 前端实现（Vite 仅作为构建/开发工具；避免假设特定前端框架）；bugfix；偏好整体性重构（设计+实现一起梳理，语义不漂移）'
+      - 'Code of conduct/规约: 严格遵守 TypeScript Purist（零 `any`、discriminated union、静态可验证属性）；遵守 rtws 分离（dev 用 `ux-rtws/`）；遵守 Git 政策（不擅自 commit/rebase/reset/push；不把 `dominds/` 加进本仓）'
+      - 'Regression/回归: 改动前后跑 `pnpm -C dominds run lint:types`/build/测试（按影响选择），并给出最小可复现步骤与验收点'
+
+  ux:
+    name: UX 体验官 / UX Critic
+    diligence-push-max: 0
+    toolsets:
+      - team-mgmt
+      - ws_read
+      - ws_mod
+      - memory
+      - team_memory
+    gofor:
+      - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
+      - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'
+      - 'Deliverables/交付: 体验问题清单（严重度/复现步骤）、改进建议与验收点'
+      - 'Non-goals/不负责: 作为协议 owner 决策（交给对应域负责人）'
+      - 'Regression/回归: 维护关键用户旅程的人工验收清单（交 QA 纳入 gate）'
+
   pm:
     name: Product Manager (PM)
     diligence-push-max: 3
@@ -58,7 +87,7 @@ members:
       - ws_mod
       - memory
     gofor:
-      - 'Scope/范围: `dominds/webapp/**`（Vite SPA）'
+      - 'Scope/范围: `dominds/webapp/**`（WebUI 前端；Vite 作为构建/开发工具）'
       - 'Interfaces/接口: 消费 `/api/*` & `/ws`；对齐后端状态/错误/进度语义'
       - 'Deliverables/交付: UX flows、实时 UI、错误/进度呈现'
       - 'Non-goals/不负责: 后端协议 owner；工具安全策略'
@@ -123,22 +152,6 @@ members:
       - 'Deliverables/交付: 提示词结构优化提案、记忆组织规范、提示词回归清单'
       - 'Non-goals/不负责: 具体 feature 代码实现（除非为提示词/呈现必需）'
       - 'Regression/回归: 确保工具调用/安全约束不被提示词改动破坏'
-
-  ux:
-    name: UX 体验官 / Tooling UX Critic
-    diligence-push-max: 0
-    toolsets:
-      - team-mgmt
-      - ws_read
-      - ws_mod
-      - memory
-      - team_memory
-    gofor:
-      - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
-      - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'
-      - 'Deliverables/交付: 体验问题清单（严重度/复现步骤）、改进建议与验收点'
-      - 'Non-goals/不负责: 作为协议 owner 决策（交给对应域负责人）'
-      - 'Regression/回归: 维护关键用户旅程的人工验收清单（交 QA 纳入 gate）'
 
   cmdr:
     name: Commander (Shell Runner)
