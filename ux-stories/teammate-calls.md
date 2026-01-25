@@ -537,9 +537,9 @@ const subdialogState = {
 
 ---
 
-### Scenario A2: Batch `!?@change_mind` + Teammate Call in One Message (Mixed Actions)
+### Scenario A2: Batch `change_mind` + Teammate Call in One Response (Mixed Actions)
 
-**Goal:** Validate that dominds can process **multiple** `!?@change_mind` updates (multiple sections) and a **teammate call** in the **same user message**, without dropping/merging actions or corrupting subdialog routing.
+**Goal:** Validate that dominds can process **multiple** `change_mind` function-tool calls (multiple sections) and a **teammate call** in the **same assistant response**, without dropping/merging actions or corrupting subdialog routing.
 
 This is a “mixed actions” stress case:
 
@@ -549,16 +549,16 @@ This is a “mixed actions” stress case:
 
 **Important notes:**
 
-- `!?@change_mind` for `*.tsk/` still requires **exactly one** selector per call. This scenario uses **multiple calls** in one message.
+- `change_mind` for `*.tsk/` still requires **exactly one** selector per call. This scenario uses **multiple calls** in one response.
 - The user message must **not** begin with `!?@pangu` (otherwise you’ve turned it into a **direct user-initiated** teammate call and you’re no longer testing “responder delegates to teammate”).
 
 #### Steps
 
-1. Capture a baseline snapshot (`pre`) and record the current round indicator (should remain stable; `!?@change_mind` must not reset rounds).
+1. Capture a baseline snapshot (`pre`) and record the current round indicator (should remain stable; `change_mind` must not reset rounds).
 2. Send exactly **one** user message instructing the responder to:
-   1. Call `!?@change_mind !goals` with a new goals list
-   2. Call `!?@change_mind !constraints` with a new constraints list
-   3. Call `!?@change_mind !progress` with a new progress list
+   1. Call function tool `change_mind` with `{"selector":"!goals","content":"..."}`
+   2. Call function tool `change_mind` with `{"selector":"!constraints","content":"..."}`
+   3. Call function tool `change_mind` with `{"selector":"!progress","content":"..."}`
    4. Then issue a teammate call to `!?@pangu` (no `!topic`) to run exactly one `shell_cmd` with `command="echo $HOME"`, and return the HOME value
 3. Wait for all teammate calls to complete and input to re-enable.
 4. Verify in UI:
@@ -575,13 +575,13 @@ This is a “mixed actions” stress case:
 
 ```text
 In one response, do these steps in order:
-1) Update the task doc goals via !?@change_mind !goals to:
+1) Call `change_mind` with selector `!goals` and content:
 - Confirm teammate routing works under mixed actions.
 - Confirm task-doc updates work under mixed actions.
-2) Update constraints via !?@change_mind !constraints to:
+2) Call `change_mind` with selector `!constraints` and content:
 - Use one selector per call.
 - No direct user-initiated !?@pangu call.
-3) Update progress via !?@change_mind !progress to:
+3) Call `change_mind` with selector `!progress` and content:
 - Started mixed-action verification.
 4) Then delegate to !?@pangu (no !topic): run exactly one shell_cmd command="echo $HOME" and reply with HOME only.
 ```

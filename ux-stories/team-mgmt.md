@@ -129,7 +129,7 @@ const mustHave = [
   'team_mgmt_overwrite_entire_file',
   'team_mgmt_preview_file_modification',
   'team_mgmt_apply_file_modification',
-  'team_mgmt_mkdir',
+  'team_mgmt_mk_dir',
   'team_mgmt_move_file',
   'team_mgmt_move_dir',
   'team_mgmt_rm_file',
@@ -163,7 +163,8 @@ await window.__e2e__.waitForInputEnabled();
 Send in chat:
 
 ```text
-!?@team_mgmt_manual !topics
+Call the function tool `team_mgmt_manual` with:
+{ "topics": ["topics"] }
 ```
 
 Wait for completion:
@@ -184,48 +185,53 @@ Pass criteria:
 1. Create a test file via preview/apply (deterministic):
 
 ```text
-!?@team_mgmt_preview_file_append .minds/team-mgmt-ws-e2e.txt create=true !e2e_init
-!?hello-1
+Call the function tool `team_mgmt_preview_file_append` with:
+{ "path": ".minds/team-mgmt-ws-e2e.txt", "create": true, "existing_hunk_id": "", "content": "hello-1\\n" }
 ```
 
 ```text
-!?@team_mgmt_apply_file_modification !e2e_init
+Call the function tool `team_mgmt_apply_file_modification` with:
+{ "hunk_id": "<hunk_id_from_previous_step>" }
 ```
 
 2. Overwrite it via the guarded exception tool (note the fixed old stats for `hello-1\n` = 1 line, 8 bytes):
 
 ```text
-!?@team_mgmt_overwrite_entire_file .minds/team-mgmt-ws-e2e.txt known_old_total_lines=1 known_old_total_bytes=8
-!?hello-2
+Call the function tool `team_mgmt_overwrite_entire_file` with:
+{ "path": ".minds/team-mgmt-ws-e2e.txt", "known_old_total_lines": 1, "known_old_total_bytes": 8, "content": "hello-2\\n" }
 ```
 
 3. Read it back:
 
 ```text
-!?@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
+Call the function tool `team_mgmt_read_file` with:
+{ "path": ".minds/team-mgmt-ws-e2e.txt" }
 ```
 
-4. Preview + apply an edit (use a fixed hunk id so the test doesn’t need to parse tool output):
+4. Preview + apply an edit (copy `hunk_id` from the preview output):
 
 ```text
-!?@team_mgmt_preview_file_modification .minds/team-mgmt-ws-e2e.txt 1~1 !e2e1
-!?hello-3
+Call the function tool `team_mgmt_preview_file_modification` with:
+{ "path": ".minds/team-mgmt-ws-e2e.txt", "range": "1~1", "existing_hunk_id": "", "content": "hello-3\\n" }
 ```
 
 ```text
-!?@team_mgmt_apply_file_modification !e2e1
+Call the function tool `team_mgmt_apply_file_modification` with:
+{ "hunk_id": "<hunk_id_from_previous_step>" }
 ```
 
 5. Confirm:
 
 ```text
-!?@team_mgmt_read_file .minds/team-mgmt-ws-e2e.txt
+Call the function tool `team_mgmt_read_file` with:
+{ "path": ".minds/team-mgmt-ws-e2e.txt" }
 ```
 
 6. Clean up:
 
 ```text
-!?@team_mgmt_rm_file .minds/team-mgmt-ws-e2e.txt
+Call the function tool `team_mgmt_rm_file` with:
+{ "path": ".minds/team-mgmt-ws-e2e.txt" }
 ```
 
 Pass criteria:
@@ -239,7 +245,8 @@ Pass criteria:
 Send in chat (expected failure):
 
 ```text
-!?@team_mgmt_read_file ../package.json
+Call the function tool `team_mgmt_read_file` with:
+{ "path": "../package.json" }
 ```
 
 Pass criteria:
@@ -264,7 +271,8 @@ await window.__e2e__.waitForInputEnabled();
 Send in chat:
 
 ```text
-!?@list_dir .minds
+Call the function tool `list_dir` with:
+{ "path": ".minds" }
 ```
 
 Pass criteria:
@@ -281,5 +289,6 @@ If any artifacts remain under `.minds/`, remove them using **team-mgmt tools** f
 Suggested cleanup:
 
 ```text
-!?@team_mgmt_rm_file .minds/team-mgmt-ws-e2e.txt
+Call the function tool `team_mgmt_rm_file` with:
+{ "path": ".minds/team-mgmt-ws-e2e.txt" }
 ```

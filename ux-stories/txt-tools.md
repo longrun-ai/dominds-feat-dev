@@ -183,76 +183,101 @@ Pass criteria:
 Send in chat (each block is a separate message):
 
 ```text
-!?@preview_file_append scratch/e2e-txt-tools.txt create=true !e2e_init0
-!?L1 hello
-!?L2 anchor: A
-!?L3 keep
-!?L4 anchor: B
-!?L5 tail
-```
-
-Apply:
-
-```text
-!?@apply_file_modification !e2e_init0
-```
-
-Then plan append:
-
-```text
-!?@preview_file_append scratch/e2e-txt-tools.txt !e2e_append1
-!?APPEND-1
-```
-
-Apply:
-
-```text
-!?@apply_file_modification !e2e_append1
-```
-
-Then plan insert-after:
-
-```text
-!?@preview_insert_after scratch/e2e-txt-tools.txt "anchor: A" occurrence=1 !e2e_after_a1
-!?AFTER-A
-```
-
-Apply:
-
-```text
-!?@apply_file_modification !e2e_after_a1
-```
-
-Then plan insert-before:
-
-```text
-!?@preview_insert_before scratch/e2e-txt-tools.txt "anchor: B" occurrence=1 !e2e_before_b1
-!?BEFORE-B
-```
-
-Apply:
-
-```text
-!?@apply_file_modification !e2e_before_b1
-```
-
-Then plan block-replace:
-
-```text
-!?@preview_block_replace scratch/e2e-txt-tools.txt "anchor: A" "anchor: B" occurrence=1 include_anchors=true
-!?BLOCK-NEW
+Call the function tool `preview_file_append` with:
+- path: scratch/e2e-txt-tools.txt
+- create: true
+- content: |
+    L1 hello
+    L2 anchor: A
+    L3 keep
+    L4 anchor: B
+    L5 tail
 ```
 
 Apply (copy `hunk_id` from the plan YAML):
 
 ```text
-!?@apply_file_modification !<hunk_id>
+Call the function tool `apply_file_modification` with:
+{ "hunk_id": "<hunk_id>" }
+```
+
+Then plan append:
+
+```text
+Call the function tool `preview_file_append` with:
+- path: scratch/e2e-txt-tools.txt
+- content: |
+    APPEND-1
+```
+
+Apply (copy `hunk_id` from the plan YAML):
+
+```text
+Call the function tool `apply_file_modification` with:
+{ "hunk_id": "<hunk_id>" }
+```
+
+Then plan insert-after:
+
+```text
+Call the function tool `preview_insert_after` with:
+- path: scratch/e2e-txt-tools.txt
+- anchor: "anchor: A"
+- occurrence: 1
+- content: |
+    AFTER-A
+```
+
+Apply (copy `hunk_id` from the plan YAML):
+
+```text
+Call the function tool `apply_file_modification` with:
+{ "hunk_id": "<hunk_id>" }
+```
+
+Then plan insert-before:
+
+```text
+Call the function tool `preview_insert_before` with:
+- path: scratch/e2e-txt-tools.txt
+- anchor: "anchor: B"
+- occurrence: 1
+- content: |
+    BEFORE-B
+```
+
+Apply (copy `hunk_id` from the plan YAML):
+
+```text
+Call the function tool `apply_file_modification` with:
+{ "hunk_id": "<hunk_id>" }
+```
+
+Then plan block-replace:
+
+```text
+Call the function tool `preview_block_replace` with:
+- path: scratch/e2e-txt-tools.txt
+- start_anchor: "anchor: A"
+- end_anchor: "anchor: B"
+- occurrence: 1
+- include_anchors: true
+- content: |
+    BLOCK-NEW
+```
+
+Apply (copy `hunk_id` from the plan YAML):
+
+```text
+Call the function tool `apply_file_modification` with:
+{ "hunk_id": "<hunk_id>" }
 ```
 
 Finally:
 
 ```text
-!?@read_file scratch/e2e-txt-tools.txt
+Call the function tool `read_file` with:
+{ "path": "scratch/e2e-txt-tools.txt" }
 ```
 
 Pass criteria:
@@ -265,17 +290,21 @@ Pass criteria:
 
 ## T4) preview/apply: YAML evidence + unified diff retained
 
-Plan with a fixed id:
+Plan:
 
 ```text
-!?@preview_file_modification scratch/e2e-txt-tools.txt 1~1 !e2e_txt1
-!?L1 HELLO-CHANGED
+Call the function tool `preview_file_modification` with:
+- path: scratch/e2e-txt-tools.txt
+- range: 1~1
+- content: |
+    L1 HELLO-CHANGED
 ```
 
-Apply:
+Apply (copy `hunk_id` from the plan YAML):
 
 ```text
-!?@apply_file_modification !e2e_txt1
+Call the function tool `apply_file_modification` with:
+{ "hunk_id": "<hunk_id>" }
 ```
 
 Pass criteria:
@@ -290,12 +319,16 @@ Pass criteria:
 1) Create a small seed file (deterministic old stats):
 
 ```text
-!?@preview_file_append scratch/e2e-diff-warning.txt create=true !e2e_seed_diff1
-!?seed
+Call the function tool `preview_file_append` with:
+- path: scratch/e2e-diff-warning.txt
+- create: true
+- content: |
+    seed
 ```
 
 ```text
-!?@apply_file_modification !e2e_seed_diff1
+Call the function tool `apply_file_modification` with:
+{ "hunk_id": "<hunk_id>" }
 ```
 
 2) Ask the agent to call the **function tool** `overwrite_entire_file` with old stats = `known_old_total_lines=1` and `known_old_total_bytes=5`, and content as a diff — but **do not** provide `content_format`:
@@ -313,7 +346,7 @@ Call the function tool overwrite_entire_file with:
 Do not set content_format.
 ```
 
-3) Repeat, but set `content_format='diff'`, then confirm by `!?@read_file scratch/e2e-diff-warning.txt`.
+3) Repeat, but set `content_format='diff'`, then confirm by calling the function tool `read_file` with `{ "path": "scratch/e2e-diff-warning.txt" }`.
 
 Pass criteria:
 
@@ -325,19 +358,23 @@ Pass criteria:
 ## T6) ripgrep\_\* navigation
 
 ```text
-!?@ripgrep_files "HELLO-CHANGED" scratch
+Call the function tool `ripgrep_files` with:
+{ "pattern": "HELLO-CHANGED", "path": "scratch" }
 ```
 
 ```text
-!?@ripgrep_snippets "HELLO-CHANGED" scratch fixed_strings=true context_before=1 context_after=1 max_results=10
+Call the function tool `ripgrep_snippets` with:
+{ "pattern": "HELLO-CHANGED", "path": "scratch", "fixed_strings": true, "context_before": 1, "context_after": 1, "max_results": 10 }
 ```
 
 ```text
-!?@ripgrep_fixed "@@ -1,1" scratch mode=snippets
+Call the function tool `ripgrep_fixed` with:
+{ "literal": "@@ -1,1", "path": "scratch", "mode": "snippets" }
 ```
 
 ```text
-!?@ripgrep_count "anchor:" scratch fixed_strings=true
+Call the function tool `ripgrep_count` with:
+{ "pattern": "anchor:", "path": "scratch", "fixed_strings": true }
 ```
 
 Pass criteria:

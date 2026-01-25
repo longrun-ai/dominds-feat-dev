@@ -386,12 +386,8 @@ const pre = await snapshotDomindsUI();
 const preCount = pre.chat?.visibleMessageCount ?? 0;
 
 const msgId = await fillAndSend(
-  'Keep-going test C1 (disabled). Reply with ONLY this single tool call; no other text:\\n' +
-    '```\\n' +
-    '!?@add_reminder\\n' +
-    'kg-c1 reminder (keep-going disabled; should not auto-continue)\\n' +
-    '!?@/\\n' +
-    '```',
+  'Keep-going test C1 (disabled). Reply with ONLY this single function tool call; no other text: ' +
+    'add_reminder({\"content\":\"kg-c1 reminder (keep-going disabled; should not auto-continue)\"})',
 );
 await waitForInputEnabled();
 
@@ -434,17 +430,15 @@ or re-enable keep-going by restoring the diligence file created in Setup S2.
 
 ### Extension E — Tool-only output still triggers keep-going (silent-stop regression)
 
-This reproduces the original “silent-stop” shape where the assistant output is only a tellask tool call
-that does **not** backfeed tool output into the model context.
+This reproduces the original “silent-stop” shape where the assistant output is only a function tool call.
 
 Run with the same diligence file from Setup S2 (`max-num-prompts: 3`, diligence instructs `KG_OK`).
 
 1. Ask the testee to reply with ONLY this tool call (no other text):
 
-   ```
-   !?@add_reminder
-   kg-e1 reminder (tool-only output)
-
+   ```text
+   Call the function tool `add_reminder` with:
+   { "content": "kg-e1 reminder (tool-only output)" }
    ```
 
 2. Assert you see:
@@ -467,7 +461,7 @@ running other E2E stories, prefer hard reset:
 If you want to keep the dialog, at minimum:
 
 - Answer the Q4H created in Scenario B (e.g. reply `yes`) so the root dialog is no longer suspended.
-- Delete the reminders created in Scenarios A/C (via `!?@delete_reminder <n>`), or accept reminder
+- Delete the reminders created in Scenarios A/C (via `delete_reminder({\"reminder_no\": <n>})`), or accept reminder
   state drift for subsequent tests.
 
 ### Cleanup the temporary diligence file (required for story isolation)

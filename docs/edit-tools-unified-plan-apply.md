@@ -4,7 +4,7 @@
 - Date: 2026-01-24
 - Owner: @tooling (implementation), @qa (gate/regression), @pm (spec)
 
-> TL;DR: 把所有“会写文件内容”的文本编辑能力统一成 **preview-first**：先 `preview_*` 生成可复核 diff + 证据 + hunk_id，再用 **唯一**的 `apply_file_modification !<hunk_id>` 落盘；**彻底移除**所有旧的直接写入/专用 apply 工具（无 alias、无兼容层）。
+> TL;DR: 把所有“会写文件内容”的文本编辑能力统一成 **preview-first**：先 `preview_*` 生成可复核 diff + 证据 + hunk_id，再用 **唯一**的 `apply_file_modification({ "hunk_id": "<hunk_id>" })` 落盘；**彻底移除**所有旧的直接写入/专用 apply 工具（无 alias、无兼容层）。
 
 ## 1. 背景与问题
 
@@ -36,7 +36,7 @@
 
 ### 4.1 统一流程
 1) `preview_*`：只读文件，生成 hunk + diff + 证据 + 注意事项（换行/空行风格提示、歧义提示）
-2) `apply_file_modification !<hunk_id>`：唯一落盘入口（输出应用证据 + context_match）
+2) `apply_file_modification({ "hunk_id": "<hunk_id>" })`：唯一落盘入口（输出应用证据 + context_match）
 
 ### 4.2 关键实现约束：工具并行执行
 
@@ -52,7 +52,7 @@
 - 输出要求沿用 `ux-issues/text-precise-edit-plan-apply-ux.md`：必须含定位证据（before/range/after）+ summary + diff
 
 ### 5.2 新增：`preview_file_append`
-**签名**：`preview_file_append <path> [options] [!existing-hunk-id]`  
+**签名**：`preview_file_append({ path, content, create, existing_hunk_id })`  
 **正文**：追加内容 `content`  
 **语义**：只计划追加，不落盘；返回可 apply 的 hunk。
 
@@ -75,8 +75,8 @@
 > 落点：`preview_file_append` 必须明确提示“原有行数/追加行数/EOF 换行/空行风格是否统一”。
 
 ### 5.3 新增：`preview_insert_after` / `preview_insert_before`
-- `preview_insert_after <path> <anchor> [options] [!existing-hunk-id]`
-- `preview_insert_before <path> <anchor> [options] [!existing-hunk-id]`
+- `preview_insert_after({ path, anchor, content, occurrence, match, existing_hunk_id })`
+- `preview_insert_before({ path, anchor, content, occurrence, match, existing_hunk_id })`
 
 **共同要求**：
 - 必须返回 `inserted_at_line`（resolved）、`occurrence_resolved`
@@ -86,10 +86,10 @@
 
 ### 5.4 保留但改造：`preview_block_replace`
 - 继续作为“锚点块替换”的 plan-only 工具
-- **取消** “下一步：apply_block_replace” 的文案；统一提示 `apply_file_modification !<hunk_id>`
+- **取消** “下一步：apply_block_replace” 的文案；统一提示 `apply_file_modification({ "hunk_id": "<hunk_id>" })`
 - 输出字段建议与现有保持一致，但应补齐统一字段（见第 6 节）
 
-### 5.5 统一 apply：`apply_file_modification !<hunk_id>`
+### 5.5 统一 apply：`apply_file_modification({ "hunk_id": "<hunk_id>" })`
 - 必须能 apply 由任意 `preview_*` 产生的 hunk（不仅限 `preview_file_modification`）
 - `context_match` 语义统一：`exact|fuzz|rejected`
 - apply 输出必须含应用证据（before/range/after 或插入/追加的 preview）

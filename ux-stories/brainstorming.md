@@ -1,15 +1,15 @@
-# Dominds WebUI E2E: `!?@change_mind` (Task Doc Update) — Brainstorming UX
+# Dominds WebUI E2E: `change_mind` (Task Doc Update) — Brainstorming UX
 
-Validate that Dominds’ `!?@change_mind` behaves correctly for the **testee agent** during exploratory work (brainstorming / ideation), where requirements evolve quickly and task-doc edits are frequent.
+Validate that Dominds’ function tool `change_mind` behaves correctly for the **testee agent** during exploratory work (brainstorming / ideation), where requirements evolve quickly and task-doc edits are frequent.
 
 This story is **semantic** (human judgment + UI observation). No strict text equality checks are required, but the tester and testee should verify that the behavior matches the intent.
 
 ## Key Semantics Under Test
 
-1. **No round reset**: `!?@change_mind` must **not** start a new dialog round and must **not** clear messages/Q4H/reminders by itself.
+1. **No round reset**: `change_mind` must **not** start a new dialog round and must **not** clear messages/Q4H/reminders by itself.
 2. **Encapsulated task packages (`*.tsk/`)**:
    - The task doc lives in a directory ending in `.tsk/`.
-   - `!?@change_mind` must target **exactly one** section: `!goals | !constraints | !progress`.
+   - `change_mind` must target **exactly one** section: `!goals | !constraints | !progress`.
    - A successful call replaces the entire target section contents (no patch semantics).
 3. **Safety**:
    - Missing/invalid selector is rejected for `*.tsk/`.
@@ -20,7 +20,7 @@ This story is **semantic** (human judgment + UI observation). No strict text equ
 
 - Create a fresh dialog using a dedicated task package:
   - `brainstorming-test.tsk/`
-- Ensure the testee is in the **root dialog** (not a subdialog), since `!?@change_mind` is root-only.
+- Ensure the testee is in the **root dialog** (not a subdialog), since `change_mind` is root-only.
 
 ## Observations to Capture (Human-Readable)
 
@@ -30,7 +30,7 @@ After each step, the tester should note:
 - Whether earlier chat messages are still visible (no timeline wipe).
 - Whether the task doc changed **in the right section**.
 - Whether the tool bubble shows success/failure appropriately.
-- If multiple `!?@change_mind` calls were included in a single message: verify there is one tool bubble per call, and that each updated section matches its corresponding body (no “cross-write” between sections).
+- If multiple `change_mind` calls were issued in a single turn: verify there is one tool bubble per call, and that each updated section matches its corresponding content (no “cross-write” between sections).
 
 Note: The current WebUI does not render `*.tsk/` task-doc panes (Goals/Constraints/Progress). For now, validate section
 updates by inspecting the workspace files (e.g., `brainstorming-test.tsk/goals.md`, `constraints.md`, `progress.md`).
@@ -47,8 +47,8 @@ If you run with the E2E helpers, keep the evidence lightweight:
 
 ### Steps
 
-1. Tester: Instruct the testee to call `!?@change_mind !goals` with a short “brainstormed” goals list.
-2. Testee: Issues exactly one `!?@change_mind !goals` call with non-empty body.
+1. Tester: Instruct the testee to call `change_mind` with a short “brainstormed” goals list.
+2. Testee: Issues exactly one `change_mind` function tool call with non-empty `content`.
 3. Tester: Verify in UI:
    - Round did **not** change.
    - Messages were **not** cleared.
@@ -57,10 +57,9 @@ If you run with the E2E helpers, keep the evidence lightweight:
 
 ### Example (not strict)
 
-```
-!?@change_mind !goals
-!?- Explore 3 product directions.
-!?- Pick 1 direction with clear success criteria.
+```text
+Call the function tool `change_mind` with:
+{ "selector": "!goals", "content": "- Explore 3 product directions.\\n- Pick 1 direction with clear success criteria.\\n" }
 ```
 
 ### Pass Conditions (semantic)
@@ -74,7 +73,7 @@ If you run with the E2E helpers, keep the evidence lightweight:
 
 ### Steps
 
-1. Tester: Instruct the testee to call `!?@change_mind !constraints` with 3–6 crisp constraints.
+1. Tester: Instruct the testee to call `change_mind` with 3–6 crisp constraints.
 2. Verify:
    - Round did not change.
    - Task doc “Constraints” is replaced.
@@ -86,7 +85,7 @@ If you run with the E2E helpers, keep the evidence lightweight:
 
 ### Steps
 
-1. Tester: Instruct the testee to call `!?@change_mind !progress` to record 2–5 bullet updates.
+1. Tester: Instruct the testee to call `change_mind` to record 2–5 bullet updates.
 2. Verify:
    - Round did not change.
    - Progress is replaced.
@@ -94,17 +93,17 @@ If you run with the E2E helpers, keep the evidence lightweight:
 
 ## Scenario 4: Update Multiple Sections in One Message (Batch Happy Path)
 
-**Intent**: In a single chat send, the testee updates **multiple** task-doc sections by including multiple `!?@change_mind` calls (one per section). This validates the WebUI/tooling behavior when the user wants to “batch apply” a set of edits without multiple sends.
+**Intent**: In a single turn, the testee updates **multiple** task-doc sections by issuing multiple `change_mind` calls (one per section). This validates the WebUI/tooling behavior when the user wants to “batch apply” a set of edits without multiple sends.
 
-Important: `*.tsk/` still enforces **one selector per `!?@change_mind` call**. This scenario is about putting multiple calls into a single message, not adding a multi-selector feature to the tool.
+Important: `*.tsk/` still enforces **one selector per `change_mind` call**. This scenario is about issuing multiple calls in a single turn, not adding a multi-selector feature to the tool.
 
 ### Steps
 
-1. Tester: Ask the testee to send **one message** that contains three `!?@change_mind` calls: `!goals`, `!constraints`, and `!progress`.
+1. Tester: Ask the testee to perform **three** `change_mind` calls in a single turn: `!goals`, `!constraints`, and `!progress`.
 2. Verify in UI:
    - Round did **not** change.
    - Messages were **not** cleared.
-   - There are **three** tool bubbles (one per `!?@change_mind` call), and all are successful.
+   - There are **three** tool bubbles (one per `change_mind` call), and all are successful.
 3. Verify in workspace files:
    - `brainstorming-test.tsk/goals.md` reflects the new goals body.
    - `brainstorming-test.tsk/constraints.md` reflects the new constraints body.
@@ -113,19 +112,15 @@ Important: `*.tsk/` still enforces **one selector per `!?@change_mind` call**. T
 
 ### Example (one message; not strict)
 
-```
-!?@change_mind !goals
-!?- Explore 3 product directions.
-!?- Pick 1 direction with clear success criteria.
+```text
+Call the function tool `change_mind` with:
+{ "selector": "!goals", "content": "- Explore 3 product directions.\\n- Pick 1 direction with clear success criteria.\\n" }
 
-!?@change_mind !constraints
-!?- No web browsing.
-!?- Keep changes under 10 lines per file.
-!?- Don’t touch prod.
+Call the function tool `change_mind` with:
+{ "selector": "!constraints", "content": "- No web browsing.\\n- Keep changes under 10 lines per file.\\n- Don’t touch prod.\\n" }
 
-!?@change_mind !progress
-!?- Chose Option B as the leading direction.
-!?- Defined success criteria draft.
+Call the function tool `change_mind` with:
+{ "selector": "!progress", "content": "- Chose Option B as the leading direction.\\n- Defined success criteria draft.\\n" }
 ```
 
 ### Pass Conditions (semantic)
@@ -140,7 +135,7 @@ These should fail safely, with no partial edits.
 ### A) Missing selector on `*.tsk/`
 
 - Testee attempts:
-  - `!?@change_mind` (no selector) with a body
+  - `change_mind({ "content": "..." })` (missing selector)
 - Expect:
   - Tool call fails with a clear error
   - No task doc section changes
@@ -149,7 +144,7 @@ These should fail safely, with no partial edits.
 ### B) Invalid selector
 
 - Testee attempts:
-  - `!?@change_mind !goalz` (typo) with a body
+  - `change_mind({ "selector": "!goalz", "content": "..." })` (invalid selector)
 - Expect:
   - Tool call fails with “invalid selector”
   - No task doc section changes
@@ -157,18 +152,18 @@ These should fail safely, with no partial edits.
 ### C) Empty body
 
 - Testee attempts:
-  - `!?@change_mind !goals` with an empty body (or whitespace)
+  - `change_mind({ "selector": "!goals", "content": "" })` (empty body)
 - Expect:
   - Tool call fails (content required)
   - No task doc section changes
 
 ## Optional Scenario 6: Encapsulation Guardrail
 
-This validates that the _only_ way to edit `*.tsk/` is via `!?@change_mind` (not file tools).
+This validates that the _only_ way to edit `*.tsk/` is via `change_mind` (not file tools).
 
 ### Steps
 
-1. Tester: Ask the testee to try `!?@read_file brainstorming-test.tsk/goals.md` (or `!?@list_dir brainstorming-test.tsk`).
+1. Tester: Ask the testee to attempt a file-tool read/list on `*.tsk/` (e.g., call function tool `read_file` with `{ "path": "brainstorming-test.tsk/goals.md" }`, or call `list_dir` with `{ "path": "brainstorming-test.tsk" }`).
 2. Expect:
    - Access denied (encapsulation policy)
    - No task doc changes
@@ -184,13 +179,7 @@ const snap1 = await snapshotDomindsUI();
 const roundBefore = snap1.currentDialog?.round || '';
 
 await fillAndSend(
-  [
-    'Update goals with a brainstorming list.',
-    '!?@change_mind !goals',
-    '- Option A: ...',
-    '- Option B: ...',
-    '- Decide next: pick one and define success.',
-  ].join('\\n'),
+  'Call the function tool `change_mind` with {\"selector\":\"!goals\",\"content\":\"- Option A: ...\\\\n- Option B: ...\\\\n- Decide next: pick one and define success.\\\\n\"}.',
 );
 
 await waitForInputEnabled();
