@@ -78,27 +78,42 @@ This project is designed so that **all code PRs happen in the `dominds` repo**.
 
 ## Development
 
-### Bootstrapping (DevOps)
+### Install `dominds` from this checkout (recommended)
 
-Prefer installing the **released** `dominds` CLI globally (stable versions from the registry), then run it from this repo root to use `./.minds/` as the team definition/workspace memory:
+For contributor development, the most reliable setup is to “dogfood” your in-tree PR checkout by installing `./dominds` as the global `dominds` CLI. This gives you a stable global CLI that only changes when you rebuild (normal source edits and `dev-server.sh` restarts won’t affect it until you run another build).
+
+For day-to-day iteration, prefer the dev server (hot reload / fast feedback). Only rebuild when you explicitly want to refresh the “installed snapshot” you run via the `dominds` CLI.
+
+First, remove any existing global `dominds` installs (npm and pnpm install to different locations and can shadow each other via `PATH`):
 
 ```bash
-# Option A (preferred): stable release from npm registry
-npm install -g dominds
+npm uninstall -g dominds
+pnpm remove -g dominds
 
-# Option B (emergency only): if the released CLI is broken, link a clean checkout of `main`
-# from a different directory (do NOT link the same `./dominds` checkout you are editing for PRs).
-git clone https://github.com/longrun-ai/dominds.git ~/src/dominds-main
-pnpm -C ~/src/dominds-main install
-pnpm -C ~/src/dominds-main run build:backend
-pnpm -C ~/src/dominds-main link --global
+pnpm -C dominds install
+pnpm -C dominds build
+pnpm add -g ./dominds
 ```
 
-Then:
+Run it from this repo root (rtws = repo root):
 
 ```bash
 dominds      # default = webui, rtws = repo root
-dominds read
+```
+
+To pick up your latest PR changes, rebuild (and reinstall to be safe across environments):
+
+```bash
+pnpm -C dominds build
+pnpm add -g ./dominds
+```
+
+If you want to switch back to the released CLI:
+
+```bash
+pnpm remove -g dominds
+npm uninstall -g dominds
+npm install -g dominds
 ```
 
 ### WebUI Dev Server (Dev/UX)
