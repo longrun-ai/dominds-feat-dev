@@ -379,7 +379,7 @@ workspace.
 
 ### C1) Repeat a tool-only root scenario; assert there is NO follow-up token
 
-````javascript
+```javascript
 checkConsoleErrors({ clear: true, threshold: 0 });
 
 const pre = await snapshotDomindsUI();
@@ -408,7 +408,7 @@ const postCount = post.chat?.visibleMessageCount ?? 0;
 if (postCount <= preCount) throw new Error('Expected at least one new visible message bubble');
 
 checkConsoleErrors({ clear: true, threshold: 0 });
-````
+```
 
 **Pass intuition:** you should see the tool call and its response bubble, then the dialog returns idle
 with **no** extra follow-up from the agent.

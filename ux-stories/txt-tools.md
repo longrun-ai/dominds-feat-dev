@@ -11,6 +11,7 @@ This UX story validates:
   - `preview_insert_before`
   - `preview_block_replace`
   - `preview_file_modification`
+- `create_new_file` create-only tool (empty content allowed)
 - `overwrite_entire_file` guardrails (diff/patch default-refuse; explicit opt-in via `content_format`)
 
 This test validates Dominds **tool contracts + WebUI surfacing**, not “LLM smartness”.
@@ -134,6 +135,7 @@ for (const name of mustHaveRead) {
 
 const mustHaveMod = [
   'read_file',
+  'create_new_file',
   'overwrite_entire_file',
   'preview_file_modification',
   'preview_file_append',
@@ -145,6 +147,19 @@ const mustHaveMod = [
 ];
 for (const name of mustHaveMod) {
   if (!wsMod.tools.includes(name)) throw new Error(`ws_mod missing tool: ${name}`);
+}
+
+const teamMgmt = s1.toolsets.find((x) => x.title.includes('team-mgmt'));
+if (!teamMgmt) throw new Error(`Missing toolset 'team-mgmt'`);
+const mustHaveTeamMgmt = [
+  'team_mgmt_read_file',
+  'team_mgmt_create_new_file',
+  'team_mgmt_overwrite_entire_file',
+  'team_mgmt_preview_file_modification',
+  'team_mgmt_apply_file_modification',
+];
+for (const name of mustHaveTeamMgmt) {
+  if (!teamMgmt.tools.includes(name)) throw new Error(`team-mgmt missing tool: ${name}`);
 }
 ```
 
@@ -316,7 +331,7 @@ Pass criteria:
 
 ## T5) overwrite_entire_file guardrails (function tool)
 
-1) Create a small seed file (deterministic old stats):
+1. Create a small seed file (deterministic old stats):
 
 ```text
 Call the function tool `preview_file_append` with:
@@ -331,7 +346,7 @@ Call the function tool `apply_file_modification` with:
 { "hunk_id": "<hunk_id>" }
 ```
 
-2) Ask the agent to call the **function tool** `overwrite_entire_file` with old stats = `known_old_total_lines=1` and `known_old_total_bytes=5`, and content as a diff — but **do not** provide `content_format`:
+2. Ask the agent to call the **function tool** `overwrite_entire_file` with old stats = `known_old_total_lines=1` and `known_old_total_bytes=5`, and content as a diff — but **do not** provide `content_format`:
 
 ```text
 Call the function tool overwrite_entire_file with:
@@ -346,7 +361,7 @@ Call the function tool overwrite_entire_file with:
 Do not set content_format.
 ```
 
-3) Repeat, but set `content_format='diff'`, then confirm by calling the function tool `read_file` with `{ "path": "scratch/e2e-diff-warning.txt" }`.
+3. Repeat, but set `content_format='diff'`, then confirm by calling the function tool `read_file` with `{ "path": "scratch/e2e-diff-warning.txt" }`.
 
 Pass criteria:
 
