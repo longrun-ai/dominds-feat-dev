@@ -18,7 +18,7 @@ Dominds must support:
 
 - `clear_mind`: reset the dialog + optionally add a reminder (UI headline renders as `@clear_mind`)
 - `change_mind`: overwrite the task doc (or `*.tsk/` section) with **no round reset** (UI headline renders as `@change_mind`)
-- Follow-up coroutine prompt: appears as the **first visible message** in the new round (target UX: first user message), with **no backfeeding** from the tool call itself
+- Follow-up coroutine prompt: appears as the **first visible message** in the new round (target UX: first user message), with **no result** from the tool call itself
 - One-round timeline: UI shows **only one round at a time** (round transitions clear `#dialog-container` then refill)
 
 ## Your Tester Agent Principles
@@ -264,7 +264,7 @@ Issue exactly one tool call. No other tool calls or extra text.
 
 - Tool call executes but no new-round prompt appears
 - New round does not start without manual user input
-- Backfeeding messages appear in the chat as if the tool replied
+- Tool result messages appear in the chat as if the tool replied
 
 **Scripted Run (JS, recommended):**
 
@@ -401,7 +401,7 @@ Issue exactly one tool call. No other tool calls or extra text.
 
 - Round resets and new-round prompt appears
 - No reminder added
-- No backfeeding output
+- No tool result output
 - Chat timeline shows only the current round’s bubbles
 
 ---
