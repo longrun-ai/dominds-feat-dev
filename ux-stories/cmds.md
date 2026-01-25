@@ -87,7 +87,7 @@ generation bubbles remain.
 
 - Sidebar visible nodes from `snap.sidebar.visibleNodeTitles` (prefixed with `Task:`/`Dialog:`/`Subdialog:`)
 - Sidebar selection from `snap.sidebar.selectedDialogTitle`
-- Pending teammate calls from `snap.chat.pendingTeammateCalls`
+- Pending teammate tellasks from `snap.chat.pendingTeammateCalls`
 - Input enabled state from `snap.input.textareaEnabled`
 - Visible message count from `snap.chat.visibleMessageCount`
 - Visible chat timeline from `snap.chat.visibleMessages`
@@ -220,7 +220,7 @@ If these conditions aren't met -> dominds infrastructure bug, stop.
 
 - Sidebar visible list includes `Task: cmds-test.tsk` and a single `Dialog: @...` row
 - Sidebar selection matches `snap.currentDialog.title`
-- Chat area shows no pending teammate calls and no messages
+- Chat area shows no pending teammate tellasks and no messages
 
 ---
 
@@ -228,7 +228,7 @@ If these conditions aren't met -> dominds infrastructure bug, stop.
 
 **Goal:** Ensure the testee understands that it should cooperate and use shell tool calls exactly as instructed.
 
-**Important:** Avoid starting a line at column 0 with `!?@` here to prevent unintended teammate calls. Use words like “Pangu” instead of `!?@pangu`.
+**Important:** Avoid starting a line at column 0 with `!?@` here to prevent unintended teammate tellasks. Use words like “Pangu” instead of `!?@pangu`.
 
 ```javascript
 const msgId = await fillAndSend(
@@ -253,7 +253,7 @@ const preflightErrors = checkConsoleErrors();
 
 - [ ] Response explicitly acknowledges cooperation with test instructions
 - [ ] Response mentions “one shell command only” (or equivalent) and no extra steps
-- [ ] Response avoids teammate calls (no new `Subdialog:` rows added)
+- [ ] Response avoids teammate tellasks (no new `Subdialog:` rows added)
 - [ ] `preflightErrors.length === 0` and `completed === true`
 
 **If the calibration fails:** **STOP** the test run and write a short advisory (see below). Do not proceed to Part A.

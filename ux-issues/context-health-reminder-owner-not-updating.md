@@ -24,7 +24,7 @@ Context health 提醒在对话中出现后：
 ## 复现步骤（观察式）
 
 1. 触发一次 context health 提醒（例如上下文偏大，出现 “上下文健康：对话上下文已偏大。”）
-2. 更新代码中的提醒文案（例如将提醒导向从 `clear_mind` 正文改为 `change_mind !progress`；或新增一条 option）
+2. 更新代码中的提醒文案（例如将提醒导向从 `clear_mind` 正文改为 `change_mind`（selector=`progress`）；或新增一条 option）
 3. 重启后继续对话，触发新一条提醒
 4. 观察：
    - 旧提醒仍保留旧文案（快照不更新）

@@ -284,7 +284,7 @@ if (window.__e2e__.snapshotDomindsUI().header.serverWorkLanguage !== 'zh') {
 }
 ```
 
-### A4) Create a dialog and trigger an inter-dialog formatted response (teammate call)
+### A4) Create a dialog and trigger an inter-dialog formatted response (teammate tellask)
 
 This step checks **working-language formatting** (stable) rather than user-facing prose (LLM-dependent).
 

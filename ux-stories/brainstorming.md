@@ -9,7 +9,7 @@ This story is **semantic** (human judgment + UI observation). No strict text equ
 1. **No round reset**: `change_mind` must **not** start a new dialog round and must **not** clear messages/Q4H/reminders by itself.
 2. **Encapsulated task packages (`*.tsk/`)**:
    - The task doc lives in a directory ending in `.tsk/`.
-   - `change_mind` must target **exactly one** section: `!goals | !constraints | !progress`.
+   - `change_mind` must target **exactly one** section: `goals | constraints | progress`.
    - A successful call replaces the entire target section contents (no patch semantics).
 3. **Safety**:
    - Missing/invalid selector is rejected for `*.tsk/`.
@@ -59,7 +59,7 @@ If you run with the E2E helpers, keep the evidence lightweight:
 
 ```text
 Call the function tool `change_mind` with:
-{ "selector": "!goals", "content": "- Explore 3 product directions.\\n- Pick 1 direction with clear success criteria.\\n" }
+{ "selector": "goals", "content": "- Explore 3 product directions.\\n- Pick 1 direction with clear success criteria.\\n" }
 ```
 
 ### Pass Conditions (semantic)
@@ -99,7 +99,7 @@ Important: `*.tsk/` still enforces **one selector per `change_mind` call**. This
 
 ### Steps
 
-1. Tester: Ask the testee to perform **three** `change_mind` calls in a single turn: `!goals`, `!constraints`, and `!progress`.
+1. Tester: Ask the testee to perform **three** `change_mind` calls in a single turn: `goals`, `constraints`, and `progress`.
 2. Verify in UI:
    - Round did **not** change.
    - Messages were **not** cleared.
@@ -114,13 +114,13 @@ Important: `*.tsk/` still enforces **one selector per `change_mind` call**. This
 
 ```text
 Call the function tool `change_mind` with:
-{ "selector": "!goals", "content": "- Explore 3 product directions.\\n- Pick 1 direction with clear success criteria.\\n" }
+{ "selector": "goals", "content": "- Explore 3 product directions.\\n- Pick 1 direction with clear success criteria.\\n" }
 
 Call the function tool `change_mind` with:
-{ "selector": "!constraints", "content": "- No web browsing.\\n- Keep changes under 10 lines per file.\\n- Don’t touch prod.\\n" }
+{ "selector": "constraints", "content": "- No web browsing.\\n- Keep changes under 10 lines per file.\\n- Don’t touch prod.\\n" }
 
 Call the function tool `change_mind` with:
-{ "selector": "!progress", "content": "- Chose Option B as the leading direction.\\n- Defined success criteria draft.\\n" }
+{ "selector": "progress", "content": "- Chose Option B as the leading direction.\\n- Defined success criteria draft.\\n" }
 ```
 
 ### Pass Conditions (semantic)
@@ -152,7 +152,7 @@ These should fail safely, with no partial edits.
 ### C) Empty body
 
 - Testee attempts:
-  - `change_mind({ "selector": "!goals", "content": "" })` (empty body)
+  - `change_mind({ "selector": "goals", "content": "" })` (empty body)
 - Expect:
   - Tool call fails (content required)
   - No task doc section changes
@@ -179,7 +179,7 @@ const snap1 = await snapshotDomindsUI();
 const roundBefore = snap1.currentDialog?.round || '';
 
 await fillAndSend(
-  'Call the function tool `change_mind` with {\"selector\":\"!goals\",\"content\":\"- Option A: ...\\\\n- Option B: ...\\\\n- Decide next: pick one and define success.\\\\n\"}.',
+  'Call the function tool `change_mind` with {\"selector\":\"goals\",\"content\":\"- Option A: ...\\\\n- Option B: ...\\\\n- Decide next: pick one and define success.\\\\n\"}.',
 );
 
 await waitForInputEnabled();

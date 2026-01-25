@@ -3,21 +3,22 @@
 This is a practical checklist for team members (and contributors) to quickly build an accurate mental model of Dominds and produce shippable feature briefs with clear QA gates.
 
 ## 0) Guiding constraints (read first)
-- Dominds is **pre-release (Alpha/preview)**: see [`release-status.md`](./release-status.md).
+- Dominds is **pre-release (Alpha/preview)**: see `dominds/docs/release-status.md`.
 - Dominds is **dogfooding-first**: optimize real agent/operator experience; remove sharp edges even if it needs refactors.
 - Prefer **root-cause fixes** and remove obsolete compatibility paths (“no compatibility baggage”).
 - Conclusions must be **anchored to docs + code** (file paths / symbols / message types), not memory.
-- Encapsulated task docs (`*.tsk/`) are **not** editable via generic file tools; only update via `!?@change_mind`.
+- Encapsulated Taskdocs (`*.tsk/`) are **not** editable via generic file tools; only update via the function tool `change_mind`.
 
 ## 1) Read these docs (in this order)
-1. [`design.md`](./design.md) — Why the system exists; Fresh Boots Reasoning; task-centered architecture.
-2. [`dialog-system.md`](./dialog-system.md) — Backend-driven driver; teammate calls; Q4H; suspension/resumption.
-3. [`encapsulated-task-doc.md`](./encapsulated-task-doc.md) — `*.tsk/` rules; why “single source of truth” matters.
-4. [`keep-going.md`](./keep-going.md) — Root dialog auto-continue; budget; when forced to Q4H.
-5. [`auth.md`](./auth.md) — Dev/prod auth modes; HTTP/WS auth propagation; WebUI behavior.
-6. [`team-tools-view.md`](./team-tools-view.md) — Tools registry + Problems view (WebUI expectations).
-7. [`mcp-support.md`](./mcp-support.md) — MCP semantics; tool name constraints; hot-reload + last-known-good behavior.
-8. [`interruption-resumption.md`](./interruption-resumption.md) — Stop/Resume semantics; blocked vs interrupted UX requirements.
+1. `dominds/docs/design.md` — Why the system exists; Fresh Boots Reasoning; task-centered architecture.
+2. `dominds/docs/dominds-terminology.md` — Canonical vocabulary across prompts/docs (Taskdoc, Teammate Tellask, etc.).
+3. `dominds/docs/dialog-system.md` — Backend-driven driver; teammate tellasks; Q4H; suspension/resumption.
+4. `dominds/docs/encapsulated-task-doc.md` — `*.tsk/` rules; why “single source of truth” matters.
+5. `dominds/docs/keep-going.md` — Root dialog auto-continue; budget; when forced to Q4H.
+6. `dominds/docs/auth.md` — Dev/prod auth modes; HTTP/WS auth propagation; WebUI behavior.
+7. `dominds/docs/team-tools-view.md` — Tools registry + Problems view (WebUI expectations).
+8. `dominds/docs/mcp-support.md` — MCP semantics; tool name constraints; hot-reload + last-known-good behavior.
+9. `dominds/docs/interruption-resumption.md` — Stop/Resume semantics; blocked vs interrupted UX requirements.
 
 ## 2) “Reality check” against code (minimum set)
 When writing or reviewing any spec, confirm these implementation anchors exist and match the doc:
@@ -33,8 +34,8 @@ When writing or reviewing any spec, confirm these implementation anchors exist a
 **Task Doc (`*.tsk/`) encapsulation**
 - Path detection + general-file-tool bans: `dominds/main/access-control.ts`
 - Task package helpers: `dominds/main/utils/task-package.ts`, `dominds/main/utils/taskdoc-search.ts`
-- Task doc rendering + warnings: `dominds/main/utils/task-doc.ts`
-- `!?@change_mind` (no round reset): `dominds/main/tools/ctrl.ts`
+- Taskdoc rendering + warnings: `dominds/main/utils/taskdoc.ts`
+- `change_mind` (no round reset): `dominds/main/tools/ctrl.ts`
 
 **Minds & tools**
 - Minds loader: `dominds/main/minds/load.ts`

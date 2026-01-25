@@ -93,7 +93,7 @@ prev = post;
 
 - Sidebar visible nodes from `snap.sidebar.visibleNodeTitles` (prefixed with `Task:`/`Dialog:`/`Subdialog:`)
 - Sidebar selection from `snap.sidebar.selectedDialogTitle`
-- Pending teammate calls from `snap.chat.pendingTeammateCalls`
+- Pending teammate tellasks from `snap.chat.pendingTeammateCalls`
 - Input enabled state from `snap.input.textareaEnabled`
 - Visible message count from `snap.chat.visibleMessageCount`
 - Visible chat timeline from `snap.chat.visibleMessages`
@@ -329,7 +329,7 @@ const assertions = {
 
 ```text
 Step 2: Call the function tool `change_mind` exactly once with:
-{ "selector": "!progress", "content": "# Task Update\\nWe are now testing dialog round control.\\n" }
+{ "selector": "progress", "content": "# Task Update\\nWe are now testing dialog round control.\\n" }
 No other tool calls. No extra text.
 ```
 
@@ -354,7 +354,7 @@ const roundBefore = snap.currentDialog?.round || '';
 
 const msgId = await fillAndSend(
   'Step 2: Call the function tool `change_mind` exactly once with ' +
-    '{\"selector\":\"!progress\",\"content\":\"# Task Update\\\\nWe are now testing dialog round control.\\\\n\"}. ' +
+    '{\"selector\":\"progress\",\"content\":\"# Task Update\\\\nWe are now testing dialog round control.\\\\n\"}. ' +
     'No other tool calls. No extra text.',
 );
 

@@ -1,13 +1,13 @@
-# Dominds WebUI E2E: Teammate Calls to `!?@pangu` - For e2e-browser-tester Agent
+# Dominds WebUI E2E: Teammate Tellasks to `!?@pangu` - For e2e-browser-tester Agent
 
-You are the **tester agent** standing in for a human user. Your role is to validate that **dominds** provides flawless agentic infrastructure for teammate call delegation. The testee should **cooperate** with your directions to help validate dominds features.
+You are the **tester agent** standing in for a human user. Your role is to validate that **dominds** provides flawless agentic infrastructure for teammate tellask delegation. The testee should **cooperate** with your directions to help validate dominds features.
 
 ## The Test Purpose
 
-This test validates **dominds teammate call infrastructure**, not the testee agent's performance.
+This test validates **dominds teammate tellask infrastructure**, not the testee agent's performance.
 
 - The testee is a reasonable LLM-powered AI agent. It should **cooperate with your instructions** to exercise dominds features, but may still make mistakes, miss tool calls, or deviate (as all LLMs do)
-- **Dominds must work flawlessly** regardless of testee behavior - providing reliable teammate call routing, proper subdialog management, and context preservation
+- **Dominds must work flawlessly** regardless of testee behavior - providing reliable teammate tellask routing, proper subdialog management, and context preservation
 - Your job: verify dominds enables you to nudge, correct, and guide the testee toward achieving business goals through teammate delegation
 
 ## Business Goal
@@ -16,8 +16,8 @@ This test validates **dominds teammate call infrastructure**, not the testee age
 
 The testee, when properly guided, must be able to:
 
-- Execute oneshot teammate calls to `!?@pangu` for single env var queries (TYPE C - transient subdialog)
-- Execute topic-based teammate calls to `!?@pangu` for multiple related queries (TYPE B - registered subdialog)
+- Execute oneshot teammate tellasks to `!?@pangu` for single env var queries (TYPE C - transient subdialog)
+- Execute topic-based teammate tellasks to `!?@pangu` for multiple related queries (TYPE B - registered subdialog)
 - Maintain context across multiple topic-based calls within the same registered subdialog
 - Properly handle subdialog completion and response supply to supdialog
 
@@ -32,7 +32,7 @@ The testee, when properly guided, must be able to:
 
 ## Tester Hardening Rules
 
-- **Assert infra, not prose** - Pass/fail must be based on UI state + teammate call bubbles, not the testee’s summary.
+- **Assert infra, not prose** - Pass/fail must be based on UI state + teammate tellask bubbles, not the testee’s summary.
 - **Time-bound every step** - If `waitForTeammateResponse()` or `waitForPendingTeammateCalls()` does not resolve within the allowed timeout, treat as infra failure.
 - **One retry for infra gaps only** - If no teammate response or wrong callsite, immediately retry once with explicit `!?@pangu` call + tool-formatted instruction and move on.
 - **Compliance nudges are separate** - If the testee responds but does not fully comply (formatting, missing confirmation, extra lines, etc.), use the _Compliance Nudge Loop_ below (up to 3 nudges).
@@ -99,7 +99,7 @@ const postDelta = post.reportDeltaTo(snap);
 
 - Sidebar visible nodes from `snap.sidebar.visibleNodeTitles` (prefixed with `Task:`/`Dialog:`/`Subdialog:`)
 - Sidebar selection from `snap.sidebar.selectedDialogTitle`
-- Pending teammate calls from `snap.chat.pendingTeammateCalls`
+- Pending teammate tellasks from `snap.chat.pendingTeammateCalls`
 - Input enabled state from `snap.input.textareaEnabled`
 - Visible message count from `snap.chat.visibleMessageCount`
 - Visible chat timeline from `snap.chat.visibleMessages` (includes teammate responses)
@@ -154,9 +154,9 @@ if (!pendingDone || !responseReady) {
 }
 ```
 
-**Fallback: Missing or Wrong Teammate Call**
+**Fallback: Missing or Wrong Teammate Tellask**
 
-If the teammate call site does not appear (or appears without `@pangu`), retry once with
+If the teammate tellask site does not appear (or appears without `@pangu`), retry once with
 an explicit `!?@pangu` directive and a single tool-formatted instruction. Do not keep re-prompting.
 
 ---
@@ -259,8 +259,8 @@ If the team never loads, treat it as an infrastructure failure (likely missing L
 | `fillAndSend(msg)`              | Send prompt to testee                                                                          |
 | `waitForInputEnabled()`         | Optional: wait when dialog selection is uncertain                                              |
 | `getTeammateMessageCount()`     | Current count of `.message.teammate` bubbles                                                   |
-| `waitForPendingTeammateCalls()` | Wait until no pending teammate calls remain                                                    |
-| `getLatestTeammateCallSiteId()` | Latest teammate call-site ID rendered in the call section                                      |
+| `waitForPendingTeammateCalls()` | Wait until no pending teammate tellasks remain                                                 |
+| `getLatestTeammateCallSiteId()` | Latest teammate tellask-site ID rendered in the call section                                   |
 | `waitForTeammateCallSiteId()`   | Wait for a new call-site ID (opts: timeoutMs/after/firstMention)                               |
 | `waitForTeammateResponse(opts)` | Wait for teammate response bubble(s) with content (opts: timeoutMs/minChars/minNew/callSiteId) |
 | `waitStreamingComplete(msgId)`  | Wait for the current assistant response to finish                                              |
@@ -268,14 +268,14 @@ If the team never loads, treat it as an infrastructure failure (likely missing L
 | `latestUserText()`              | Latest user prompt text in the current dialog                                                  |
 | `createDialog(taskDoc, agent?)` | Create new dialog (agent optional - uses default responder)                                    |
 | `checkConsoleErrors()`          | Check for infrastructure errors                                                                |
-| `getPendingTeammateCalls()`     | Get current pending teammate call entries                                                      |
+| `getPendingTeammateCalls()`     | Get current pending teammate tellask entries                                                   |
 | `getSubdialogHierarchy()`       | Get subdialog nesting depth                                                                    |
 | `selectDialog(title)`           | Select dialog from sidebar (await this; ensures lazy-loaded subdialogs)                        |
 | `openSubdialog(rootId, subId)`  | Open subdialog by root and self ID                                                             |
 
 ---
 
-## Part A: Oneshot Teammate Call (TYPE C - Transient Subdialog)
+## Part A: Oneshot Teammate Tellask (TYPE C - Transient Subdialog)
 
 ### Before You Begin
 
@@ -326,7 +326,7 @@ If these conditions aren't met → dominds infrastructure bug, stop.
 
 - Sidebar visible list includes `Task: cmds-test.tsk` and a single `Dialog: @...` row
 - Sidebar selection matches `snap.currentDialog.title`
-- Chat area shows no pending teammate calls and no messages
+- Chat area shows no pending teammate tellasks and no messages
 
 ---
 
@@ -334,7 +334,7 @@ If these conditions aren't met → dominds infrastructure bug, stop.
 
 **Goal:** Ensure the testee understands the test setup and can articulate it correctly in its own words.
 
-**Important:** Avoid starting a line at column 0 with `!?@` here to prevent unintended teammate calls. Use words like “Pangu” instead of `@pangu` / `!?@pangu`.
+**Important:** Avoid starting a line at column 0 with `!?@` here to prevent unintended teammate tellasks. Use words like “Pangu” instead of `@pangu` / `!?@pangu`.
 
 ```javascript
 const preflightStart = await snapshotDomindsUI();
@@ -355,7 +355,7 @@ const preflightErrors = checkConsoleErrors();
 
 - [ ] Response is **semantically correct**: acknowledges cooperation, limits teammate contact to explicit instructions, and commits to exactly one tool action when requested
 - [ ] Response explicitly states no teammate/tool calls during calibration
-- [ ] Response avoids teammate calls (no new `Subdialog:` rows added)
+- [ ] Response avoids teammate tellasks (no new `Subdialog:` rows added)
 - [ ] `preflightErrors.length === 0` and `completed === true`
 
 **If the calibration fails:** **STOP** the test run and write a short advisory (see below). Do not proceed to Part A/B/C.
@@ -370,14 +370,14 @@ const preflightErrors = checkConsoleErrors();
 
 ### Scenario A0: Direct User-Initiated Call (TYPE C)
 
-**Goal:** Validate a **user-initiated** teammate call (the tester triggers the call directly).
+**Goal:** Validate a **user-initiated** teammate tellask (the tester triggers the call directly).
 
 **Important:** This is intentionally a direct `!?@pangu` call from the tester (human). The call
 text is delivered straight to the pangu subdialog (no intermediary instruction step). Expect
 the call origin to show **Human → @pangu** if your UI exposes it.
 
 ```javascript
-// 1. Send a direct teammate call (user-initiated)
+// 1. Send a direct teammate tellask (user-initiated)
 const teammateStart = getTeammateMessageCount();
 const callSiteBefore = getLatestTeammateCallSiteId();
 const msgId = await fillAndSend(
@@ -419,7 +419,7 @@ const errors = checkConsoleErrors();
 
 ### Scenario A1: Responder-Initiated Env Query (TYPE C)
 
-**Goal:** Test TYPE C teammate call initiated by the **current dialog responder**
+**Goal:** Test TYPE C teammate tellask initiated by the **current dialog responder**
 
 ```javascript
 // 1. Verify ready state
@@ -436,15 +436,15 @@ const callSiteBefore = getLatestTeammateCallSiteId();
 **UI observation (pre-send):**
 
 - Sidebar visible list shows the current root dialog but no subdialog row
-- Pending teammate calls count is 0
+- Pending teammate tellasks count is 0
 - Input is enabled and focused in the main panel
 
 ```javascript
 // 2. Send the prompt
 const msgId = await fillAndSend(
-  'Current dialog responder: issue a teammate call to the pangu teammate (mention `!?@pangu` without `!topic`) ' +
+  'Current dialog responder: issue a teammate tellask to the pangu teammate (mention `!?@pangu` without `!topic`) ' +
     'to query the HOME environment variable. ' +
-    'Roles: root dialog responder sends the teammate call; pangu runs shell_cmd; tester/human runs nothing. ' +
+    'Roles: root dialog responder sends the teammate tellask; pangu runs shell_cmd; tester/human runs nothing. ' +
     'Use shell_cmd with command="echo $HOME". Use only one shell_cmd call, no extra commands.',
 );
 
@@ -480,19 +480,19 @@ const errors = checkConsoleErrors();
 
 **What to look for in `delta` and verification:**
 
-| Check                                                          | Expected          | Meaning                  |
-| -------------------------------------------------------------- | ----------------- | ------------------------ |
-| `post.chat.visibleMessageCount > pre.chat.visibleMessageCount` | true              | Response appended        |
-| `pendingDone && responseReady`                                 | true              | Teammate call completed  |
-| `post.input.textareaEnabled`                                   | true              | Processing complete      |
-| `latestTeammate.author`                                        | contains `@pangu` | Teammate call visible    |
-| `errors.length`                                                | 0                 | No infrastructure errors |
+| Check                                                          | Expected          | Meaning                    |
+| -------------------------------------------------------------- | ----------------- | -------------------------- |
+| `post.chat.visibleMessageCount > pre.chat.visibleMessageCount` | true              | Response appended          |
+| `pendingDone && responseReady`                                 | true              | Teammate tellask completed |
+| `post.input.textareaEnabled`                                   | true              | Processing complete        |
+| `latestTeammate.author`                                        | contains `@pangu` | Teammate tellask visible   |
+| `errors.length`                                                | 0                 | No infrastructure errors   |
 
 **UI observation (post-call):**
 
 - `delta` includes a `Sidebar visible:` line that adds a `Subdialog: ...` entry
 - The root dialog is expanded and the subdialog row is visible in the sidebar
-- Pending teammate calls drops back to 0 and input re-enables
+- Pending teammate tellasks drops back to 0 and input re-enables
 
 ```javascript
 // 6. Detailed verification
@@ -528,7 +528,7 @@ const subdialogState = {
 
 **Pass Criteria (A1):**
 
-- [ ] `@pangu` teammate call visible in response
+- [ ] `@pangu` teammate tellask visible in response
 - [ ] `shell_cmd` tool call executed with `echo $HOME`
 - [ ] Response contains HOME environment variable value
 - [ ] Call origin is the current dialog responder → pangu (not Human → pangu)
@@ -537,32 +537,32 @@ const subdialogState = {
 
 ---
 
-### Scenario A2: Batch `change_mind` + Teammate Call in One Response (Mixed Actions)
+### Scenario A2: Batch `change_mind` + Teammate Tellask in One Response (Mixed Actions)
 
-**Goal:** Validate that dominds can process **multiple** `change_mind` function-tool calls (multiple sections) and a **teammate call** in the **same assistant response**, without dropping/merging actions or corrupting subdialog routing.
+**Goal:** Validate that dominds can process **multiple** `change_mind` function-tool calls (multiple sections) and a **teammate tellask** in the **same assistant response**, without dropping/merging actions or corrupting subdialog routing.
 
 This is a “mixed actions” stress case:
 
 - Multiple task-doc section updates (Goals/Constraints/Progress)
-- A teammate call to `!?@pangu` (TYPE C)
+- A teammate tellask to `!?@pangu` (TYPE C)
 - All triggered from a single send (one user message)
 
 **Important notes:**
 
 - `change_mind` for `*.tsk/` still requires **exactly one** selector per call. This scenario uses **multiple calls** in one response.
-- The user message must **not** begin with `!?@pangu` (otherwise you’ve turned it into a **direct user-initiated** teammate call and you’re no longer testing “responder delegates to teammate”).
+- The user message must **not** begin with `!?@pangu` (otherwise you’ve turned it into a **direct user-initiated** teammate tellask and you’re no longer testing “responder delegates to teammate”).
 
 #### Steps
 
 1. Capture a baseline snapshot (`pre`) and record the current round indicator (should remain stable; `change_mind` must not reset rounds).
 2. Send exactly **one** user message instructing the responder to:
-   1. Call function tool `change_mind` with `{"selector":"!goals","content":"..."}`
-   2. Call function tool `change_mind` with `{"selector":"!constraints","content":"..."}`
-   3. Call function tool `change_mind` with `{"selector":"!progress","content":"..."}`
-   4. Then issue a teammate call to `!?@pangu` (no `!topic`) to run exactly one `shell_cmd` with `command="echo $HOME"`, and return the HOME value
-3. Wait for all teammate calls to complete and input to re-enable.
+   1. Call function tool `change_mind` with `{"selector":"goals","content":"..."}`
+   2. Call function tool `change_mind` with `{"selector":"constraints","content":"..."}`
+   3. Call function tool `change_mind` with `{"selector":"progress","content":"..."}`
+   4. Then issue a teammate tellask to `!?@pangu` (no `!topic`) to run exactly one `shell_cmd` with `command="echo $HOME"`, and return the HOME value
+3. Wait for all teammate tellasks to complete and input to re-enable.
 4. Verify in UI:
-   - There is **one** assistant turn that contains **three** successful `@change_mind` tool bubbles (one per selector) and a visible `@pangu` teammate call + response.
+   - There is **one** assistant turn that contains **three** successful `@change_mind` tool bubbles (one per selector) and a visible `@pangu` teammate tellask + response.
    - No cross-write: the “goals-like” text is in goals, “constraints-like” text is in constraints, etc.
    - Subdialog hierarchy returns to a single level after completion (transient subdialog completed).
    - No console errors.
@@ -575,13 +575,13 @@ This is a “mixed actions” stress case:
 
 ```text
 In one response, do these steps in order:
-1) Call `change_mind` with selector `!goals` and content:
+1) Call `change_mind` with selector `goals` and content:
 - Confirm teammate routing works under mixed actions.
 - Confirm task-doc updates work under mixed actions.
-2) Call `change_mind` with selector `!constraints` and content:
+2) Call `change_mind` with selector `constraints` and content:
 - Use one selector per call.
 - No direct user-initiated !?@pangu call.
-3) Call `change_mind` with selector `!progress` and content:
+3) Call `change_mind` with selector `progress` and content:
 - Started mixed-action verification.
 4) Then delegate to !?@pangu (no !topic): run exactly one shell_cmd command="echo $HOME" and reply with HOME only.
 ```
@@ -589,14 +589,14 @@ In one response, do these steps in order:
 **Pass Criteria (A2):**
 
 - [ ] UI shows 3 successful `@change_mind` tool executions (Goals/Constraints/Progress) from the same send
-- [ ] UI shows a responder-initiated `@pangu` teammate call and a `shell_cmd` execution for `echo $HOME`
+- [ ] UI shows a responder-initiated `@pangu` teammate tellask and a `shell_cmd` execution for `echo $HOME`
 - [ ] All three task-doc files updated correctly (`cmds-test.tsk/goals.md`, `constraints.md`, `progress.md`)
 - [ ] Subdialog hierarchy returns to 1 level (transient complete)
 - [ ] No console errors
 
 ---
 
-## Part B: Topic-Based Teammate Call (TYPE B - Registered Subdialog)
+## Part B: Topic-Based Teammate Tellask (TYPE B - Registered Subdialog)
 
 ### Before You Begin
 
@@ -624,7 +624,7 @@ const ready = {
 
 ### Scenario B1: Establish Registered Subdialog Context
 
-**Goal:** Test TYPE B teammate call (`!?@pangu !topic env-check`)
+**Goal:** Test TYPE B teammate tellask (`!?@pangu !topic env-check`)
 
 ```javascript
 // 1. Verify input ready
@@ -693,8 +693,8 @@ const hierarchyExpected = hierarchy.length >= 2;
 **UI observation (post-call):**
 
 - Sidebar visible list adds a `Subdialog: ...` entry under the root (root expanded)
-- Chat shows a teammate call section transitioning to a response
-- Pending teammate calls returns to 0
+- Chat shows a teammate tellask section transitioning to a response
+- Pending teammate tellasks returns to 0
 
 **Pass Criteria (B1):**
 
@@ -781,7 +781,7 @@ const errorsB2 = checkConsoleErrors();
 
 - `deltaB2` should not add a new `Subdialog: ...` row in `Sidebar visible`
 - Sidebar still shows the same subdialog entry (no duplicates)
-- Pending teammate calls returns to 0
+- Pending teammate tellasks returns to 0
 
 **Pass Criteria (B2):**
 
@@ -862,7 +862,7 @@ const errorsB3 = checkConsoleErrors();
 
 - Sidebar visible list still shows the same `Subdialog: ...` entry
 - `deltaB3` should not introduce a new subdialog row
-- Pending teammate calls is 0 and input is enabled
+- Pending teammate tellasks is 0 and input is enabled
 
 **Pass Criteria (B3):**
 
@@ -1159,7 +1159,7 @@ Correction: Reply ONLY with a Type A supdialog call (NO `!topic`): `!?@super Whi
 
 **Pass Criteria (C2):**
 
-- [ ] A teammate call site appears for `@super`
+- [ ] A teammate tellask site appears for `@super`
 - [ ] `parentResponseMsg` exists in subdialog timeline (response bridged back)
 - [ ] Parent response includes extension guidance (at least `.md`, optionally others)
 - [ ] `responseNarrativeHasRoles === true` and `responseNarrativeHasHeadLine === true`
@@ -1302,7 +1302,7 @@ const errors = checkConsoleErrors();
 
 ```
 Correction: Use the pangu subdialog's document list to answer the original request. Reply with the list only.
-Do NOT create any new teammate calls (do not call `@pangu` again) and do NOT run tools. Use the already-visible `@pangu` response bubble above as the source of truth, and output only the file list.
+Do NOT create any new teammate tellasks (do not call `@pangu` again) and do NOT run tools. Use the already-visible `@pangu` response bubble above as the source of truth, and output only the file list.
 ```
 
 ---
