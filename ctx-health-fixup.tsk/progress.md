@@ -1,21 +1,5 @@
 ## Progress
-- Added new doc `dominds/docs/memory-system.md` describing ideal memory layers: Taskdoc (`*.tsk/`), reminders as curated working set/worklog, personal/team memory, and tool-history as disposable.
-- Updated reminder UX copy to reflect the intended model:
-  - Non-owned reminders: guide now emphasizes reminders as curated working set; prefer update_reminder to compress/merge; delete only when obsolete.
-  - Reminders intro: reframed reminders as cross-round working set; includes mandatory distill loop when context health is yellow/red.
-- Strengthened context-health reminder copy in zh to enforce a hard stop at yellow/red: stop implementation/large reads; compress reminders (update_reminder) → change_mind(progress) → clear_mind.
-- Strengthened context-health owned reminder header (zh) to reinforce the same hard-stop workflow.
-- Updated system prompt to match `memory-system.md`:
-  - Injected a **Memory System** section into the system prompt (`minds/load.ts` toolUsageText): Taskdoc vs reminders vs team/personal memory vs disposable tool/chat history, plus explicit distill → clear workflow (hard-stop at yellow/red).
-  - Shell execution policy prompt now points to configured `shell_specialists` (instead of guessing “shell-capable” peers).
-- Refined memory system semantics (doc + prompt):
-  - `memory-system.md` now emphasizes Taskdoc (`goals`/`constraints`/`progress`) as **team-shared** and adds explicit merge/owner rules (no overwriting/deleting other contributors; add owner tags like `[owner:@id]`).
-  - Prompt now distinguishes Taskdoc (team-shared) vs reminders (dialog-local working set), and adds main-dialog vs subdialog guidance:
-    - main dialog: responsible for timely, clear, merged Taskdoc updates;
-    - subdialog: cannot `change_mind`; must `!?@super` the parent with a merged replacement draft when Taskdoc needs updates.
-  - `change_mind` tool description and Taskdoc rendering preamble now explicitly warn that each call replaces the entire section and must not overwrite other contributors.
-- Completed shell specialist (shell_specialists) wiring:
-  - `Team.load()` enforces `shell_specialists` policy as **error Problems** (fail-open runtime): unknown specialist, specialist missing shell tools, and non-specialist with shell tools.
-  - `minds/load.ts` **gates shell tools** (and hides toolset prompt `os`) to members listed in `team.shellSpecialists`.
-  - Updated tests (`dominds/tests/team-yaml-parsing.ts`) to cover both policy Problems + runtime gating; ensured tests import builtin tool registrations.
-  - Updated rtws team configs to use `shell_specialists`: `.minds/team.yaml`, `ux-rtws/.minds/team.yaml`.
+- [owner:@fullstack] Finalized the “no-code” UX acceptance doc for system prompt + tooling (`ux-issues/system-prompt-tools-ux-acceptance.md`) with non-prescriptive copy (no fixed length targets), “主对话/根对话” terminology for Taskdoc maintenance, and shell specialist wording as placeholders.
+- [owner:@fullstack] Implemented the refactor in `dominds/` in one pass: removed “写 5 行” from context-health/reminder copy, de-special-cased docs example `@cmdr` → `@<shell-specialist>`, clarified `!?@super` (parent) vs Taskdoc maintainer (main/root) language. (Note: the ad-hoc `context-health-copy.ts` test was intentionally deleted by the user; it is not a regression gate.)
+- [owner:@fullstack] Updated `ux-issues/system-prompt-tools-refactor-plan.md` and `ux-issues/system-prompt-tools-ux-acceptance.md` to incorporate dogfooding findings (hard-gate `clear_mind` on yellow/red; auto-tellask shell specialist instead of pausing).
+- Next: run `pnpm -C dominds run lint:types` and fix any TS errors; then run `pnpm -C dominds/tests run team-yaml-parsing` (and any other relevant smoke tests) to confirm prompt/docs wiring.
