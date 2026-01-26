@@ -1,16 +1,10 @@
 ## Progress
-- Discussed & frozen new shell delegation contract:
-  - `.minds/team.yaml` will support `shell_specialist` as **strong constraint** and allow **array** (multiple specialists).
-  - If any specialists are configured: only those members may have shell tools; non-specialists must not.
-  - Validation (`team_mgmt_validate_team_cfg`) must emit **error-level Problems** when:
-    - a configured specialist does not exist, or lacks required shell tools;
-    - any non-specialist has shell tools;
-    - (and by implication) `shell_specialist: null` + anyone has shell tools.
-  - Problems are **error severity** but must **not block runtime**; user may run with risks.
-  - No backwards-compat: update prompts/behavior to the new design, remove legacy assumptions.
-- Noted a UX/process gap: context-health reminder hit critical → countdown reached 0 and auto-started new round without me proactively `change_mind(progress)` + `clear_mind`. Need stronger internal discipline and possibly stronger reminder copy/mechanism so the agent reliably distills progress + clears early.
-- Next implementation steps:
-  - Update `Team` config types + YAML parsing to accept `shell_specialist` as `null | string | string[]` and normalize.
-  - Implement runtime gating: only shell specialists receive shell tools; other members get explicit prompt-only instruction to delegate via `!?@<shell_specialist>`.
-  - Update `team_mgmt_validate_team_cfg` to enforce the strong constraint and emit error Problems without stopping startup.
-  - Re-check context-health reminder copy/mechanism to improve early compliance.
+- Added new doc `dominds/docs/memory-system.md` describing ideal memory layers: Taskdoc (`*.tsk/`), reminders as curated working set/worklog, personal/team memory, and tool-history as disposable.
+- Updated reminder UX copy to reflect the intended model:
+  - Non-owned reminders: guide now emphasizes reminders as curated working set; prefer update_reminder to compress/merge; delete only when obsolete.
+  - Reminders intro: reframed reminders as cross-round working set; includes mandatory distill loop when context health is yellow/red.
+- Strengthened context-health reminder copy in zh to enforce a hard stop at yellow/red: stop implementation/large reads; compress reminders (update_reminder) → change_mind(progress) → clear_mind.
+- Strengthened context-health owned reminder header (zh) to reinforce the same hard-stop workflow.
+- Began implementing new shell delegation policy foundation:
+  - Team YAML now uses `shell_specialists` (string|string[]|null) and Team model stores normalized `shellSpecialists: string[]`.
+  - (WIP) Need to finish wiring: enforce `shell_specialists` policy as error Problems (fail-open runtime), gate shell tools to specialists, and update tests expecting team.yaml parsing + validation.
