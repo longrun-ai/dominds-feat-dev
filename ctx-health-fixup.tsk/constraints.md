@@ -1,0 +1,11 @@
+- Do not use generic file tools under `*.tsk/` (taskdoc updates only via `change_mind`).
+- Keep TypeScript strict: no `any`, `catch` uses `unknown`, discriminated unions with exhaustive `never` checks.
+- Preserve end-to-end behavior: owned 提醒项 should dedupe, update dynamically, and drop when recovered.
+- Copy rules:
+  - User-visible Chinese uses “提醒项” (avoid “reminder”).
+  - Use “新一轮/新回合” (avoid “轮次”).
+- Default thresholds when `provider.models` doesn’t specify:
+  - `optimal_max_tokens`: `100_000`
+  - `critical_max_tokens`: `floor(modelContextLimitTokens * 0.9)`
+- Countdown policy:
+  - When level is `critical`, start/update a 5-generation-turn countdown; each generation while still critical decrements; at 0 auto-start new round (equivalent to `clear_mind`), without Q4H.

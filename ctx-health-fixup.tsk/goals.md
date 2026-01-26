@@ -1,0 +1,10 @@
+- Implement 2-threshold context health detection + reminder UX:
+  - `optimal_max_tokens` default `100_000` when not specified in `provider.models`.
+  - `critical_max_tokens` default `floor(modelContextLimitTokens * 0.9)` when not specified.
+- Add critical countdown: when in `critical`, start a **5 generation-turn** countdown; each gen decrements while still critical; at 0 the system auto-starts **新一轮/新回合** for stability (equivalent to `clear_mind`).
+- Refactor reminders UX:
+  - Owned 提醒项 must NOT auto-suggest `delete_reminder`.
+  - `formatReminderItemGuide()` should only guide non-owned 提醒项; owned 提醒项 header (prompt-only) should be dynamically provided by the owner (can be empty).
+  - Context-health owner renders both prompt-only header + user-visible content; user-visible copy uses “提醒项” (not “reminder”) and says “新一轮/新回合” (not “round/轮次”).
+- Update UI indicator levels to 绿/黄/红 and ensure event payloads carry the level.
+- Sync `dominds/docs/context-health.md` with implementation, defaults, and the countdown/auto-new-round behavior.
