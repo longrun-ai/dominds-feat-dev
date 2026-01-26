@@ -1,13 +1,7 @@
 ## Progress
-- [owner:@fullstack] Contract frozen for a **v2 context-health remediation redesign**:
-  - Replace owned 提醒项 + 5-turn countdown auto-new-round with **non-persisted role=user guidance injection**.
-  - `caution`: choose `clear_mind(reminder_content=重入包)` or `add_reminder(content=重入包)`; re-inject every 10 gen turns until cleared.
-  - `critical`: forced-clear loop (max 3 attempts); if no `clear_mind` call, discard assistant output (log only, no persistence); after 3 failures trigger Q4H with `kind=context_health_critical` and WebUI send disabled; dialog becomes suspended.
-- [owner:@fullstack] Next implementation steps (backend → types → webui → docs):
-  - Remove old countdown/auto-new-round paths and owned reminder owner usage.
-  - Implement guidance injection + throttling for `caution` and forced-clear loop for `critical` in `dominds/main/llm/driver.ts`.
-  - Extend Q4H types/payloads with a discriminated `kind` and wire through to WebUI; disable send for `context_health_critical` only.
-  - Update `dominds/docs/context-health.md` to match new policy and acceptance criteria.
-- [owner:@fullstack] Verification gates after code changes:
-  - `pnpm -C dominds run lint:types`
-  - `pnpm -C dominds/tests run realtime` (and any targeted smoke tests touching Q4H + WS payloads)
+- [owner:@fullstack] In this round: fixed stale guidance that suggested `clear_mind({"reminder_content":""})`.
+  - Updated `dominds/docs/encapsulated-taskdoc.md` to recommend a non-empty re-entry package when starting a new round.
+  - Updated `dominds/main/tools/txt.ts` “large file strategy” hints (zh/en) to use `clear_mind({"reminder_content":"<re-entry package>"})` and explain why.
+- [owner:@fullstack] Environment gates: **pending** (must not claim passed until @cmdr posts results)
+  - Need: `./dev-server.sh status` and `pnpm -C dominds run lint:types`.
+- [owner:@fullstack] Next steps (after gates): run `pnpm -C dominds/tests run realtime`, then do a manual WebUI check for Q4H send gating (`kind=context_health_critical`) and confirm context-health guidance injection is non-persisted.

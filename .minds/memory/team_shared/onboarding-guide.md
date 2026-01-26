@@ -13,7 +13,7 @@ This is a practical checklist for team members (and contributors) to quickly bui
 1. `dominds/docs/design.md` — Why the system exists; Fresh Boots Reasoning; task-centered architecture.
 2. `dominds/docs/dominds-terminology.md` — Canonical vocabulary across prompts/docs (Taskdoc, Teammate Tellask, etc.).
 3. `dominds/docs/dialog-system.md` — Backend-driven driver; teammate tellasks; Q4H; suspension/resumption.
-4. `dominds/docs/encapsulated-task-doc.md` — `*.tsk/` rules; why “single source of truth” matters.
+4. `dominds/docs/encapsulated-taskdoc.md` — `*.tsk/` rules; why “single source of truth” matters.
 5. `dominds/docs/keep-going.md` — Root dialog auto-continue; budget; when forced to Q4H.
 6. `dominds/docs/auth.md` — Dev/prod auth modes; HTTP/WS auth propagation; WebUI behavior.
 7. `dominds/docs/team-tools-view.md` — Tools registry + Problems view (WebUI expectations).
