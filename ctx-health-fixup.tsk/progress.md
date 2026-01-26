@@ -5,6 +5,17 @@
   - Reminders intro: reframed reminders as cross-round working set; includes mandatory distill loop when context health is yellow/red.
 - Strengthened context-health reminder copy in zh to enforce a hard stop at yellow/red: stop implementation/large reads; compress reminders (update_reminder) → change_mind(progress) → clear_mind.
 - Strengthened context-health owned reminder header (zh) to reinforce the same hard-stop workflow.
-- Began implementing new shell delegation policy foundation:
-  - Team YAML now uses `shell_specialists` (string|string[]|null) and Team model stores normalized `shellSpecialists: string[]`.
-  - (WIP) Need to finish wiring: enforce `shell_specialists` policy as error Problems (fail-open runtime), gate shell tools to specialists, and update tests expecting team.yaml parsing + validation.
+- Updated system prompt to match `memory-system.md`:
+  - Injected a **Memory System** section into the system prompt (`minds/load.ts` toolUsageText): Taskdoc vs reminders vs team/personal memory vs disposable tool/chat history, plus explicit distill → clear workflow (hard-stop at yellow/red).
+  - Shell execution policy prompt now points to configured `shell_specialists` (instead of guessing “shell-capable” peers).
+- Refined memory system semantics (doc + prompt):
+  - `memory-system.md` now emphasizes Taskdoc (`goals`/`constraints`/`progress`) as **team-shared** and adds explicit merge/owner rules (no overwriting/deleting other contributors; add owner tags like `[owner:@id]`).
+  - Prompt now distinguishes Taskdoc (team-shared) vs reminders (dialog-local working set), and adds main-dialog vs subdialog guidance:
+    - main dialog: responsible for timely, clear, merged Taskdoc updates;
+    - subdialog: cannot `change_mind`; must `!?@super` the parent with a merged replacement draft when Taskdoc needs updates.
+  - `change_mind` tool description and Taskdoc rendering preamble now explicitly warn that each call replaces the entire section and must not overwrite other contributors.
+- Completed shell specialist (shell_specialists) wiring:
+  - `Team.load()` enforces `shell_specialists` policy as **error Problems** (fail-open runtime): unknown specialist, specialist missing shell tools, and non-specialist with shell tools.
+  - `minds/load.ts` **gates shell tools** (and hides toolset prompt `os`) to members listed in `team.shellSpecialists`.
+  - Updated tests (`dominds/tests/team-yaml-parsing.ts`) to cover both policy Problems + runtime gating; ensured tests import builtin tool registrations.
+  - Updated rtws team configs to use `shell_specialists`: `.minds/team.yaml`, `ux-rtws/.minds/team.yaml`.

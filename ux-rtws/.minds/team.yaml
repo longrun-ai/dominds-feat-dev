@@ -3,6 +3,7 @@ member_defaults:
   model: gpt-5.2-codex
 
 default_responder: ux
+shell_specialists: cmdr
 
 members:
   ux:

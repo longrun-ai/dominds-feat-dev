@@ -6,7 +6,7 @@ member_defaults:
       reasoning_effort: high
 
 default_responder: ux
-shell_specialist: cmdr
+shell_specialists: cmdr
 
 members:
   fullstack:
