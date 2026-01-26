@@ -1,7 +1,15 @@
-## Progress
-- [owner:@fullstack] In this round: fixed stale guidance that suggested `clear_mind({"reminder_content":""})`.
-  - Updated `dominds/docs/encapsulated-taskdoc.md` to recommend a non-empty re-entry package when starting a new round.
-  - Updated `dominds/main/tools/txt.ts` “large file strategy” hints (zh/en) to use `clear_mind({"reminder_content":"<re-entry package>"})` and explain why.
-- [owner:@fullstack] Environment gates: **pending** (must not claim passed until @cmdr posts results)
-  - Need: `./dev-server.sh status` and `pnpm -C dominds run lint:types`.
-- [owner:@fullstack] Next steps (after gates): run `pnpm -C dominds/tests run realtime`, then do a manual WebUI check for Q4H send gating (`kind=context_health_critical`) and confirm context-health guidance injection is non-persisted.
+- [owner:@fullstack] 已确认 v2 remediation 的代码现实与差遣牒契约一致：
+  - `dominds/main/llm/driver.ts`：`caution` 时以 **非持久化** `environment_msg` + `role='user'` 注入下一次生成的指引；未清理则每 **10** 次生成重注入；`critical` 时进入最多 **3** 次强制清理循环（若非“仅 clear_mind 且 reminder_content 非空”则丢弃输出且不落盘），3 次失败后触发 `Q4H(kind=context_health_critical)` 并 suspend。
+  - `dominds/main/shared/types/q4h.ts` / `dominds/main/persistence.ts`：`context_health_critical` kind 已纳入类型与 normalize。
+  - `dominds/webapp/src/components/dominds-q4h-input.ts`：已对 `kind=context_health_critical` 做 send gating。
+  - `dominds/webapp/src/components/dominds-app.tsx`：消费 `context_health_evt` 并更新 toolbar 指示灯。
+- [owner:@fullstack] 文档同步：`dominds/docs/context-health.md` 已是 v2 语义（不存在旧的“倒计时自动开新一轮/新回合”机制描述），无需额外删改。
+- [owner:@fullstack] 本轮已修复遗留指引里 `clear_mind({"reminder_content":""})` 的错误示例。
+  - 更新 `dominds/docs/encapsulated-taskdoc.md`：建议以非空“重入包”开启新一轮/新回合。
+  - 更新 `dominds/main/tools/txt.ts`（zh/en）“large file strategy” hints：统一改为 `clear_mind({"reminder_content":"<re-entry package>"})` 并解释原因。
+- [owner:@fullstack] 环境门命令修复：为使 `pnpm -C dominds/tests run realtime|parsing` 可用，已在 `dominds/tests/package.json` 增加 `realtime` / `parsing` scripts，并在 `dominds/tests/README.md` 说明 repo root 调用方式。
+- [owner:@fullstack] 环境门：pending（必须等待 @cmdr 回贴结果后才能宣称通过）
+  - 需要：`./dev-server.sh status`、`pnpm -C dominds run lint:types`、`pnpm -C dominds/tests run realtime`。
+- [owner:@fullstack] 手工验收清单（待环境门通过后执行）
+  - `caution`：确认 remediation guide 为 role=user 注入且不持久化到 dialog history/events。
+  - `critical`：确认无效输出被丢弃且不改变对话状态；3 次失败后 Q4H(kind=context_health_critical) 触发并使对话 suspended；WebUI 仅对该 kind 禁止发送。
