@@ -1,11 +1,13 @@
 - Do not use generic file tools under `*.tsk/` (taskdoc updates only via `change_mind`).
 - Keep TypeScript strict: no `any`, `catch` uses `unknown`, discriminated unions with exhaustive `never` checks.
-- Preserve end-to-end behavior: owned 提醒项 should dedupe, update dynamically, and drop when recovered.
-- Copy rules:
-  - User-visible Chinese uses “提醒项” (avoid “reminder”).
-  - Use “新一轮/新回合” (avoid “轮次”).
+- Copy rules (user-visible Chinese): use “提醒项”，用“新一轮/新回合”（避免“轮次”）。
 - Default thresholds when `provider.models` doesn’t specify:
   - `optimal_max_tokens`: `100_000`
   - `critical_max_tokens`: `floor(modelContextLimitTokens * 0.9)`
-- Countdown policy:
-  - When level is `critical`, start/update a 5-generation-turn countdown; each generation while still critical decrements; at 0 auto-start new round (equivalent to `clear_mind`), without Q4H.
+- New remediation mechanism constraints:
+  - Context-health guidance is injected as **role=user** for the *next* LLM gen turn, but **must not be persisted** into dialog history/events.
+  - `caution`: allow only `clear_mind(reminder_content=重入包)` or `add_reminder(content=重入包)`; re-inject every 10 gen turns if not cleared.
+  - `critical`: forced-clear loop; only accept `clear_mind` with non-empty `reminder_content`; otherwise discard output and retry; after 3 failed attempts trigger Q4H.
+  - Q4H must include a `kind` discriminator (e.g. `context_health_critical`) so WebUI can selectively disable send only for that kind.
+  - When Q4H fires, dialog becomes suspended; driver must not continue attempting generations.
+- Regression priority: preserve end-to-end behavior and observability (discarded outputs must not mutate dialog state; only log).

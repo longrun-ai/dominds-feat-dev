@@ -1,10 +1,14 @@
-- Implement 2-threshold context health detection + reminder UX:
-  - `optimal_max_tokens` default `100_000` when not specified in `provider.models`.
-  - `critical_max_tokens` default `floor(modelContextLimitTokens * 0.9)` when not specified.
-- Add critical countdown: when in `critical`, start a **5 generation-turn** countdown; each gen decrements while still critical; at 0 the system auto-starts **新一轮/新回合** for stability (equivalent to `clear_mind`).
-- Refactor reminders UX:
-  - Owned 提醒项 must NOT auto-suggest `delete_reminder`.
-  - `formatReminderItemGuide()` should only guide non-owned 提醒项; owned 提醒项 header (prompt-only) should be dynamically provided by the owner (can be empty).
-  - Context-health owner renders both prompt-only header + user-visible content; user-visible copy uses “提醒项” (not “reminder”) and says “新一轮/新回合” (not “round/轮次”).
-- Update UI indicator levels to 绿/黄/红 and ensure event payloads carry the level.
-- Sync `dominds/docs/context-health.md` with implementation, defaults, and the countdown/auto-new-round behavior.
+- [owner:@fullstack] Redesign context health remediation to be **next-gen injected guidance** (role=user prompt in the next LLM gen turn), not an owned 提醒项.
+  - Injected guidance must be **non-persisted** (affects only the next LLM request context; never written into dialog history/events).
+- [owner:@fullstack] Caution policy (`level=caution`, over optimal but not critical):
+  - Provide exactly 2 choices with the same “重入包” content:
+    - `clear_mind({"reminder_content":"<重入包>"})` (preferred)
+    - `add_reminder({"content":"<重入包>","position":0})`
+  - If agent does not clear: re-inject the guidance every **10 generation turns** while still `caution`.
+- [owner:@fullstack] Critical policy (`level=critical`, over critical):
+  - Enter a **forced-clear loop** (max 3 attempts):
+    - Each attempt injects clear-only guidance (must call `clear_mind` with non-empty `reminder_content`).
+    - If the attempt returns without a `clear_mind` function call: **discard the assistant output** (may log; must not persist into dialog history/events).
+  - After 3 failed attempts: trigger **Q4H** with a dedicated `kind` flag (see constraints) which suspends the dialog.
+- [owner:@fullstack] UI context health indicator uses 绿/黄/红 and wire payloads include the level.
+- [owner:@fullstack] Sync `dominds/docs/context-health.md` to match the new policy (remove old 5-turn countdown auto-new-round mechanism; document re-injection cadence and forced-clear loop + Q4H escalation).

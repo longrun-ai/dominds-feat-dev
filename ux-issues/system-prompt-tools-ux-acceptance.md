@@ -37,10 +37,22 @@
 
 - 等级呈现：用户可见为 `绿/黄/红` 三档。
 - 行为开关：当黄/红时，agent 必须停止大实现/大阅读，转入“提炼闭环”。
+- v2 remediation（driver 强制，重点验收点）：
+  - 机制：当黄/红触发后，driver 会在下一次 LLM gen turn 注入一条 **role=user 指南**（但不持久化进对话历史/事件）。
+  - 黄（`caution`，超过 optimal 未超过 critical）：只给两种选择（二选一；同一份“重入包”内容）：
+    - `clear_mind({"reminder_content":"<重入包>"})`
+    - `add_reminder({"content":"<重入包>","position":0})`
+    - 若 agent 不清理：每 10 个 gen turn 再提醒一次。
+  - 红（`critical`，超过 critical）：进入 forced-clear loop（最多 3 次）：
+    - 每次只允许 `clear_mind`，且 `reminder_content` 必须非空（必须携带“重入包”）。
+    - 若本次返回未出现 `clear_mind`：丢弃 assistant 输出（可 log，但不得写入对话历史/事件），然后重试。
+    - 3 次失败后触发 Q4H：`kind=context_health_critical`，并使 dialog 进入 suspended（driver 不再继续）。
 - 提炼闭环（强制习惯；**不对篇幅设目标**，只要求“可扫读、可行动”）：
-  1) `update_reminder` 压缩/合并提醒项为少量工作集
+  1) 用“重入包”写入提醒项（`add_reminder` 或 `clear_mind.reminder_content`）
   2) `change_mind(progress)` 写“提炼摘要”（覆盖：目标 / 关键决策 / 已改动点 / 下一步 / 未决问题；每项可按任务规模与参与人数多行展开）
   3) `clear_mind` 开启新一轮/新回合（为稳定性清空噪音）
+
+> 恢复成本验收：执行 `clear_mind` 后，agent 应能在 **≤ 3 个文件读取**内恢复工作上下文并继续推进。
 
 > 追根溯源说明：此前出现的“写 5 行”属于示例模板（方便强调“短、可扫读”），不应成为目标或硬性约束。
 
@@ -141,18 +153,24 @@
 
 ### 8.1 失败模式：agent 无视黄/红与 `clear_mind`，继续硬抗
 
-- 现象：系统托管的 context-health 提醒已经进入黄/红并明确要求“先提炼→再 clear_mind”，但 agent 仍持续推进实现/写盘，直到用户强制指出。
-- 预期：一旦进入黄/红，agent 应立即停止大实现/大阅读，优先执行提炼闭环（提醒项压缩→progress 提炼→`clear_mind`）。
+- 现象：当上下文健康进入黄/红后，driver 注入了 role=user 的 v2 remediation 指南，但 agent 仍持续推进实现/写盘，或忽略/绕开建议工具调用。
+- 预期：
+  - 黄（`caution`）时，agent 应在两种允许动作中做出选择（二选一）：
+    - `clear_mind({"reminder_content":"<重入包>"})`
+    - `add_reminder({"content":"<重入包>","position":0})`
+  - 红（`critical`）时，agent 必须调用 `clear_mind` 且 `reminder_content` 非空；否则本次输出会被 driver 丢弃并重试。
 - 影响：
   - 上下文继续膨胀，稳定性进一步恶化；
   - agent 更容易漏读关键护栏文本，形成“越忙越错”的正反馈；
   - 用户体验上表现为“系统明明提醒了，但 agent 不执行”。
 - 根因假设（提示/工具设计层面）：
-  - 现有提示把 `clear_mind` 描述成“建议工作流”，缺少“遇黄/红即硬停”的明确优先级与自我约束措辞；
-  - reminder intro 等文案仍可能用“请主动维护/建议”语气稀释紧迫性（导致 agent 把它当普通提示而不是硬门槛）。
+  - 指南仍然可能被当成“可忽略的建议”，缺少足够强的机制性约束（因此需要 driver 层强制策略：丢弃输出 + suspended 的 Q4H 升级）。
+  - “重入包”模板若过长/不够明确，会导致 agent 选择逃避或填充无效内容。
 - 下一轮迭代验收点：
-  - [ ] 当出现 owned context-health 提醒且 level=黄/红时，agent 不继续实现/大读；必须先执行提炼闭环或明确说明为何暂缓（仅限紧急收尾、且不超过 1 次生成）。
-  - [ ] agent 不应在同一轮中生成大量新实现内容；应优先输出提炼与恢复动作（含调用）。
+  - [ ] 黄（`caution`）时，agent 不继续大实现/大读；必须在同一轮内选择并执行二选一动作（`clear_mind` 或 `add_reminder`，内容为重入包）。
+  - [ ] 黄（`caution`）且 agent 未清理时，driver 每 10 个 gen turn 再注入一次；agent 最终会在有限次提醒后执行 `clear_mind`（主观体验上不再“硬抗到爆炸”）。
+  - [ ] 红（`critical`）时，若 agent 未调用 `clear_mind`，本次输出不会写入对话历史/事件（只允许 log），并在最多 3 次后进入 Q4H：`kind=context_health_critical`。
+  - [ ] 进入 `kind=context_health_critical` 的 Q4H 后，dialog 进入 suspended，且 WebUI 仅对此 kind 禁用发送。
 
 ### 8.2 失败模式：非 shell specialist 的 agent 没有自动 tellask，反而“暂停等待”
 ### 8.2 失败模式：非 shell specialist 的 agent 没有自动 tellask，反而“暂停等待”/误判“tellask 不可用”

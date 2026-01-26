@@ -1,5 +1,13 @@
 ## Progress
-- [owner:@fullstack] Finalized the “no-code” UX acceptance doc for system prompt + tooling (`ux-issues/system-prompt-tools-ux-acceptance.md`) with non-prescriptive copy (no fixed length targets), “主对话/根对话” terminology for Taskdoc maintenance, and shell specialist wording as placeholders.
-- [owner:@fullstack] Implemented the refactor in `dominds/` in one pass: removed “写 5 行” from context-health/reminder copy, de-special-cased docs example `@cmdr` → `@<shell-specialist>`, clarified `!?@super` (parent) vs Taskdoc maintainer (main/root) language. (Note: the ad-hoc `context-health-copy.ts` test was intentionally deleted by the user; it is not a regression gate.)
-- [owner:@fullstack] Updated `ux-issues/system-prompt-tools-refactor-plan.md` and `ux-issues/system-prompt-tools-ux-acceptance.md` to incorporate dogfooding findings (hard-gate `clear_mind` on yellow/red; auto-tellask shell specialist instead of pausing).
-- Next: run `pnpm -C dominds run lint:types` and fix any TS errors; then run `pnpm -C dominds/tests run team-yaml-parsing` (and any other relevant smoke tests) to confirm prompt/docs wiring.
+- [owner:@fullstack] Contract frozen for a **v2 context-health remediation redesign**:
+  - Replace owned 提醒项 + 5-turn countdown auto-new-round with **non-persisted role=user guidance injection**.
+  - `caution`: choose `clear_mind(reminder_content=重入包)` or `add_reminder(content=重入包)`; re-inject every 10 gen turns until cleared.
+  - `critical`: forced-clear loop (max 3 attempts); if no `clear_mind` call, discard assistant output (log only, no persistence); after 3 failures trigger Q4H with `kind=context_health_critical` and WebUI send disabled; dialog becomes suspended.
+- [owner:@fullstack] Next implementation steps (backend → types → webui → docs):
+  - Remove old countdown/auto-new-round paths and owned reminder owner usage.
+  - Implement guidance injection + throttling for `caution` and forced-clear loop for `critical` in `dominds/main/llm/driver.ts`.
+  - Extend Q4H types/payloads with a discriminated `kind` and wire through to WebUI; disable send for `context_health_critical` only.
+  - Update `dominds/docs/context-health.md` to match new policy and acceptance criteria.
+- [owner:@fullstack] Verification gates after code changes:
+  - `pnpm -C dominds run lint:types`
+  - `pnpm -C dominds/tests run realtime` (and any targeted smoke tests touching Q4H + WS payloads)
