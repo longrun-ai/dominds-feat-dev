@@ -1,15 +1,10 @@
-- [owner:@fullstack] 已确认 v2 remediation 的代码现实与差遣牒契约一致：
-  - `dominds/main/llm/driver.ts`：`caution` 时以 **非持久化** `environment_msg` + `role='user'` 注入下一次生成的指引；未清理则每 **10** 次生成重注入；`critical` 时进入最多 **3** 次强制清理循环（若非“仅 clear_mind 且 reminder_content 非空”则丢弃输出且不落盘），3 次失败后触发 `Q4H(kind=context_health_critical)` 并 suspend。
-  - `dominds/main/shared/types/q4h.ts` / `dominds/main/persistence.ts`：`context_health_critical` kind 已纳入类型与 normalize。
-  - `dominds/webapp/src/components/dominds-q4h-input.ts`：已对 `kind=context_health_critical` 做 send gating。
-  - `dominds/webapp/src/components/dominds-app.tsx`：消费 `context_health_evt` 并更新 toolbar 指示灯。
-- [owner:@fullstack] 文档同步：`dominds/docs/context-health.md` 已是 v2 语义（不存在旧的“倒计时自动开新一轮/新回合”机制描述），无需额外删改。
-- [owner:@fullstack] 本轮已修复遗留指引里 `clear_mind({"reminder_content":""})` 的错误示例。
-  - 更新 `dominds/docs/encapsulated-taskdoc.md`：建议以非空“重入包”开启新一轮/新回合。
-  - 更新 `dominds/main/tools/txt.ts`（zh/en）“large file strategy” hints：统一改为 `clear_mind({"reminder_content":"<re-entry package>"})` 并解释原因。
-- [owner:@fullstack] 环境门命令修复：为使 `pnpm -C dominds/tests run realtime|parsing` 可用，已在 `dominds/tests/package.json` 增加 `realtime` / `parsing` scripts，并在 `dominds/tests/README.md` 说明 repo root 调用方式。
+- [owner:@fullstack] v3 remediation 已落地（caution 维护提醒项 + critical 强制清理），并完成命名/文档对齐。
+  - `dominds/main/llm/driver.ts`：
+    - `caution`：默认 3 次生成缓冲期（软提示）→ 之后按 cadence（默认每 10 次生成，可按 model 配置）注入 role=user 临时指引，要求 agent 至少调用一次 `update_reminder`/`add_reminder` 维护提醒项，并在提醒项中写明“还差什么信息就可完成重入包，从而安全 clear_mind 进入新一轮/新回合”。
+    - cadence 读取：直接读取 `providerCfg.models[model].caution_remediation_cadence_generations`（不再由 context health snapshot 携带）。
+    - `critical`：最多 3 次强制清理循环（若非“仅 clear_mind 且 reminder_content 非空”则丢弃输出且不落盘），3 次失败后触发 `Q4H(kind=context_health_critical)` 并 suspend。
+  - 提醒项显著性：非 owner 提醒项从 `transient_guide_msg`/role=assistant 改为 `environment_msg`/role=user 注入（仍然不持久化），且在 0 条提醒项时不注入 intro 以避免 prompt 膨胀。
+  - `dominds/main/shared/i18n/driver-messages.ts`：remediation 指引标题统一为 v3。
+  - `dominds/docs/context-health.md`：已更新为 v3 remediation 语义与配置项说明。
 - [owner:@fullstack] 环境门：pending（必须等待 @cmdr 回贴结果后才能宣称通过）
   - 需要：`./dev-server.sh status`、`pnpm -C dominds run lint:types`、`pnpm -C dominds/tests run realtime`。
-- [owner:@fullstack] 手工验收清单（待环境门通过后执行）
-  - `caution`：确认 remediation guide 为 role=user 注入且不持久化到 dialog history/events。
-  - `critical`：确认无效输出被丢弃且不改变对话状态；3 次失败后 Q4H(kind=context_health_critical) 触发并使对话 suspended；WebUI 仅对该 kind 禁止发送。

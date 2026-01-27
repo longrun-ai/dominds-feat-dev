@@ -1,14 +1,14 @@
-- [owner:@fullstack] Redesign context health remediation to be **next-gen injected guidance** (role=user prompt in the next LLM gen turn), not an owned 提醒项.
+- [owner:@fullstack] Redesign context health remediation to be **next-gen injected guidance** (role=user prompt in the next LLM gen turn), not an owned 提醒项。
   - Injected guidance must be **non-persisted** (affects only the next LLM request context; never written into dialog history/events).
-- [owner:@fullstack] Caution policy (`level=caution`, over optimal but not critical):
-  - Provide exactly 2 choices with the same “重入包” content:
-    - `clear_mind({"reminder_content":"<重入包>"})` (preferred)
-    - `add_reminder({"content":"<重入包>","position":0})`
-  - If agent does not clear: re-inject the guidance every **10 generation turns** while still `caution`.
-- [owner:@fullstack] Critical policy (`level=critical`, over critical):
+- [owner:@fullstack] `caution` policy (over optimal but not critical) — **v3 remediation**:
+  - Provide a bounded grace period so the agent can keep working briefly and distill a better “重入包” before clearing.
+  - After grace expires, use a configurable cadence (default every **10** generations) to require **reminder curation** (no forced clear):
+    - The agent must call at least one of `update_reminder` (preferred) / `add_reminder`.
+    - The agent should maintain a re-entry-package draft in reminders and explicitly state “还差什么信息就可以完成重入包，从而安全 clear_mind 进入新一轮/新回合”。
+- [owner:@fullstack] `critical` policy (over critical) — forced clear unchanged:
   - Enter a **forced-clear loop** (max 3 attempts):
     - Each attempt injects clear-only guidance (must call `clear_mind` with non-empty `reminder_content`).
     - If the attempt returns without a `clear_mind` function call: **discard the assistant output** (may log; must not persist into dialog history/events).
   - After 3 failed attempts: trigger **Q4H** with a dedicated `kind` flag (see constraints) which suspends the dialog.
 - [owner:@fullstack] UI context health indicator uses 绿/黄/红 and wire payloads include the level.
-- [owner:@fullstack] Sync `dominds/docs/context-health.md` to match the new policy (remove old 5-turn countdown auto-new-round mechanism; document re-injection cadence and forced-clear loop + Q4H escalation).
+- [owner:@fullstack] Sync `dominds/docs/context-health.md` to match v3 semantics (grace period + reminder-curation cadence + forced-clear loop + Q4H escalation).

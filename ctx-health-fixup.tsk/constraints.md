@@ -6,7 +6,7 @@
   - `critical_max_tokens`: `floor(modelContextLimitTokens * 0.9)`
 - New remediation mechanism constraints:
   - Context-health guidance is injected as **role=user** for the *next* LLM gen turn, but **must not be persisted** into dialog history/events.
-  - `caution`: allow only `clear_mind(reminder_content=重入包)` or `add_reminder(content=重入包)`; re-inject every 10 gen turns if not cleared.
+  - `caution`: allow a bounded grace period; after grace, require reminder curation on a configurable cadence (default every 10 generations): agent must call at least one of `update_reminder` / `add_reminder` and maintain a re-entry-package draft that includes what is still missing before it can safely `clear_mind`.
   - `critical`: forced-clear loop; only accept `clear_mind` with non-empty `reminder_content`; otherwise discard output and retry; after 3 failed attempts trigger Q4H.
   - Q4H must include a `kind` discriminator (e.g. `context_health_critical`) so WebUI can selectively disable send only for that kind.
   - When Q4H fires, dialog becomes suspended; driver must not continue attempting generations.
