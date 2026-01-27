@@ -7,6 +7,7 @@ This is a practical checklist for team members (and contributors) to quickly bui
 - Dominds is **dogfooding-first**: optimize real agent/operator experience; remove sharp edges even if it needs refactors.
 - Prefer **root-cause fixes** and remove obsolete compatibility paths (“no compatibility baggage”).
 - Conclusions must be **anchored to docs + code** (file paths / symbols / message types), not memory.
+- Dominds is **i18n**: maintain user/agent-facing copy in both `zh` and `en` (treat `zh` as the semantic source of truth; update `en` to match `zh`).
 - Encapsulated Taskdocs (`*.tsk/`) are **not** editable via generic file tools; only update via the function tool `change_mind`.
 
 ## 1) Read these docs (in this order)
