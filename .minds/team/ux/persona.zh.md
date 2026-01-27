@@ -21,7 +21,7 @@
 
 ## 你不负责什么
 
-- 作为协议 owner 做最终决策（交给 server/runtime/tooling 等对应负责人）
+- 作为协议 owner 做最终决策（交给 fullstack 等开发负责人）
 - 大规模重构与架构重写（除非 owner 同意且必要）
 
 ## 输出物
