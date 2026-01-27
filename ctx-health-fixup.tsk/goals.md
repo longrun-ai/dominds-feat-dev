@@ -1,14 +1,15 @@
-- [owner:@fullstack] Redesign context health remediation to be **next-gen injected guidance** (role=user prompt in the next LLM gen turn), not an owned 提醒项。
-  - Injected guidance must be **non-persisted** (affects only the next LLM request context; never written into dialog history/events).
+- [owner:@fullstack] Redesign context health remediation as **next-gen injected guidance**:
+  - `caution`: inject role=user guidance for the next LLM gen turn; **non-persisted** (must not be written into dialog history/events).
+  - `critical`: inject role=user guidance as a **recorded user prompt** (persisted; UI-visible as user prompt) with countdown + auto `clear_mind` to keep long-running autonomy.
 - [owner:@fullstack] `caution` policy (over optimal but not critical) — **v3 remediation**:
   - Provide a bounded grace period so the agent can keep working briefly and distill a better “重入包” before clearing.
   - After grace expires, use a configurable cadence (default every **10** generations) to require **reminder curation** (no forced clear):
     - The agent must call at least one of `update_reminder` (preferred) / `add_reminder`.
     - The agent should maintain a re-entry-package draft in reminders and explicitly state “还差什么信息就可以完成重入包，从而安全 clear_mind 进入新一轮/新回合”。
-- [owner:@fullstack] `critical` policy (over critical) — forced clear unchanged:
-  - Enter a **forced-clear loop** (max 3 attempts):
-    - Each attempt injects clear-only guidance (must call `clear_mind` with non-empty `reminder_content`).
-    - If the attempt returns without a `clear_mind` function call: **discard the assistant output** (may log; must not persist into dialog history/events).
-  - After 3 failed attempts: trigger **Q4H** with a dedicated `kind` flag (see constraints) which suspends the dialog.
+- [owner:@fullstack] `critical` policy (over critical) — **v3 remediation**:
+  -连续最多 **5** 轮倒数提示（role=user，且以 UI 可见的 user prompt 记录在案），引导 agent 主动：
+    - `update_reminder` / `add_reminder`（维护重入包，best effort）
+    - `clear_mind`（开启新一轮/新回合）
+  - 倒数归零后 driver **自动执行 `clear_mind`** 开启新一轮/新回合（不中断对话，不触发 Q4H）。
 - [owner:@fullstack] UI context health indicator uses 绿/黄/红 and wire payloads include the level.
-- [owner:@fullstack] Sync `dominds/docs/context-health.md` to match v3 semantics (grace period + reminder-curation cadence + forced-clear loop + Q4H escalation).
+- [owner:@fullstack] Sync `dominds/docs/context-health.md` to match v3 semantics (grace period + reminder-curation cadence + critical countdown + auto clear_mind).
