@@ -14,8 +14,8 @@ members:
     diligence-push-max: 0
     toolsets:
       - memory
-      - ws_read
-      - codex_style_tools  # make chatgpt models feel home
+      - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
+      # - ws_read  # dominds style txt read tools
       # - ws_mod  # dominds style txt mod tools
     gofor:
       - 'Scope/范围: 端到端交付 Dominds 功能与修复（`dominds/main/**` + `dominds/webapp/**` + 必要的 shared 类型/协议）'
@@ -29,10 +29,11 @@ members:
     diligence-push-max: 0
     toolsets:
       - team-mgmt
-      - ws_read
-      - ws_mod
-      - memory
       - team_memory
+      - memory
+      - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
+      # - ws_read  # dominds style txt read tools
+      # - ws_mod  # dominds style txt mod tools
     gofor:
       - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
       - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'
