@@ -7,7 +7,7 @@ This is a practical checklist for team members (and contributors) to quickly bui
 - Dominds is **dogfooding-first**: optimize real agent/operator experience; remove sharp edges even if it needs refactors.
 - Prefer **root-cause fixes** and remove obsolete compatibility paths (“no compatibility baggage”).
 - Conclusions must be **anchored to docs + code** (file paths / symbols / message types), not memory.
-- Dominds is **i18n**: maintain user/agent-facing copy in both `zh` and `en` (treat `zh` as the semantic source of truth; update `en` to match `zh`).
+- Dominds is **i18n**: maintain user/agent-facing copy in both `zh` and `en` (treat `zh` as the semantic source of truth; update `en` to match `zh`); also distinguish **work language vs UI language** per `dominds/docs/i18n.md`.
 - Encapsulated Taskdocs (`*.tsk/`) are **not** editable via generic file tools; only update via the function tool `change_mind`.
 
 ## 1) Read these docs (in this order)
@@ -16,10 +16,13 @@ This is a practical checklist for team members (and contributors) to quickly bui
 3. `dominds/docs/dialog-system.md` — Backend-driven driver; teammate tellasks; Q4H; suspension/resumption.
 4. `dominds/docs/encapsulated-taskdoc.md` — `*.tsk/` rules; why “single source of truth” matters.
 5. `dominds/docs/keep-going.md` — Root dialog auto-continue; budget; when forced to Q4H.
-6. `dominds/docs/auth.md` — Dev/prod auth modes; HTTP/WS auth propagation; WebUI behavior.
-7. `dominds/docs/team-tools-view.md` — Tools registry + Problems view (WebUI expectations).
-8. `dominds/docs/mcp-support.md` — MCP semantics; tool name constraints; hot-reload + last-known-good behavior.
-9. `dominds/docs/interruption-resumption.md` — Stop/Resume semantics; blocked vs interrupted UX requirements.
+6. `dominds/docs/dialog-persistence.md` — On-disk storage format; what is persisted and why.
+7. `dominds/docs/memory-system.md` — Minds, team memory, reminders; what is stable vs per-run.
+8. `dominds/docs/i18n.md` — Work language vs UI language; per-prompt language preference.
+9. `dominds/docs/auth.md` — Dev/prod auth modes; HTTP/WS auth propagation; WebUI behavior.
+10. `dominds/docs/team-tools-view.md` — Tools registry + Problems view (WebUI expectations).
+11. `dominds/docs/mcp-support.md` — MCP semantics; tool name constraints; hot-reload + last-known-good behavior.
+12. `dominds/docs/interruption-resumption.md` — Stop/Resume semantics; blocked vs interrupted UX requirements.
 
 ## 2) “Reality check” against code (minimum set)
 When writing or reviewing any spec, confirm these implementation anchors exist and match the doc:
@@ -46,14 +49,16 @@ When writing or reviewing any spec, confirm these implementation anchors exist a
 
 **Server contracts**
 - HTTP routes: `dominds/main/server/api-routes.ts`
+- Setup HTTP handlers: `dominds/main/server/setup-routes.ts`
 - WS message handling: `dominds/main/server/websocket-handler.ts`
 - Auth middleware: `dominds/main/server/auth.ts`
 
 **WebUI contracts (where UX meets protocol)**
 - HTTP client surfaces: `dominds/webapp/src/services/api.ts`, `dominds/webapp/src/services/auth.ts`
 - WS client + packets: `dominds/webapp/src/services/websocket.ts`
+- App wiring: `dominds/webapp/src/components/dominds-app.tsx`
+- Setup page: `dominds/webapp/src/components/dominds-setup.tsx`
 - Q4H presentation/input: `dominds/webapp/src/components/dominds-q4h-panel.ts`, `dominds/webapp/src/components/dominds-q4h-input.ts`
-- Tools/Problems/overall app wiring: `dominds/webapp/src/components/dominds-app.tsx`
 
 If docs and code disagree, treat it as **P0**: fix docs or code quickly.
 
