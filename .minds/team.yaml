@@ -13,6 +13,7 @@ members:
     name: 全栈开发 / Fullstack Developer
     diligence-push-max: 0
     toolsets:
+      - team_memory
       - memory
       - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
       # - ws_read  # dominds style txt read tools
