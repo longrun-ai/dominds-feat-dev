@@ -356,15 +356,15 @@ pnpm -C dominds tsx tests/driving/dialog-driving.ts --agent=gd --task=test-track
 
 ## Code References
 
-| Component          | Path                                                         |
-| ------------------ | ------------------------------------------------------------ |
-| Driver streaming   | `dominds/main/llm/driver.ts`                                 |
-| Persistence        | `dominds/main/persistence.ts`                                |
-| Event registry     | `dominds/main/evt-registry.ts`                               |
-| Frontend WebSocket | `dominds/webapp/main/services/websocket.ts`                  |
-| Streaming UI       | `dominds/webapp/main/components/dominds-dialog-container.ts` |
-| Q4H Panel UI       | `dominds/webapp/main/components/dominds-q4h-panel.ts`        |
-| Test helper        | `dominds/webapp/static/testing/e2e-test-helper.js`           |
+| Component          | Path                                                        |
+| ------------------ | ----------------------------------------------------------- |
+| Driver streaming   | `dominds/main/llm/driver.ts`                                |
+| Persistence        | `dominds/main/persistence.ts`                               |
+| Event registry     | `dominds/main/evt-registry.ts`                              |
+| Frontend WebSocket | `dominds/webapp/src/services/websocket.ts`                  |
+| Streaming UI       | `dominds/webapp/src/components/dominds-dialog-container.ts` |
+| Q4H Panel UI       | `dominds/webapp/src/components/dominds-q4h-panel.ts`        |
+| Test helper        | `dominds/webapp/static/testing/e2e-test-helper.js`          |
 
 ---
 
