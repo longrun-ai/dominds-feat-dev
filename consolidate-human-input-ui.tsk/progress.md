@@ -1,0 +1,11 @@
+- [owner:@fullstack] 已验证：`pnpm -C dominds run lint:types` ✅（exit 0）。
+- [owner:@fullstack] 已落地（待手工验收确认）：
+  - Problems pill（`#toolbar-problems-toggle`）：count>0 且 severity=info 时蓝底高亮；count=0 时默认样式。
+  - Q4H badge：bottom panel `data-bp-tab="q4h"` 内 `.bp-badge` 在 count>0 时蓝底高亮。
+  - bottom panel：flex + resize；collapsed 时无 active tab 高亮；Q4H/Docs/Prompts/Team content 高度跟随容器。
+  - 鞭策（Keep-going）：无 rtws diligence 文件时用内置；保存写入有覆盖确认 + i18n；后端增加 `diligence_budget_evt` 推送；badge ≤99、2 位宽、强 pulse、居中。
+  - Prompts：支持选中→预览编辑；workspace 覆盖；插入到输入框；支持 description 字段（workspace 保存写入 frontmatter）。
+  - Docs：stem 归一化 + 后端 whitelist；ToC/#hash 内链点击仅滚动不导航；heading 自动生成 `id`（当前策略：用原文标题）。
+  - Team manual：已开发完成并稳定（当前状态 OK）。
+- [owner:@fullstack] 待继续（本轮）：
+  - Prompts：新增 `fileName` 字段以显式对应 `.minds/prompts/<groupKey>/<fileName>.md`，UI 调整为 fileName/name 短输入、description 长输入；Save 按钮仅在 name+content 非空时高亮/可点。

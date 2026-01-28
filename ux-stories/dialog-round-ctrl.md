@@ -470,17 +470,17 @@ starting a new round for the **subdialog only**, without resetting or altering t
 This is the primary round-control scenario for long-run work: sub-agents should be able to shed noise locally
 while the orchestration dialog stays stable.
 
-### Step 5A: Create a registered pangu subdialog (topic context)
+### Step 5A: Create a registered pangu subdialog (tellask session)
 
 **Prompt to testee (in parent dialog):**
 
 ```
 Step 5A (critical): This scenario ONLY validates a TYPE B registered subdialog call.
 Reply with EXACTLY 2 lines:
-Line 1 MUST be exactly: !?@pangu !topic subdlg-round-ctrl
+Line 1 MUST be exactly: !?@pangu !tellaskSession subdlg-round-ctrl
 Line 2 MUST be exactly: !?SUBDLG_TOKEN_V2
 
-IMPORTANT: Do NOT put `!topic ...` on a second line (that would be in the body, not the headline).
+IMPORTANT: Do NOT put `!tellaskSession ...` on a second line (that would be in the body, not the headline).
 No other tool calls. No extra text.
 ```
 
@@ -525,7 +525,7 @@ const pre = await snapshotDomindsUI();
 const parentRoundBefore = pre.currentDialog?.round || '';
 const rootInfo = getCurrentDialogInfo();
 if (!rootInfo?.rootId) throw new Error('Missing root dialog info');
-const topicId = 'subdlg-round-ctrl';
+const tellaskSession = 'subdlg-round-ctrl';
 
 // Ensure we start from the parent/root dialog (not currently inside a subdialog).
 // Some UI flows can auto-focus into a subdialog; this scenario assumes Step 5A is issued from the parent.
@@ -538,14 +538,14 @@ while (getSubdialogHierarchy().length > 1) {
 const msgA = await fillAndSend(
   'Step 5A (critical): This scenario ONLY validates a TYPE B registered subdialog call.\\n' +
     'Reply with EXACTLY 2 lines:\\n' +
-    'Line 1 MUST be exactly: @pangu !topic subdlg-round-ctrl\\n' +
+    'Line 1 MUST be exactly: @pangu !tellaskSession subdlg-round-ctrl\\n' +
     'Line 2 MUST be exactly: SUBDLG_TOKEN_V2\\n\\n' +
-    'IMPORTANT: Do NOT put `!topic ...` on a second line (that would be in the body, not the headline).\\n' +
+    'IMPORTANT: Do NOT put `!tellaskSession ...` on a second line (that would be in the body, not the headline).\\n' +
     'No other tool calls. No extra text.',
 );
 
 // Wait until the TYPE B (registered) pangu subdialog exists.
-// If the testee accidentally creates a transient pangu subdialog (no !topic), nudge once and retry.
+// If the testee accidentally creates a transient pangu subdialog (no !tellaskSession), nudge once and retry.
 let cmdrSub = null;
 try {
   await waitUntil(() => {
@@ -556,7 +556,7 @@ try {
           d &&
           d.supdialogId === rootInfo.rootId &&
           d.agentId === 'pangu' &&
-          d.topicId === topicId &&
+          d.tellaskSession === tellaskSession &&
           typeof d.selfId === 'string' &&
           d.selfId !== '',
       )[0] || null;
@@ -565,7 +565,7 @@ try {
 } catch {
   await fillAndSend(
     'Correction #1: Reply ONLY with the following 2 lines (copy exactly; no extra text):\\n' +
-      '@pangu !topic subdlg-round-ctrl\\n' +
+      '@pangu !tellaskSession subdlg-round-ctrl\\n' +
       'SUBDLG_TOKEN_V2',
   );
   await waitUntil(() => {
@@ -576,7 +576,7 @@ try {
           d &&
           d.supdialogId === rootInfo.rootId &&
           d.agentId === 'pangu' &&
-          d.topicId === topicId &&
+          d.tellaskSession === tellaskSession &&
           typeof d.selfId === 'string' &&
           d.selfId !== '',
       )[0] || null;
