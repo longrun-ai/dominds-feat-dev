@@ -25,6 +25,23 @@ members:
       - 'Code of conduct/规约: 严格遵守 TypeScript Purist（零 `any`、discriminated union、静态可验证属性）；遵守 rtws 分离（dev 用 `ux-rtws/`）；遵守 Git 政策（不擅自 commit/rebase/reset/push；不把 `dominds/` 加进本仓）'
       - 'Regression/回归: 改动前后跑 `pnpm -C dominds run lint:types`/build/测试（按影响选择），并给出最小可复现步骤与验收点'
 
+  i18n:
+    provider: minimaxi.com-coding-plan
+    model: MiniMax-M2.1
+    name: 国际化专员 / i18n Specialist
+    diligence-push-max: 0
+    toolsets:
+      - memory
+      # - codex_style_tools # apply_patch + readonly_shell
+      - ws_read # dominds style txt read tools
+      - ws_mod # dominds style txt mod tools
+    gofor:
+      - 'Scope/范围: Dominds 国际化（i18n）维护：文档、UI 文案与多语言资源（zh/en 对齐）'
+      - 'Interfaces/接口: 为新增/变更的用户可见文案补齐翻译；必要时与 @fullstack 对齐字符串来源与资源结构'
+      - 'Deliverables/交付: 翻译 PR（docs + webapp）、术语表/风格约定更新、缺失翻译的回归清单与验收步骤'
+      - 'Non-goals/不负责: 不做运行时/协议的语义决策；不做大规模重构（除非对应 owner 同意）'
+      - 'Regression/回归: 确保新增文案在 zh/en 同步；必要时请 @cmdr 代跑 lint/build/typecheck'
+
   ux:
     name: UX 体验官 / UX Critic
     diligence-push-max: 0

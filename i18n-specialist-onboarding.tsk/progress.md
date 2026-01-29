@@ -1,0 +1,4 @@
+- [owner:@ux] 已在 `.minds/team.yaml` 注册 `i18n` 成员，并创建 `.minds/team/i18n/persona.zh.md`。
+- [owner:@ux] 已将 `i18n` 的目录权限配置从 `team.yaml` 中移除（不再显式写 `read_dirs`/`write_dirs`/`no_*`），以减少冗余并提升可读性。
+- [owner:@ux] 已更新 Dominds 运行时访问控制：对 `.minds/**` 改为“默认拒绝，需显式白名单才可用通用文件工具访问”；并更新 team-mgmt 手册与文档，明确 `*.tsk/**` / `.minds/**` 属于内置约束，一般无需在 deny-list 重复声明。
+- 下一步：视需要补齐 `.minds/team/i18n/persona.en.md`；并在首次 i18n 任务中验证 zh/en 同步流程。
