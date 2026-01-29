@@ -11,7 +11,6 @@ shell_specialists: cmdr
 members:
   fullstack:
     name: 全栈开发 / Fullstack Developer
-    diligence-push-max: 0
     toolsets:
       - team_memory
       - memory
@@ -29,7 +28,6 @@ members:
     provider: minimaxi.com-coding-plan
     model: MiniMax-M2.1
     name: 国际化专员 / i18n Specialist
-    diligence-push-max: 0
     toolsets:
       - memory
       # - codex_style_tools # apply_patch + readonly_shell
@@ -44,7 +42,6 @@ members:
 
   ux:
     name: UX 体验官 / UX Critic
-    diligence-push-max: 0
     toolsets:
       - team-mgmt
       - team_memory
