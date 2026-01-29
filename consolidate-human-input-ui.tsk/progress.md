@@ -7,5 +7,9 @@
   - Prompts：支持选中→预览编辑；workspace 覆盖；插入到输入框；支持 description 字段（workspace 保存写入 frontmatter）。
   - Docs：stem 归一化 + 后端 whitelist；ToC/#hash 内链点击仅滚动不导航；heading 自动生成 `id`（当前策略：用原文标题）。
   - Team manual：已开发完成并稳定（当前状态 OK）。
+  - npm publish 修复（疑似发布包缺资源导致 Docs/Prompts 失效）：
+    - `dominds/package.json`：`build:backend` 增加复制 `docs/ → dist/docs/`、`main/snippets/ → dist/snippets/`；新增 `prepublishOnly` 强制 publish 前 `pnpm run build`。
+    - `dominds/main/server/api-routes.ts`：`/api/docs/read` 优先读 `dist/docs`，并保留 dev fallback 到 `docs/`。
+    - `dominds/main/server/prompts-routes.ts`：builtin prompts/catalog 优先读 `dist/snippets`，并保留 dev fallback 到 `main/snippets/`。
 - [owner:@fullstack] 待继续（本轮）：
   - Prompts：新增 `fileName` 字段以显式对应 `.minds/prompts/<groupKey>/<fileName>.md`，UI 调整为 fileName/name 短输入、description 长输入；Save 按钮仅在 name+content 非空时高亮/可点。
