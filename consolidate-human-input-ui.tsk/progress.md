@@ -4,6 +4,7 @@
   - Q4H badge：bottom panel `data-bp-tab="q4h"` 内 `.bp-badge` 在 count>0 时蓝底高亮。
   - bottom panel：flex + resize；collapsed 时无 active tab 高亮；Q4H/Docs/Prompts/Team content 高度跟随容器。
   - 鞭策（Keep-going）：无 rtws diligence 文件时用内置；保存写入有覆盖确认 + i18n；后端增加 `diligence_budget_evt` 推送；badge ≤99、2 位宽、强 pulse、居中。
+  - 鞭策（Keep-going）：新增 `#diligence-reset`“重置为内置”按钮（删除工作区鞭策语文件），并将 `#diligence-reload` 图标调整为“云端下载”（仍为“加载最新鞭策语”）。
   - Prompts：支持选中→预览编辑；workspace 覆盖；插入到输入框；支持 description 字段（workspace 保存写入 frontmatter）。
   - Docs：stem 归一化 + 后端 whitelist；ToC/#hash 内链点击仅滚动不导航；heading 自动生成 `id`（当前策略：用原文标题）。
   - Team manual：已开发完成并稳定（当前状态 OK）。
