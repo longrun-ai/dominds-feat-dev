@@ -19,4 +19,18 @@
   - 创建 `dominds/docs/mcp-support.zh.md`（mcp-support.md 的中文翻译）
   - 创建 `dominds/docs/team-mgmt-toolset.zh.md`（team-mgmt-toolset.md 的中文翻译）
   - 创建 `dominds/docs/txt-editing-tools.zh.md`（txt-editing-tools.md 的中文翻译）✅
-- [owner:@i18n] 所有 docs 文档翻译任务已完成 ✅
+- [owner:@i18n] 已完成术语一致性修正：
+  - 修正 `dominds/docs/keep-going.zh.md` 中的"勤奋"术语为"鞭策"，使其与 WebUI 界面显示的术语一致
+  - 主要修正：标题从"Keep-Going（勤奋自动继续）"改为"Keep-Going（鞭策）"
+  - "勤奋提示" → "鞭策语"
+  - "勤奋文件" → "鞭策语文件"
+  - "勤奋-push-max" → "鞭策推送上限"
+  - "勤奋注入" → "鞭策注入" ✅
+- [owner:@i18n] 已验证以下文档的翻译质量符合 WebUI 术语标准：
+  - dialog-system.zh.md - 术语使用正确
+  - memory-system.zh.md - 术语使用正确
+  - encapsulated-taskdoc.zh.md - 术语使用正确
+  - txt-editing-tools.zh.md - 术语使用正确
+  - team-mgmt-toolset.zh.md - 术语使用正确（标题"团队管理工具集"与文档内容相符）
+- [owner:@i18n] 已验证 snippets 目录的双语文件术语一致性：
+  - starting.zh.md 和 starting.en.md 的术语使用符合标准
