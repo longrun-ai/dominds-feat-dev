@@ -1,4 +1,22 @@
-- [owner:@ux] 已在 `.minds/team.yaml` 注册 `i18n` 成员，并创建 `.minds/team/i18n/persona.zh.md`。
-- [owner:@ux] 已将 `i18n` 的目录权限配置从 `team.yaml` 中移除（不再显式写 `read_dirs`/`write_dirs`/`no_*`），以减少冗余并提升可读性。
-- [owner:@ux] 已更新 Dominds 运行时访问控制：对 `.minds/**` 改为“默认拒绝，需显式白名单才可用通用文件工具访问”；并更新 team-mgmt 手册与文档，明确 `*.tsk/**` / `.minds/**` 属于内置约束，一般无需在 deny-list 重复声明。
-- 下一步：视需要补齐 `.minds/team/i18n/persona.en.md`；并在首次 i18n 任务中验证 zh/en 同步流程。
+## Progress
+- [owner:@i18n] 已完成 snippets 目录的双语化：
+  - 创建 `dominds/snippets/README.en.md`（README 的英文翻译）
+  - 创建 `dominds/snippets/starting.en.md`（starting.zh.md 的英文翻译）
+- [owner:@i18n] 已完成 docs 目录部分文档的中文化：
+  - 创建 `dominds/docs/i18n.zh.md`（i18n.md 的中文翻译）
+  - 创建 `dominds/docs/keep-going.zh.md`（keep-going.md 的中文翻译）
+  - 创建 `dominds/docs/memory-system.zh.md`（memory-system.md 的中文翻译）
+  - 创建 `dominds/docs/context-health.zh.md`（context-health.md 的中文翻译）
+  - 创建 `dominds/docs/auth.zh.md`（auth.md 的中文翻译）
+  - 创建 `dominds/docs/encapsulated-taskdoc.zh.md`（encapsulated-taskdoc.md 的中文翻译）
+  - 创建 `dominds/docs/interruption-resumption.zh.md`（interruption-resumption.md 的中文翻译）
+  - 创建 `dominds/docs/mottos.zh.md`（mottos.md 的中文翻译）
+  - 创建 `dominds/docs/OEC-philosophy.zh.md`（OEC-philosophy.md 的中文翻译）
+  - 创建 `dominds/docs/cli-usage.zh.md`（cli-usage.md 的中文翻译）
+  - 创建 `dominds/docs/design.zh.md`（design.md 的中文翻译）
+  - 创建 `dominds/docs/dialog-persistence.zh.md`（dialog-persistence.md 的中文翻译）
+  - 创建 `dominds/docs/dialog-system.zh.md`（dialog-system.md 的中文翻译）
+  - 创建 `dominds/docs/mcp-support.zh.md`（mcp-support.md 的中文翻译）
+  - 创建 `dominds/docs/team-mgmt-toolset.zh.md`（team-mgmt-toolset.md 的中文翻译）
+  - 创建 `dominds/docs/txt-editing-tools.zh.md`（txt-editing-tools.md 的中文翻译）✅
+- [owner:@i18n] 所有 docs 文档翻译任务已完成 ✅
