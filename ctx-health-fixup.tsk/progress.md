@@ -1,9 +1,0 @@
-- [owner:@fullstack] v3 remediation 已落地并按最新设计更新：
-  - `dominds/main/llm/driver.ts`：
-    - `caution`：默认 3 次生成缓冲期（软提示）→ 之后按 cadence（默认每 10 次生成，可按 model 配置）注入 role=user 临时指引，要求 agent 至少调用一次 `update_reminder`/`add_reminder` 维护提醒项，并在提醒项中写明“还差什么信息就可完成重入包，从而安全 clear_mind 进入新一轮/新回合”。
-    - `critical`：改为 **连续最多 5 轮倒数提示**（role=user，且以 UI 可见的 user prompt 记录在案），引导 agent 主动 `update_reminder`/`add_reminder` + `clear_mind`；倒数归零后 driver **自动执行 `clear_mind`** 开启新一轮/新回合（不中断对话，不触发 Q4H）。
-  - 提醒项显著性：非 owner 提醒项从 `transient_guide_msg`/role=assistant 改为 `environment_msg`/role=user 注入（仍然不持久化），且在 0 条提醒项时不注入 intro 以避免 prompt 膨胀。
-  - `dominds/main/shared/i18n/driver-messages.ts`：remediation 指引标题与文案统一为 countdown + auto clear。
-  - `dominds/docs/context-health.md`：已更新为 v3 remediation（缓冲期 + cadence + critical countdown + auto clear_mind）语义与说明。
-- [owner:@fullstack] 环境门：pending（必须等待 @cmdr 回贴结果后才能宣称通过）
-  - 需要：`./dev-server.sh status`、`pnpm -C dominds run lint:types`、`pnpm -C dominds/tests run realtime`。
