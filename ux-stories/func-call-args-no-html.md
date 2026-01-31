@@ -27,4 +27,3 @@
 
 - Pass：`func-call-arguments` 以纯文本显示 `<dominds-app>`，页面里**不会出现**实际的 `<dominds-app>` DOM 节点，也不会触发任何自定义 element 的副作用。
 - Fail：`func-call-arguments` 里出现被解析后的 DOM（例如页面里真的插入了 `<dominds-app>`），或出现异常渲染/崩溃。
-
