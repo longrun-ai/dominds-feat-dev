@@ -140,6 +140,13 @@ All CLI tools operate on the current working directory as the rtws by default; u
 
 WebSocket communication uses a simple message protocol defined in `main/shared/types/wire.ts`. The frontend connects to `/ws` for real-time dialog updates.
 
+### Streaming Substream Ordering (Thinking / Saying)
+
+- Within a single generation (`genseq`), thinking and saying may alternate any number of times as segments: `start → chunk* → finish`.
+- Segments MUST NOT overlap: a new `start` MUST NOT occur before the previous segment has `finish`ed (at most one active substream at a time).
+- The UI MUST render sections in event arrival order (do not reorder DOM to “fix” ordering).
+- If overlap/out-of-order is detected, the backend should emit a loud `stream_error_evt` to make the issue debuggable across the stack.
+
 ### Workspace Context
 
 This repo uses two runtime workspaces:
