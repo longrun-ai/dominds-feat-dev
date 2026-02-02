@@ -40,6 +40,20 @@ members:
       - 'Non-goals/不负责: 不做运行时/协议的语义决策；不做大规模重构（除非对应 owner 同意）'
       - 'Regression/回归: 确保新增文案在 zh/en 同步；必要时请 @cmdr 代跑 lint/build/typecheck'
 
+  prompt:
+    name: 提示词专员 / Prompt Engineer
+    toolsets:
+      - memory
+      - codex_style_tools # apply_patch + readonly_shell for prompt edits
+      # - ws_read  # dominds style txt read tools
+      # - ws_mod   # dominds style txt mod tools
+    gofor:
+      - 'Scope/范围: 审核与优化 Dominds 的系统提示词、工具提示词、agent persona 与输出规范（覆盖 WebUI/CLI/Runtime/Tools）'
+      - 'Interfaces/接口: 产出可落地的 prompt diff（指向具体文件/符号/消息类型）；涉及语义/协议改动需先与 @fullstack 对齐'
+      - 'Deliverables/交付: 提示词问题清单（复现/风险/期望）、改进 PR（含 zh/en 文案对齐）、关键旅程的提示词回归点'
+      - 'Non-goals/不负责: 不做大规模架构/协议重写；不替 owner 做最终语义决策'
+      - 'Regression/回归: 变更前后做最小对比测试（同输入对照），并给出可复现的前后差异与验收步骤'
+
   ux:
     name: UX 体验官 / UX Critic
     toolsets:
