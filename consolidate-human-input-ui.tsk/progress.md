@@ -13,6 +13,7 @@
     - WebUI：`dominds-prompts-panel` → `dominds-snippets-panel`；bottom panel tab key：`prompts` → `snippets`（UI 标题仍为“提示词模板”）
   - Docs：stem 归一化 + 后端 whitelist；ToC/#hash 内链点击仅滚动不导航；heading 自动生成 `id`（当前策略：用原文标题）。
   - Team manual：已开发完成并稳定（当前状态 OK）；已移除 `#team-manual-panel` 内多余的 `topics-title` 标题，节省垂直空间。
+  - 版本显示：主界面与 `/setup` header 在 Logo 右侧淡色小字显示 Dominds 版本（来自 `GET /api/health`，后端从 `package.json` 读取）。
   - npm publish 修复（疑似发布包缺资源导致 Docs/提示词模板失效）：
     - `dominds/package.json`：`build:backend` 增加复制 `docs/ → dist/docs/`、`main/snippets/ → dist/snippets/`；新增 `prepublishOnly` 强制 publish 前 `pnpm run build`。
     - `dominds/main/server/api-routes.ts`：`/api/docs/read` 优先读 `dist/docs`，并保留 dev fallback 到 `docs/`。
