@@ -1,4 +1,3 @@
-
 # Prompts / System Prompt Issues
 
 维护人：@prompt
@@ -7,16 +6,58 @@
 
 ## 决策（已确认）
 
-1) **中文系统提示必须补齐“多人集体诉请（collective teammate tellask）”规则**，且英文版与之语义对齐。
-2) 历史上的“诉请工具 / tellask tools”已取消：最新版 `!?@...` 仅用于 **队友诉请** 与 **Q4H（`!?@human`）**。
+1. **中文系统提示必须补齐“多人集体诉请（collective teammate tellask）”规则**，且英文版与之语义对齐。
+2. 历史上的“诉请工具 / tellask tools”已取消：最新版 `!?@...` 仅用于 **队友诉请** 与 **Q4H（`!?@human`）**。
    - 任何“看起来像工具调用”的文案/示例（如 `!?@tool_a`）必须彻底移除，不留历史痕迹。
-3) 参考 `codex-rs/` 的 `codex-cli`：在 `codex_style_tools` 中增加 `update_plan` 工具，并将其语义映射为 Dominds 的 reminder 操作。
-4) Dominds 支持暴露内部推理过程：若 provider 对 thought streaming 支持不足/欠佳，需要提出整改方案并修正。
-5) **命名与分层原则：实现层禁止出现 `tool_call*` 字眼**。
+3. 参考 `codex-rs/` 的 `codex-cli`：在 `codex_style_tools` 中增加 `update_plan` 工具，并将其语义映射为 Dominds 的 reminder 操作。
+4. Dominds 支持暴露内部推理过程：若 provider 对 thought streaming 支持不足/欠佳，需要提出整改方案并修正。
+5. **命名与分层原则：实现层禁止出现 `tool_call*` 字眼**。
    - 仅允许在 **LLM API / provider 适配层** 使用 `tool_call`（因为这是各家模型/SDK 的既有术语）。
    - Dominds 自己的实现层（事件类型/持久化记录/前端处理/注释/文档）必须改用语义更精确的命名：
      - `teammate_call_*`：指 **队友诉请（tellask）块** 及其相关事件。
      - `function_call_*`：指 **function tools 执行** 及其相关事件。
+6. **Q4H（`!?@human`）使用原则：不外包执行，但允许请求最小必要输入**。
+   - `@human` 是特殊成员：只用于向人类用户提问以获取**必要的澄清/决策/授权/缺失输入**，或汇报当前环境中**无法由智能体自主完成**的阻塞点。
+   - 禁止把可由智能体完成的执行性工作外包给 `@human`；对 `@human` 的请求应尽量**最小化、可验证**（给出所需信息的明确格式/选项/约束），拿到答复后继续由智能体完成后续工作。
+   - 该原则必须 **zh/en 语义对齐**，避免语言切换导致行为漂移。
+
+   建议替换系统提示中的“团队目录/Team Directory”相关段落为如下**规范文案**（仅记录口径，不规定具体实现方式）：
+   - 推荐系统提示文案（zh）：
+
+     ```plain-text
+     **特殊成员**：人类（@human）是特殊团队成员。你可以使用 `!?@human ...` 发起 Q4H（Question for Human），用于请求必要的澄清/决策/授权/提供缺失输入，或汇报当前环境中无法由智能体自主完成的阻塞事项。
+     **注意**：不要把可由智能体完成的执行性工作外包给 @human。向 @human 的请求应尽量最小化、可验证（给出需要的具体信息、预期格式/选项），并在得到答复后继续由智能体完成后续工作。
+     ```
+
+   - Recommended system prompt copy (en):
+     ```plain-text
+     **Special member**: Human (@human) is a special team member. You may use `!?@human ...` to ask a Q4H (Question for Human) when you need necessary clarification/decision/authorization/missing inputs, or to report blockers that cannot be completed autonomously in the current environment.
+     **Note**: Do not outsource executable work to @human. Keep Q4H requests minimal and verifiable (ask for specific info, expected format/options), then continue the remaining work autonomously after receiving the answer.
+     ```
+
+7. **使用者语境的叙事口径：避免“父/子/主/根对话”**。
+   - 原则：在面向使用者（对话的主理人智能体）的文案/提示词中，不应暴露实现层的层级术语（父对话/子对话/主对话/根对话）。
+   - 推荐改用“从使用者视角可理解、可操作”的术语来描述机制与行为：
+     - **诉请人**：发起诉请的一方（来源对话的主理人智能体）。
+     - **被诉请人**：被点名的目标（队友智能体、`@human`，或回问目标）。
+     - **来源对话**：诉请从哪个对话发起（用于定位上下文与回链）。
+     - **原始对话**：需要汇总结果/需要继续推进的对话（用于解释结果将“回到哪里”）。
+   - 仅在“技术实现说明”小节中，才允许使用 `rootId` / `RootDialog` / root dialog 等术语辅助读者理解。
+   - 术语表可能需要同步更新：尤其是 `!?@super ...` 的 `super` 关键词会带出“父/上级”语感，后续可评估是否要换成更贴近“回问/回呼/回报”语义的关键词。
+
+8. **中文用词统一：文案中的“代理”应改为“智能体”**。
+   - 默认口径：中文对外文案统一使用“智能体”；“代理”仅在引用外部资料或行业惯用译法且确有必要时保留。
+   - 对“用户”的表述按上下文选择：
+     - “用户（通常是智能体）”
+     - “人类用户”
+
+9. **Collective teammate tellask 语义口径：同一诉请块自然支持多目标（一对多拆分）**。
+   - 现状问题：系统提示中存在“默认单目标 + 例外模式”的表述，且中文混入英文（headline/headLine/callBody/collective targets 等），不符合词汇表口径。
+   - 正确口径：单个诉请块从语义上就允许多个目标；这不是例外模式，而是同一语法的自然行为。
+   - 推荐改写为：
+     - 当同一条诉请块的**诉请头**（Tellask headline/诉请头，含多行诉请头）中出现多个队友呼号时，Dominds 会将其视为“一对多诉请”，并对每个目标队友进行**一对多拆分**（生成多条队友诉请；诉请头与诉请正文保持一致）。
+     - 若诉请头包含 `!tellaskSession <slug>`，它最多出现一次，并对所有被拆分的目标队友生效。
+   - 中文中避免混入非必要英文：使用术语表中的中文对照（headline→诉请头等）；“扇出”建议替换为更自然的“一对多拆分”。
 
 ## 当前状态（观察到的实现变更，待验收）
 
@@ -80,23 +121,25 @@
 
 ## 回归清单（最小可复现）
 
-1) **Collective teammate tellask**：在同一条诉请 headline 中放多个队友呼号，验证会 fan-out 成多个队友诉请且 `!tellaskSession` 仅出现一次时可对所有目标生效。（运行态已验收：`!?@ux @cmdr !tellaskSession collective-fanout-verify`；@cmdr/@ux 均回贴收到，且观察到 `tellaskSession=collective-fanout-verify`、targets=`@ux,@cmdr`）
-2) **示例净化**：注入的系统提示中不再出现 `!?@tool_a` 这类“工具样式”的示例。
-3) **文案净化**：全 repo 不再出现 “tellask tools / 诉请工具” 残留表述。
-4) **Codex update_plan**：`codex_style_tools` 列表中出现 `update_plan`；调用一次后能在 reminders 中看到 plan 更新。
-5) **Thought streaming（可选/可延后）**：同一代 `genseq` 内 thinking/saying 子流不重叠；WebUI 按到达序渲染。
+1. **Collective teammate tellask**：在同一条诉请 headline 中放多个队友呼号，验证会 fan-out 成多个队友诉请且 `!tellaskSession` 仅出现一次时可对所有目标生效。（运行态已验收：`!?@ux @cmdr !tellaskSession collective-fanout-verify`；@cmdr/@ux 均回贴收到，且观察到 `tellaskSession=collective-fanout-verify`、targets=`@ux,@cmdr`）
+2. **示例净化**：注入的系统提示中不再出现 `!?@tool_a` 这类“工具样式”的示例。
+3. **文案净化**：全 repo 不再出现 “tellask tools / 诉请工具” 残留表述。
+4. **Codex update_plan**：`codex_style_tools` 列表中出现 `update_plan`；调用一次后能在 reminders 中看到 plan 更新。
+5. **Thought streaming（可选/可延后）**：同一代 `genseq` 内 thinking/saying 子流不重叠；WebUI 按到达序渲染。
 
 ## 新发现的问题（待修复）
 
 ### E) 实现层仍残留 `tool_call_*` 命名（需要一次性清理，不留历史痕迹）
 
 目标：把 Dominds 实现层里所有 `tool_call_*` 相关命名（事件/记录/注释/文档）全部替换为：
+
 - `teammate_call_*`：队友诉请（tellask）块及其 streaming 事件
 - `function_call_*`：function tools 执行及其事件/持久化
 
 注意：本项 **不做任何向后兼容**。按最新最优方式改完后，直接删除所有历史记录（例如清空 `./.dialogs/` 及 `ux-rtws/.dialogs/`）即可。
 
 建议修复（给 @fullstack 的“该改什么/改成什么”清单，不涉及实现细节）：
+
 - **Streaming tellask 块事件**：将 `tool_call_*_evt` 全部改为 `teammate_call_*_evt`（含 start/headline/body/finish 等）。
 - **Inline 结果事件/记录**：把当前用于“把结果贴回同一 bubble”的 `tool_call_response_evt` / `tool_call_result_record` 改为 `function_call_response_evt` / `function_call_result_record`（或等价命名，只要语义对齐“function tools 的结果”）。
 - **函数执行事件**：当前 `func_call_*` / `func_result_*` 建议统一为 `function_call_*` / `function_result_*`（避免缩写，并与上面原则一致）。
@@ -105,6 +148,7 @@
 ### F) WebUI 注释仍残留泛称 “tool calls”（需在重命名后同步修正）
 
 优先修正点（行号仅作参考，后续可能漂移）：
+
 - `dominds/webapp/src/components/dominds-dialog-container.ts:74`
 - `dominds/webapp/src/components/dominds-dialog-container.ts:78`
 - `dominds/webapp/src/components/dominds-dialog-container.ts:80`
