@@ -66,7 +66,7 @@
 - `dominds/main/minds/system-prompt.ts`：已补齐中文 collective teammate tellask 规则；已移除 `!?@tool_a`/`!?@tool_b` 示例；已清理英文 “tellask tools”。
 - `dominds/main/tools/plan.ts`：新增 `update_plan` function tool，将 plan 写入/更新到 reminders（用 meta.kind='plan' 做幂等定位）。
 - `dominds/main/tools/builtins.ts`：`codex_style_tools` 已包含 `update_plan` 且 toolset prompt 已补充说明。
-- `dominds/main/dialog.ts`、`dominds/main/shared/types/dialog.ts`、`dominds/webapp/src/components/dominds-dialog-container.ts`：注释术语基本已收敛为“tellask call block（`!?@...`）”与“function calls（工具执行）”两类，但 WebUI 里仍有少量 “tool calls” 旧措辞残留（见下方问题 D）。
+- `dominds/main/dialog.ts`、`dominds/main/shared/types/dialog.ts`、`dominds/webapp/src/components/dominds-dialog-container.ts`：注释术语基本已收敛为“tellask call block（`!?@...`）”与“function calls（工具执行）”两类；WebUI 中残留的泛称 “tool calls” 旧措辞已修正为更精确的 “teammate-call / function tool call”。
 - `dominds/main/llm/gen.ts`、`dominds/main/llm/gen/openai.ts`、`dominds/main/llm/gen/codex.ts`、`dominds/main/llm/driver.ts`：出现对 thought/streaming 异常的 `streamError` 上报链路（用于暴露/诊断子流重叠等问题）。
 
 ## 发现的问题（带定位）
@@ -77,11 +77,9 @@
 - **中文重复段落**：`!?@super` 说明在中文版本重复出现两次（`dominds/main/minds/system-prompt.ts:151`、`dominds/main/minds/system-prompt.ts:152`）。
 - **示例呈现出“工具调用倾向”**：系统提示示例中使用 `!?@tool_a`（`dominds/main/minds/system-prompt.ts:111`、`dominds/main/minds/system-prompt.ts:119`、`dominds/main/minds/system-prompt.ts:276`）。这会把“队友诉请”误导成“工具调用”。
 
-### B) 代码/类型注释残留“!?@tool_name = 工具调用”说法
+### B) 代码/类型注释残留“!?@tool_name = 工具调用”说法（已修复）
 
-- `dominds/main/dialog.ts:298`：注释写了 `Tool Call (\`!?@tool_name\`)`，容易被理解为“`!?@` 可以调用工具”。
-- `dominds/main/shared/types/dialog.ts:124`、`dominds/main/shared/types/dialog.ts:283`：注释写了 “Tool call events (streaming mode - @tool_name mentions)”/“Tool calls (@tool_name)”，需明确与 `!?@...` 队友诉请语法区分。
-- `dominds/webapp/src/components/dominds-dialog-container.ts`：该文件已把 `tool_call_*` 事件注释为 “TELLASK CALL BLOCK EVENTS（streaming mode - `!?@...` blocks）”，但仍需注意 `tool_call_*` 这一事件名容易让读者误解为“工具调用”（建议后续统一术语并在注释里显式区分 tellask vs function tools）。
+已修正：实现层注释不再使用 `!?@tool_name` 作为“工具调用”示例；并收敛为 “tellask call block / teammate-call / function tool call” 的精确口径。
 
 ### C) 文档残留“诉请工具”说法
 
@@ -145,9 +143,15 @@
 - **函数执行事件**：当前 `func_call_*` / `func_result_*` 建议统一为 `function_call_*` / `function_result_*`（避免缩写，并与上面原则一致）。
 - **注释与文案**：实现层不再出现 “tool call(s)” 作为泛称；用 “teammate call（tellask）” 与 “function call（function tool）” 做精确区分。
 
-### F) WebUI 注释仍残留泛称 “tool calls”（需在重命名后同步修正）
+- **清理 `receiveToolResponse` / `ToolCallResultRecord` 遗留（不留痕迹）**：
+  - 若实现中仍存在 `receiveToolResponse` / `ToolCallResultRecord`（或其改名残留），应当按语义做**二选一**：
+    1) **改名并收敛为 function tools 语境**：将其改为 `FuncCall*` / `FuncToolResponse*` 等明确指向 function tools 的命名（避免让读者误以为 tellask 是工具调用）。
+    2) **直接删除该路径**：若该路径仅用于历史兼容/可被其他事件（如 function call/result 事件）替代，则删除实现与文案，不留历史痕迹。
+  - 目标：实现层不再出现“ToolCall/ToolResponse”这类容易混淆的命名；仅 LLM API/provider 适配层允许保留 `tool_call` 既有术语。
 
-优先修正点（行号仅作参考，后续可能漂移）：
+### F) WebUI 注释仍残留泛称 “tool calls”（已修复）
+
+已修正：`dominds/webapp/src/components/dominds-dialog-container.ts` 中的注释与错误提示不再使用泛称 “tool call(s)”。
 
 - `dominds/webapp/src/components/dominds-dialog-container.ts:74`
 - `dominds/webapp/src/components/dominds-dialog-container.ts:78`
