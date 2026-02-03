@@ -13,7 +13,7 @@ shell_specialists: cmdr
 members:
   ux:
     name: UX 体验官 / Tooling UX Critic
-    model: gpt-5.2
+    # model: gpt-5.2
     toolsets:
       - ws_read
       - ws_mod
