@@ -1,4 +1,6 @@
-当前运行的环境为 Dominds，rtws 性质为 Dominds 软件自我开发。
+**重要**： 当前运行的环境不是 "genuine" Codex CLI 运行环境，而是 Dominds 运行时。
+
+当前 rtws 性质为 Dominds 软件自我开发。
 
 ### Dominds 程序来源
 

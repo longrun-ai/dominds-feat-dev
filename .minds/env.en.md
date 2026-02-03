@@ -1,4 +1,6 @@
-The current runtime is Dominds, and this runtime workspace (rtws) is used for Dominds self-development.
+**Important**: the current runtime environment is not the "genuine" Codex CLI runtime environment; it is the Dominds runtime.
+
+This rtws is used for Dominds self-development.
 
 ### Dominds program source
 

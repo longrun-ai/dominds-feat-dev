@@ -1,0 +1,112 @@
+
+# Prompts / System Prompt Issues
+
+维护人：@prompt
+
+目标：把“当前环境系统提示”的问题与决策落盘，形成可执行的修正清单与回归点。
+
+## 决策（已确认）
+
+1) **中文系统提示必须补齐“多人集体诉请（collective teammate tellask）”规则**，且英文版与之语义对齐。
+2) 历史上的“诉请工具 / tellask tools”已取消：最新版 `!?@...` 仅用于 **队友诉请** 与 **Q4H（`!?@human`）**。
+   - 任何“看起来像工具调用”的文案/示例（如 `!?@tool_a`）必须彻底移除，不留历史痕迹。
+3) 参考 `codex-rs/` 的 `codex-cli`：在 `codex_style_tools` 中增加 `update_plan` 工具，并将其语义映射为 Dominds 的 reminder 操作。
+4) Dominds 支持暴露内部推理过程：若 provider 对 thought streaming 支持不足/欠佳，需要提出整改方案并修正。
+5) **命名与分层原则：实现层禁止出现 `tool_call*` 字眼**。
+   - 仅允许在 **LLM API / provider 适配层** 使用 `tool_call`（因为这是各家模型/SDK 的既有术语）。
+   - Dominds 自己的实现层（事件类型/持久化记录/前端处理/注释/文档）必须改用语义更精确的命名：
+     - `teammate_call_*`：指 **队友诉请（tellask）块** 及其相关事件。
+     - `function_call_*`：指 **function tools 执行** 及其相关事件。
+
+## 当前状态（观察到的实现变更，待验收）
+
+说明：本项是对当前工作区 `dominds/` 里已出现的改动做的观察记录（未必已过 lint/test）。
+
+- `dominds/main/minds/system-prompt.ts`：已补齐中文 collective teammate tellask 规则；已移除 `!?@tool_a`/`!?@tool_b` 示例；已清理英文 “tellask tools”。
+- `dominds/main/tools/plan.ts`：新增 `update_plan` function tool，将 plan 写入/更新到 reminders（用 meta.kind='plan' 做幂等定位）。
+- `dominds/main/tools/builtins.ts`：`codex_style_tools` 已包含 `update_plan` 且 toolset prompt 已补充说明。
+- `dominds/main/dialog.ts`、`dominds/main/shared/types/dialog.ts`、`dominds/webapp/src/components/dominds-dialog-container.ts`：注释术语基本已收敛为“tellask call block（`!?@...`）”与“function calls（工具执行）”两类，但 WebUI 里仍有少量 “tool calls” 旧措辞残留（见下方问题 D）。
+- `dominds/main/llm/gen.ts`、`dominds/main/llm/gen/openai.ts`、`dominds/main/llm/gen/codex.ts`、`dominds/main/llm/driver.ts`：出现对 thought/streaming 异常的 `streamError` 上报链路（用于暴露/诊断子流重叠等问题）。
+
+## 发现的问题（带定位）
+
+### A) Dominds runtime 系统提示（注入给 agent 的那份）
+
+- **中文缺失 collective teammate tellask 规则**：英文版包含“headline 中多个队友呼号 → 扇出到多个队友”的规则（`dominds/main/minds/system-prompt.ts:241`），中文版本未覆盖。
+- **中文重复段落**：`!?@super` 说明在中文版本重复出现两次（`dominds/main/minds/system-prompt.ts:151`、`dominds/main/minds/system-prompt.ts:152`）。
+- **示例呈现出“工具调用倾向”**：系统提示示例中使用 `!?@tool_a`（`dominds/main/minds/system-prompt.ts:111`、`dominds/main/minds/system-prompt.ts:119`、`dominds/main/minds/system-prompt.ts:276`）。这会把“队友诉请”误导成“工具调用”。
+
+### B) 代码/类型注释残留“!?@tool_name = 工具调用”说法
+
+- `dominds/main/dialog.ts:298`：注释写了 `Tool Call (\`!?@tool_name\`)`，容易被理解为“`!?@` 可以调用工具”。
+- `dominds/main/shared/types/dialog.ts:124`、`dominds/main/shared/types/dialog.ts:283`：注释写了 “Tool call events (streaming mode - @tool_name mentions)”/“Tool calls (@tool_name)”，需明确与 `!?@...` 队友诉请语法区分。
+- `dominds/webapp/src/components/dominds-dialog-container.ts`：该文件已把 `tool_call_*` 事件注释为 “TELLASK CALL BLOCK EVENTS（streaming mode - `!?@...` blocks）”，但仍需注意 `tool_call_*` 这一事件名容易让读者误解为“工具调用”（建议后续统一术语并在注释里显式区分 tellask vs function tools）。
+
+### C) 文档残留“诉请工具”说法
+
+- `dominds/docs/dialog-system.md:1039`：出现 “teammate Tellask tools” 表述，需改为“teammate tellask capability / teammate tellask mechanism”等不含 tools 的措辞。
+
+### D) Codex provider 与工具契约
+
+- `codex_style_tools` 目前只包含 `apply_patch` + `readonly_shell`（`dominds/main/tools/builtins.ts:219`），但 Codex 侧 base prompt 强依赖 `update_plan`（例如 `dominds/codex-auth/prompts/gpt_5_2_prompt.md:38`）。
+- `codex-rs` 的 `update_plan` schema（来源：`codex-rs/core/src/tools/handlers/plan.rs:39` 起）：
+  - 参数：`{ explanation?: string, plan: Array<{ step: string, status: "pending"|"in_progress"|"completed" }> }`
+  - `plan` 必填；不允许额外字段；最多一个 `in_progress`。
+
+## 建议修正（给 @fullstack 落盘）
+
+### 1) 修正 `dominds/main/minds/system-prompt.ts`
+
+- 为中文版本补齐与英文一致的 collective teammate tellask 规则（建议直接把英文 `:241` 的语义翻译进中文同位置）。
+- 删除中文 `!?@super` 重复条目，保留一个规范版本即可。
+- 全面替换 `!?@tool_a` / `!?@tool_b` 等示例为真实队友呼号（例如 `!?@pangu`、`!?@ux`、`!?@cmdr`），并明确“`!?@...` 仅是队友诉请/Q4H，不是工具调用”。
+
+### 2) 清理文档 `dominds/docs/dialog-system.md`
+
+- 将 “teammate Tellask tools” 替换为不含 tools 的表述，避免误导。
+
+### 3) 在 `codex_style_tools` 增加 `update_plan`
+
+- 新增 `FuncTool`：`name: "update_plan"`，参数 schema 对齐 `codex-rs`。
+- 行为建议（“映射为 reminder 操作”）：
+  - 将 plan 渲染成一段稳定格式文本（包含可选 explanation + 列表），写入/更新一个“Plan”提醒；
+  - 用 `meta` 标记（例如 `{ "kind": "plan" }`）以便幂等查找与更新；
+  - 位置建议固定在 reminders 顶部（position=1 的 UI 视觉第一条）或末尾（需与 UX 约定）。
+
+### 4) 内部推理（thought streaming）整改
+
+- 目标：provider 能可靠产生并传输 “thinking/thought” 子流；WebUI 能稳定展示（并遵守单子流不重叠的事件序约束）。
+- 建议由 @fullstack 结合现有流式协议实现评估：若 codex provider 或其他 provider 在 thought 子流上缺失/不稳定，给出补丁方案（协议字段/事件类型/前端渲染）。
+
+## 回归清单（最小可复现）
+
+1) **Collective teammate tellask**：在同一条诉请 headline 中放多个队友呼号，验证会 fan-out 成多个队友诉请且 `!tellaskSession` 仅出现一次时可对所有目标生效。（运行态已验收：`!?@ux @cmdr !tellaskSession collective-fanout-verify`；@cmdr/@ux 均回贴收到，且观察到 `tellaskSession=collective-fanout-verify`、targets=`@ux,@cmdr`）
+2) **示例净化**：注入的系统提示中不再出现 `!?@tool_a` 这类“工具样式”的示例。
+3) **文案净化**：全 repo 不再出现 “tellask tools / 诉请工具” 残留表述。
+4) **Codex update_plan**：`codex_style_tools` 列表中出现 `update_plan`；调用一次后能在 reminders 中看到 plan 更新。
+5) **Thought streaming（可选/可延后）**：同一代 `genseq` 内 thinking/saying 子流不重叠；WebUI 按到达序渲染。
+
+## 新发现的问题（待修复）
+
+### E) 实现层仍残留 `tool_call_*` 命名（需要一次性清理，不留历史痕迹）
+
+目标：把 Dominds 实现层里所有 `tool_call_*` 相关命名（事件/记录/注释/文档）全部替换为：
+- `teammate_call_*`：队友诉请（tellask）块及其 streaming 事件
+- `function_call_*`：function tools 执行及其事件/持久化
+
+注意：本项 **不做任何向后兼容**。按最新最优方式改完后，直接删除所有历史记录（例如清空 `./.dialogs/` 及 `ux-rtws/.dialogs/`）即可。
+
+建议修复（给 @fullstack 的“该改什么/改成什么”清单，不涉及实现细节）：
+- **Streaming tellask 块事件**：将 `tool_call_*_evt` 全部改为 `teammate_call_*_evt`（含 start/headline/body/finish 等）。
+- **Inline 结果事件/记录**：把当前用于“把结果贴回同一 bubble”的 `tool_call_response_evt` / `tool_call_result_record` 改为 `function_call_response_evt` / `function_call_result_record`（或等价命名，只要语义对齐“function tools 的结果”）。
+- **函数执行事件**：当前 `func_call_*` / `func_result_*` 建议统一为 `function_call_*` / `function_result_*`（避免缩写，并与上面原则一致）。
+- **注释与文案**：实现层不再出现 “tool call(s)” 作为泛称；用 “teammate call（tellask）” 与 “function call（function tool）” 做精确区分。
+
+### F) WebUI 注释仍残留泛称 “tool calls”（需在重命名后同步修正）
+
+优先修正点（行号仅作参考，后续可能漂移）：
+- `dominds/webapp/src/components/dominds-dialog-container.ts:74`
+- `dominds/webapp/src/components/dominds-dialog-container.ts:78`
+- `dominds/webapp/src/components/dominds-dialog-container.ts:80`
+- `dominds/webapp/src/components/dominds-dialog-container.ts:1175`
+- `dominds/webapp/src/components/dominds-dialog-container.ts:1561`
