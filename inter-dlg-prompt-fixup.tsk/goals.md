@@ -1,0 +1,2 @@
+- [owner:@prompt] 校对并修正 `ux-issues/inter-dlg-prompts.md` 中对 inter-dialog 消息 role/type/流向的描述，使其与当前实现一致（以代码为准，避免“提供商限制/LLM 忽略”等未经证实表述）。
+- [owner:@fullstack] 决策是否要修改 `formatSupdialogCallPrompt` / `formatTeammateResponseContent` 的具体措辞（消除“你最初诉请”歧义）；若修改则后端/前端 twin 同步并通过 WebUI dev 一致性校验。
