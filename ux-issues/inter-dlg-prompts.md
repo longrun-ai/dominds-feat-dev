@@ -47,7 +47,7 @@ WebUI 在 dev 模式会对部分格式化结果做一致性校验（见 `dominds
 ```
 1. Supdialog → Subdialog-A: "任务 A，请执行" (assignment)
 2. Subdialog-A 执行中遇到需要澄清的问题
-3. Subdialog-A → Supdialog: "!?@super 我需要澄清" (Type A 回问)
+3. Subdialog-A → Supdialog: "!?@tellasker 我需要澄清" (Type A 回问)
    ↑ formatSupdialogCallPrompt 处理的就是这一步！
 4. Supdialog 收到回问并处理
 ```
@@ -130,7 +130,7 @@ const asking =
 
 `@subdialog-A` 回问：
 
-> !?@super 我需要澄清（request headline）
+> !?@tellasker 我需要澄清（request headline）
 > …（request body）
 ```
 

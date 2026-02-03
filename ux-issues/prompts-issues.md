@@ -43,7 +43,11 @@
      - **来源对话**：诉请从哪个对话发起（用于定位上下文与回链）。
      - **原始对话**：需要汇总结果/需要继续推进的对话（用于解释结果将“回到哪里”）。
    - 仅在“技术实现说明”小节中，才允许使用 `rootId` / `RootDialog` / root dialog 等术语辅助读者理解。
-   - 术语表可能需要同步更新：尤其是 `!?@super ...` 的 `super` 关键词会带出“父/上级”语感，后续可评估是否要换成更贴近“回问/回呼/回报”语义的关键词。
+   - 术语表需要同步更新：实现层可保留内部术语，但**使用者语境**（系统提示/用户可见文案/示例）不得出现 `Supdialog/Subdialog/Type A/B/C` 等实现标签。
+   - 冻结口径（不做兼容）：
+     - 使用者语境只用 **诉请者 / 被诉请者**。
+     - 使用者语境采用 **主线对话 / 支线对话**（主线对话主理人拥有 `change_mind` 权限；支线对话主理人没有）。
+     - `!?@tellasker` 直接生效（不考虑兼容；落地后清空所有 `.dialogs/` 目录）。
 
 8. **中文用词统一：文案中的“代理”应改为“智能体”**。
    - 默认口径：中文对外文案统一使用“智能体”；“代理”仅在引用外部资料或行业惯用译法且确有必要时保留。
@@ -73,9 +77,9 @@
 
 ### A) Dominds runtime 系统提示（注入给 agent 的那份）
 
-- **中文缺失 collective teammate tellask 规则**：英文版包含“headline 中多个队友呼号 → 扇出到多个队友”的规则（`dominds/main/minds/system-prompt.ts:241`），中文版本未覆盖。
-- **中文重复段落**：`!?@super` 说明在中文版本重复出现两次（`dominds/main/minds/system-prompt.ts:151`、`dominds/main/minds/system-prompt.ts:152`）。
-- **示例呈现出“工具调用倾向”**：系统提示示例中使用 `!?@tool_a`（`dominds/main/minds/system-prompt.ts:111`、`dominds/main/minds/system-prompt.ts:119`、`dominds/main/minds/system-prompt.ts:276`）。这会把“队友诉请”误导成“工具调用”。
+- **决策 7（不兼容）落地后自检要点**：如果你仍看到运行时输出/历史对话记录里出现旧别名或实现标签，通常是 `.dialogs/` 残留导致。
+  - 操作：清空各 rtws 的 `.dialogs/`（保留 `dominds/tests/.dialogs` 夹具），再复测。
+  - 复测仍出现：重点检查 `dominds/main/minds/system-prompt.ts`、`dominds/main/shared/i18n/driver-messages.ts`、`dominds/main/llm/driver.ts` 是否仍残留旧字面量。
 
 ### B) 代码/类型注释残留“!?@tool_name = 工具调用”说法（已修复）
 
@@ -83,7 +87,7 @@
 
 ### C) 文档残留“诉请工具”说法
 
-- `dominds/docs/dialog-system.md:1039`：出现 “teammate Tellask tools” 表述，需改为“teammate tellask capability / teammate tellask mechanism”等不含 tools 的措辞。
+- 已修正：工作区已无 “tellask tools / 诉请工具” 残留表述（以 `rg` 验收为准）。
 
 ### D) Codex provider 与工具契约
 
@@ -97,8 +101,14 @@
 ### 1) 修正 `dominds/main/minds/system-prompt.ts`
 
 - 为中文版本补齐与英文一致的 collective teammate tellask 规则（建议直接把英文 `:241` 的语义翻译进中文同位置）。
-- 删除中文 `!?@super` 重复条目，保留一个规范版本即可。
+- 删除中文 `!?@tellasker` 重复条目，保留一个规范版本即可。
 - 全面替换 `!?@tool_a` / `!?@tool_b` 等示例为真实队友呼号（例如 `!?@pangu`、`!?@ux`、`!?@cmdr`），并明确“`!?@...` 仅是队友诉请/Q4H，不是工具调用”。
+
+### 1.1) 决策 7（冻结口径）落地：改别名 + 改叙事术语（不兼容）
+
+- `!?@tellasker` 直接生效（不保留兼容路径；落地后清空所有 `.dialogs/` 目录）。
+- 使用者语境（system prompt/用户可见文案/示例）不得出现：`Supdialog/Subdialog/Type A/B/C`、`parent/child/root/main dialog` 等实现/层级标签。
+- 使用者语境统一用词：**主线对话/支线对话**、**诉请者/被诉请者**；并明确：仅主线对话主理人拥有 `change_mind` 权限。
 
 ### 2) 清理文档 `dominds/docs/dialog-system.md`
 
@@ -124,6 +134,7 @@
 3. **文案净化**：全 repo 不再出现 “tellask tools / 诉请工具” 残留表述。
 4. **Codex update_plan**：`codex_style_tools` 列表中出现 `update_plan`；调用一次后能在 reminders 中看到 plan 更新。
 5. **Thought streaming（可选/可延后）**：同一代 `genseq` 内 thinking/saying 子流不重叠；WebUI 按到达序渲染。
+6. **决策 7（不兼容）**：全 repo 不再出现 `!?@tellasker` 以外的旧别名；以 `!?@tellasker` 为准。且 system prompt 的“别名说明”只使用“主线对话/支线对话、诉请者/被诉请者”叙事，不出现 Supdialog/Subdialog/Type A/B/C。
 
 ## 新发现的问题（待修复）
 
@@ -145,8 +156,8 @@
 
 - **清理 `receiveToolResponse` / `ToolCallResultRecord` 遗留（不留痕迹）**：
   - 若实现中仍存在 `receiveToolResponse` / `ToolCallResultRecord`（或其改名残留），应当按语义做**二选一**：
-    1) **改名并收敛为 function tools 语境**：将其改为 `FuncCall*` / `FuncToolResponse*` 等明确指向 function tools 的命名（避免让读者误以为 tellask 是工具调用）。
-    2) **直接删除该路径**：若该路径仅用于历史兼容/可被其他事件（如 function call/result 事件）替代，则删除实现与文案，不留历史痕迹。
+    1. **改名并收敛为 function tools 语境**：将其改为 `FuncCall*` / `FuncToolResponse*` 等明确指向 function tools 的命名（避免让读者误以为 tellask 是工具调用）。
+    2. **直接删除该路径**：若该路径仅用于历史兼容/可被其他事件（如 function call/result 事件）替代，则删除实现与文案，不留历史痕迹。
   - 目标：实现层不再出现“ToolCall/ToolResponse”这类容易混淆的命名；仅 LLM API/provider 适配层允许保留 `tool_call` 既有术语。
 
 ### F) WebUI 注释仍残留泛称 “tool calls”（已修复）
