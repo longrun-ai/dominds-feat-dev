@@ -1,5 +1,8 @@
 # Inter-Dialog 格式化文案问题分析（校对版）
 
+> 规范声明：当本文件处于 **git 暂存版**（staged）并被标记为“最新规格”时，它就是 inter-dialog 文案/结构的契约来源。
+> 运行时实际输出若与该规格不一致，应优先视为实现偏差并修正代码；只有在明确要变更规格时才改动本文件。
+
 ## 背景
 
 在 Dominds 对话系统中，`inter-dialog-format.ts` 负责把“对话间”（inter-dialog）的结构化字段格式化为 markdown 文本，供两类用途复用：
@@ -80,7 +83,7 @@ const hello =
 **容易产生歧义的文案模式（示例；见 `dominds/*/shared/utils/inter-dialog-format.ts`）：**
 
 ```typescript
-const tail = language === 'zh' ? '针对你最初的诉请：' : 'to your original call:';
+const tail = language === 'zh' ? '针对你最初的诉请：' : 'to your original tellask:';
 ```
 
 **歧义分析：**
@@ -136,7 +139,7 @@ const asking =
 **建议文案：**
 
 ```typescript
-const tail = language === 'zh' ? '针对原始诉请：' : 'regarding the original call:';
+const tail = language === 'zh' ? '针对原始诉请：' : 'regarding the original tellask:';
 ```
 
 ### 方案：内容前缀（谨慎；通常不推荐）
