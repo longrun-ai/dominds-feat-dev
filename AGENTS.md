@@ -159,6 +159,10 @@ This repo uses two runtime workspaces:
 - **Node.js version**: 22.x required (>=22 <23 in package.json engines)
 - **TypeScript**: Strict mode with no `any` allowed
 - **i18n (中文语义基准)**: Treat `zh` text as the canonical source of semantics. Never update `zh` content by translating from `en`; instead, update `en` to match `zh` when needed.
+- **Terminology (Context Matters)**:
+  - **User-facing context (WebUI copy / prompts / examples)**: follow the terminology glossary. Prefer “Mainline dialog / Sideline dialog” (ZH: `主线对话 / 支线对话`) and avoid implementation terms like `root/main/subdialog/supdialog`, as well as hierarchy-implying phrasing (e.g. ZH: `父对话/子对话`). If you must describe relationships, prefer “requester/responder” or “upstream/downstream”.
+  - **Implementation context (code / logs / wire / storage)**: it’s OK to use `root dialog / main dialog / subdialog / supdialog`, but do not surface these terms directly into user-facing copy.
+  - Reference: `dominds/docs/dominds-terminology.md`, especially **“Dialog Terms（主线对话 / 支线对话）”** and **“Supdialog / 上游对话”** (and the cross-note about implementation terms vs user-facing terms).
 - **Logs**: `./dev-server.sh` redirects stdout/stderr to `logs/` (wrapper logs)
 - **Dialogs**: persisted under the chosen rtws (repo root `./.dialogs/` for DevOps; `ux-rtws/.dialogs/` for WebUI dev/UX)
 
