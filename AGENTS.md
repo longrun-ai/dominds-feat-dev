@@ -173,4 +173,6 @@ This repo uses two runtime workspaces:
 - Read-only git commands (`git status`, `git diff`, `git log`, `git show`, `git blame`) are allowed.
 - **Parallel worktree edits are normal**: assume humans and other agents may modify the same worktree concurrently. Do not assume exclusive control or that the working tree stays stable during a task.
 - **Monitor diffs to avoid clobbering**: re-check `git status` / `git diff` (and `git -C dominds status` / `git -C dominds diff` when working in `dominds/`) before making edits to files, and especially before any “cleanup” actions.
-- **Never revert unrelated changes by default**: do not discard/revert/overwrite unstaged changes from other ongoing tasks unless explicitly asked. If you detect unrelated diffs, call them out and ask how to proceed.
+- **Never touch other people's in-flight work**: if you notice edits that are clearly unrelated to the requested task, do not refactor, restructure, or “fix up” those areas. Only make minimal, targeted edits required by the user request.
+- **Only fix compile errors opportunistically**: it is OK to do a small, localized compile/lint fix when you are already touching the exact file/area, but do not make broader logic/structure changes in someone else’s WIP to “clean things up”.
+- **Do not change the staging area without asking**: after you finish your own work, you may propose staging only your changes and unstaging others, but you MUST ask the user for explicit approval before running any `git add`, `git restore --staged`, `git reset <path>`, etc.
