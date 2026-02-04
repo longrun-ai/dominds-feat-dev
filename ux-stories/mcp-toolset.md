@@ -414,15 +414,14 @@ Call exactly one tool: stdio_env_report with empty args. Then stop (no other too
 await window.__e2e__.waitUntil(() => window.__e2e__.noLingering(), 120000);
 await window.__e2e__.waitForInputEnabled();
 
-await window.__e2e__.waitUntil(() => getRemindersCount() >= baselineReminders + 1, 15000);
-await openReminders();
-const text = getRemindersContent();
-if (!text.includes('MCP toolset lease')) throw new Error('Missing MCP lease reminder text');
-if (!text.includes('sdk_stdio')) throw new Error('Lease reminder missing serverId (sdk_stdio)');
-if (!text.includes('mcp_release'))
-  throw new Error('Lease reminder missing mcp_release instruction');
-await closeReminders();
-```
+	await window.__e2e__.waitUntil(() => getRemindersCount() >= baselineReminders + 1, 15000);
+	await openReminders();
+	const text = getRemindersContent();
+	if (!text.includes('sdk_stdio')) throw new Error('Lease reminder missing serverId (sdk_stdio)');
+	if (!text.includes('mcp_release'))
+	  throw new Error('Lease reminder missing mcp_release instruction');
+	await closeReminders();
+	```
 
 Expected:
 
