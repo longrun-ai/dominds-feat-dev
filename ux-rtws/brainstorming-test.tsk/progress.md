@@ -1,2 +1,0 @@
-- Chose Option B as the leading direction.
-- Defined success criteria draft.

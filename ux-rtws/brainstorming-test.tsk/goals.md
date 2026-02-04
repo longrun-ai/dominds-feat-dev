@@ -1,2 +1,0 @@
-- Explore 3 product directions.
-- Pick 1 direction with clear success criteria.

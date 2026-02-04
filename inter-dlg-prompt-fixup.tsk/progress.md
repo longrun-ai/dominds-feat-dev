@@ -1,4 +1,0 @@
-- [owner:@prompt] 已更新 `ux-issues/inter-dlg-prompts.md`：澄清 inter-dialog 的两类用途（驱动对话的 `prompting_msg`/`role:user` vs 响应叙事的 `tellask_result_msg`/`role:tool`），并把“最新规格”口径对齐为 git 暂存版文档。
-- [owner:@prompt] 已同步词汇表：英文“回问”标签统一为 `TellaskBack:`（示例与实现一致）。
-- [owner:@fullstack] 已在本地 checkout 完成最小 diff：仅改 `dominds/main/shared/utils/inter-dialog-format.ts`（hello zh 用“在处理以下任务期间（如下引文）”；asking zh 用“回问：”/en 用 `TellaskBack:`；tail zh 用“针对原始诉请：”/en 用“regarding the original call:”；并删除 assignment `tellaskBody` 仅保留 `tellaskHead`，避免上下文膨胀）。
-- 下一步（人类操作者执行）：跑 `./dev-server.sh` 做 WebUI DEV 校验（触发一次 `!?@teammate` 返回，控制台不报 `handleTeammateResponse: Response formatting mismatch`，锚点 `dominds/webapp/src/components/dominds-dialog-container.ts:1231`），然后在 `dominds` 仓仅提交 `main/shared/utils/inter-dialog-format.ts` 并开 PR。

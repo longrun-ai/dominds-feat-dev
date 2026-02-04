@@ -1,2 +1,0 @@
-- 已确认差遣牒目标/约束；进入第 2 轮走查。  
-- 下一步：在 `dominds/` 范围内建立端到端走查清单（WebUI/CLI/WS/API/Runtime/Tools），并开始收集可复现 UX 问题点。  

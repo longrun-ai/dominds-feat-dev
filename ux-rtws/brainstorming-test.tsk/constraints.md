@@ -1,3 +1,0 @@
-- No web browsing.
-- Keep changes under 10 lines per file.
-- Don’t touch prod.
