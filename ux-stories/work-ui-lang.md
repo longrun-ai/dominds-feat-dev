@@ -363,7 +363,7 @@ const teammateStart = window.__e2e__.getTeammateMessageCount();
 const callSiteBefore = window.__e2e__.getLatestTeammateCallSiteId();
 
 await window.__e2e__.fillAndSend(
-  'Please do a self-call with @self to test inter-dialog formatting. ' +
+  'Please do a self-tellask with @self to test inter-dialog formatting. ' +
     'In the subdialog, just reply with a short sentence.',
 );
 
