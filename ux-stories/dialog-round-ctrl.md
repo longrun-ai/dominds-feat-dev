@@ -1,4 +1,4 @@
-# Dominds WebUI E2E: Dialog Round Control (`clear_mind`) + Task Doc Update (`change_mind`)
+# Dominds WebUI E2E: Dialog Round Control (`clear_mind`) + Taskdoc Update (`change_mind`)
 
 You are the **tester agent** standing in for a human user. Your role is to validate that **dominds** provides flawless dialog round control infrastructure for mental clarity operations. The testee should **cooperate** with your directions to help validate dominds features.
 
@@ -12,12 +12,12 @@ This test validates **dominds dialog round control infrastructure**, not the tes
 
 ## Business Goal
 
-Enable **autonomous mind clearing** during long-run work (days → months): after information is distilled into the task doc, reminders, and agent memory, the agent can discard noisy dialog/tool-call history without losing durable context.
+Enable **autonomous mind clearing** during long-run work (days → months): after information is distilled into the Taskdoc, reminders, and agent memory, the agent can discard noisy dialog/tool-call history without losing durable context.
 
 Dominds must support:
 
 - `clear_mind`: reset the dialog + optionally add a reminder (UI headline renders as `@clear_mind`)
-- `change_mind`: overwrite the task doc (or `*.tsk/` section) with **no round reset** (UI headline renders as `@change_mind`)
+- `change_mind`: overwrite the Taskdoc (or `*.tsk/` section) with **no round reset** (UI headline renders as `@change_mind`)
 - Follow-up coroutine prompt: appears as the **first visible message** in the new round (target UX: first user message), with **no result** from the tool call itself
 - One-round timeline: UI shows **only one round at a time** (round transitions clear `#dialog-container` then refill)
 
@@ -181,7 +181,7 @@ If the team never loads, treat it as an infrastructure failure (likely missing L
 
 ## Before You Begin
 
-Create a fresh dialog using a dedicated task document so `change_mind` doesn’t clobber other tests.
+Create a fresh dialog using a dedicated Taskdoc so `change_mind` doesn’t clobber other tests.
 
 Before each run, wipe all runtime-workspace dialog records so you start from a known clean slate:
 
@@ -321,9 +321,9 @@ const assertions = {
 
 ---
 
-## Scenario 2: `change_mind` updates task doc
+## Scenario 2: `change_mind` updates Taskdoc
 
-**Goal:** Verify task doc overwrite with **no** round reset.
+**Goal:** Verify Taskdoc overwrite with **no** round reset.
 
 **Prompt to testee:**
 
@@ -336,14 +336,14 @@ No other tool calls. No extra text.
 **Expected Infrastructure Outcomes:**
 
 - A `@change_mind` call bubble appears in the timeline
-- Task document content updates to include the new heading (if UI exposes task doc, confirm visible update)
+- Taskdoc content updates to include the new heading (if UI exposes Taskdoc, confirm visible update)
 - The dialog round does **not** change
 - The tool call may show a tool result (typically `Mind changed`) **inside the tool bubble**, but **no extra chat bubbles** are injected by the tool
 - Input remains enabled (no follow-up coroutine is expected)
 
 **Fail Conditions (Infra):**
 
-- Task doc not updated or not visible after the change
+- Taskdoc not updated or not visible after the change
 - Round changes unexpectedly
 
 **Scripted Run (JS, recommended):**

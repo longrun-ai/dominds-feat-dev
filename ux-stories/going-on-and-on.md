@@ -48,7 +48,7 @@ From repo root:
 ./dev-server.sh restart
 ```
 
-### S1) Create a dedicated task doc (task package directory)
+### S1) Create a dedicated Taskdoc (Taskdoc package directory)
 
 Use a stable path:
 

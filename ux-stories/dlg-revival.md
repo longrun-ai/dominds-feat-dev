@@ -118,11 +118,11 @@ From repo root:
 ./dev-server.sh restart
 ```
 
-### S1) Create a dedicated task doc (task package directory)
+### S1) Create a dedicated Taskdoc (Taskdoc package directory)
 
 Use a stable path (create the directory if missing).
 
-Note: The Create Dialog modal validates that the task doc path ends in `.tsk/` (encapsulated task package directory).
+Note: The Create Dialog modal validates that the Taskdoc path ends in `.tsk/` (encapsulated Taskdoc package directory).
 
 ```bash
 mkdir -p tasks
@@ -290,9 +290,9 @@ await window.__e2e__.waitUntil(() => listRootIds('running').includes(rootId), 20
 
 ## Scenario D — Task-level bulk actions (mark all done / archive all / revive all)
 
-Goal: validate **task-doc node** action buttons (bulk actions apply to all dialogs under the same task doc path).
+Goal: validate **Taskdoc node** action buttons (bulk actions apply to all dialogs under the same Taskdoc path).
 
-### D1) Create two dialogs under the same task doc
+### D1) Create two dialogs under the same Taskdoc
 
 ```javascript
 await window.__e2e__.createDialog('tasks/ux-dlg-revival.tsk');
@@ -312,7 +312,7 @@ if (typeof b !== 'string' || !b) throw new Error('Missing dialog rootId b');
 
 Manual UX action:
 
-1. In “Running” view, on the **task doc row** (`tasks/ux-dlg-revival.tsk`), click **Mark all done**.
+1. In “Running” view, on the **Taskdoc row** (`tasks/ux-dlg-revival.tsk`), click **Mark all done**.
 
 Assertions:
 
@@ -331,7 +331,7 @@ await window.__e2e__.waitUntil(
 
 Manual UX action:
 
-1. In “Done” view, on the **task doc row**, click **Revive all**.
+1. In “Done” view, on the **Taskdoc row**, click **Revive all**.
 
 Assertions:
 

@@ -290,7 +290,7 @@ This step checks **working-language formatting** (stable) rather than user-facin
 
 ```javascript
 // Create dialog using the helper UI flow.
-// Use any existing task doc in the outer workspace (rtws).
+// Use any existing Taskdoc in the outer workspace (rtws).
 await window.__e2e__.createDialog('cmds-test.tsk');
 
 // Glitch radar: per-prompt userLanguageCode should be recorded on each user message bubble.

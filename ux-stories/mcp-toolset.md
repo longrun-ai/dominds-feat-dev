@@ -366,7 +366,7 @@ Expected:
 
 - `sdk_stdio` is still registered and contains tools (`greet`, `echo`, `env_report`).
 - Create the dialog using a `.tsk/` task package directory (e.g. `tasks/ux-dlg-stop-resume.tsk/`),
-  since Dominds dialog task-doc paths are required to end with `.tsk/`.
+  since Dominds dialog Taskdoc paths are required to end with `.tsk/`.
 - Create a dialog and ask the testee agent to call MCP tool `env_report` (no args). The returned JSON must include:
   - `MCP_DIRECT: "direct_literal_from_mcp_yaml"`
   - `MCP_RENAMED: "renamed_from_env_local"` (from `.env.local`)
