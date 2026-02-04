@@ -1,1 +1,1 @@
-- [owner:@fullstack] 在 `dominds/docs/dominds-terminology.md` 的词汇表中加入 `Tellask headline/诉请头` 与 `Tellask body/诉请内容` 两个术语，并给出简短定义。
+- [owner:@fullstack] 在 `dominds/docs/dominds-terminology.md` 的词汇表中加入 `Tellask headline/诉请头` 与 `Tellask body/诉请正文` 两个术语，并给出简短定义。

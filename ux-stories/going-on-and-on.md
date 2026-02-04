@@ -247,8 +247,8 @@ await waitUntil(() => {
   const qs = s.q4h?.questions ?? [];
   return qs.some(
     (q) =>
-      q.callBodyPreview.includes('Keep-going budget exhausted') &&
-      q.callBodyPreview.includes('max 3'),
+      q.tellaskBodyPreview.includes('Keep-going budget exhausted') &&
+      q.tellaskBodyPreview.includes('max 3'),
   );
 }, 60000);
 

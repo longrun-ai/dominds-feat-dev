@@ -56,7 +56,7 @@
      - “人类用户”
 
 9. **Collective teammate tellask 语义口径：同一诉请块自然支持多目标（一对多拆分）**。
-   - 现状问题：系统提示中存在“默认单目标 + 例外模式”的表述，且中文混入英文（headline/headLine/callBody/collective targets 等），不符合词汇表口径。
+   - 现状问题：系统提示中存在“默认单目标 + 例外模式”的表述，且中文混入英文（headline/tellaskHead/tellaskBody/collective targets 等），不符合词汇表口径。
    - 正确口径：单个诉请块从语义上就允许多个目标；这不是例外模式，而是同一语法的自然行为。
    - 推荐改写为：
      - 当同一条诉请块的**诉请头**（Tellask headline/诉请头，含多行诉请头）中出现多个队友呼号时，Dominds 会将其视为“一对多诉请”，并对每个目标队友进行**一对多拆分**（生成多条队友诉请；诉请头与诉请正文保持一致）。

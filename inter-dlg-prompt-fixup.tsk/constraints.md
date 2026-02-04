@@ -1,4 +1,4 @@
 - 结论必须锚定到具体实现位置（例如 `dominds/main/llm/driver.ts`、`dominds/*/shared/utils/inter-dialog-format.ts`），避免推测性原因解释。
-- **最新规格**：以 git 暂存版 `ux-issues/inter-dlg-prompts.md` 为准；并新增要求：当提及原始诉请/任务作为上下文时，通常仅包含 `headLine`，避免重复 `callBody` 造成上下文膨胀；英文“回问”标签使用术语 `TellaskBack:`（参考 `dominds/docs/dominds-terminology.md`）；英文文案中尽量使用术语 `tellask`（避免泛称 `call`），例如 `regarding the original tellask:`。
+- **最新规格**：以 git 暂存版 `ux-issues/inter-dlg-prompts.md` 为准；并新增要求：当提及原始诉请/任务作为上下文时，通常仅包含 `tellaskHead`，避免重复 `tellaskBody` 造成上下文膨胀；英文“回问”标签使用术语 `TellaskBack:`（参考 `dominds/docs/dominds-terminology.md`）；英文文案中尽量使用术语 `tellask`（避免泛称 `call`），例如 `regarding the original tellask:`。
 - 如需改动 inter-dialog 文案/格式：必须同时更新 `dominds/main/shared/utils/inter-dialog-format.ts` 与 `dominds/webapp/src/shared/utils/inter-dialog-format.ts`（本地 checkout 里 webapp/shared 为 symlink 亦需按双端契约验收），并确保 `dominds/webapp/src/components/dominds-dialog-container.ts` 的 dev 校验不再报 mismatch。
 - 本仓 `dominds/` 为本地 checkout（gitignored）；对外提交 `dominds` 仓 PR 需要具备 git 写权限的一方执行（通常是人类操作者），@fullstack 负责给出最小 diff 与 PR 描述/验收口径并协助 review。

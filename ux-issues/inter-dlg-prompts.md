@@ -98,7 +98,7 @@ const tail = language === 'zh' ? '针对你最初的诉请：' : 'to your origin
 
 目标是：在不引入额外前缀/身份噪音的前提下，把“你”改成更稳定的指代（例如“原始任务/该任务/该原始诉请”），减少 supdialog / requester 在三方语境下的误解概率。
 
-同时，当“提及原始诉请/原始任务作为上下文”时，通常只包含 `headLine` 即可；把 `callBody` 一并重复进叙事文本会导致接收者上下文不必要膨胀。
+同时，当“提及原始诉请/原始任务作为上下文”时，通常只包含 `tellaskHead` 即可；把 `tellaskBody` 一并重复进叙事文本会导致接收者上下文不必要膨胀。
 
 #### 1. `formatSupdialogCallPrompt` 改进
 

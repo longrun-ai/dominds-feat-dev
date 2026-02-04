@@ -1,2 +1,2 @@
-- [owner:@fullstack] 已在 `dominds/docs/dominds-terminology.md` 增加 `Tellask headline/诉请头` 与 `Tellask body/诉请内容`（含 Quick Glossary 条目 + 定义小节）。
-- [owner:@fullstack] 已在 `dominds/docs/dialog-system.md` 与 `dominds/docs/dialog-system.zh.md` 补充“诉请头/诉请内容”的术语引用与块结构说明，减少 headline/body 的歧义。
+- [owner:@fullstack] 已在 `dominds/docs/dominds-terminology.md` 增加 `Tellask headline/诉请头` 与 `Tellask body/诉请正文`（含 Quick Glossary 条目 + 定义小节）。
+- [owner:@fullstack] 已在 `dominds/docs/dialog-system.md` 与 `dominds/docs/dialog-system.zh.md` 补充“诉请头/诉请正文”的术语引用与块结构说明，减少 headline/body 的歧义。
