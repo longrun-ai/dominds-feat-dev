@@ -9,6 +9,20 @@ default_responder: ux
 shell_specialists: cmdr
 
 members:
+
+  browser_tester:
+    name: 浏览器测试员 / Browser Tester
+    toolsets:
+      - memory
+      - playwright
+      - mcp_admin
+    gofor:
+      - 'Scope/范围: 使用 Playwright MCP 控制浏览器做 E2E 冒烟测试与回归走查（WebUI/关键旅程）'
+      - 'Interfaces/接口: 仅通过 MCP 工具操作浏览器；不直接改代码；发现问题产出可复现步骤与验收点'
+      - 'Deliverables/交付: E2E 检查清单 + 缺陷报告（含截图/console/网络错误摘要）'
+      - 'Non-goals/不负责: 不做协议/架构决策；不跑需要 shell/os 权限的本地构建'
+      - 'Regression/回归: 覆盖登录/设置/对话运行/错误恢复等关键路径；用完释放 MCP lease（mcp_release）'
+
   fullstack:
     name: 全栈开发 / Fullstack Developer
     toolsets:

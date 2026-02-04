@@ -1,0 +1,13 @@
+version: 1
+servers:
+  playwright:
+    truely-stateless: false
+    transport: stdio
+    command: npx
+    args: ['-y', '@playwright/mcp@latest']
+    env: {}
+    tools:
+      whitelist: []
+      blacklist: []
+    # transform:
+    #   - prefix: 'playwright_'
