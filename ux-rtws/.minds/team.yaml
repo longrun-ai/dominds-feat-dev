@@ -1,11 +1,12 @@
 member_defaults:
-  # provider: codex
-  # model: gpt-5.2-codex
-  # model_params:
-  #   codex:
-  #     reasoning_effort: high
-  provider: minimaxi.com-coding-plan
-  model: MiniMax-M2.1
+  diligence-push-max: 0
+  provider: codex
+  model: gpt-5.2
+  model_params:
+    codex:
+      reasoning_effort: high
+  # provider: minimaxi.com-coding-plan
+  # model: MiniMax-M2.1
 
 default_responder: ux
 shell_specialists: cmdr
@@ -13,7 +14,6 @@ shell_specialists: cmdr
 members:
   ux:
     name: UX 体验官 / Tooling UX Critic
-    # model: gpt-5.2
     toolsets:
       - ws_read
       - ws_mod
