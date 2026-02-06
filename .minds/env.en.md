@@ -2,6 +2,12 @@
 
 This rtws is used for Dominds self-development.
 
+### Execution Policy (Default)
+
+- Dominds is a full-stack integrated repo; design and implementation should be coordinated across `dominds/main`, `dominds/webapp`, and shared contracts.
+- Default execution policy: **full-stack integrated, one-shot done-right, no compatibility layer**.
+- Unless @human explicitly requires it, do not introduce transitional paths, dual-track logic, backward-compatibility shims, or legacy baggage.
+
 ### Dominds program source
 
 This Dominds environment uses a “globally installed/linked” `dominds` WebUI, and the version is built from the `./dominds/` directory in this repository:

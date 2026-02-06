@@ -12,6 +12,13 @@ For WebUI dev/UX testing, `./dev-server.sh` runs Dominds with `ux-rtws/` as the 
 
 ---
 
+## Execution Policy (Holistic Refactor Default)
+
+- Dominds is a full-stack integrated repo; plan and implement changes across `dominds/main`, `dominds/webapp`, and shared contracts together.
+- Default policy: **`前后端一体、一次性改到位、无兼容层`**.
+- Do not introduce transitional compatibility shims, dual paths, or legacy fallbacks unless humans explicitly require them.
+- When replacing old behavior/contracts, remove obsolete paths in the same change and keep docs/i18n/regression checks aligned.
+
 ## TypeScript Purist Principles
 
 ### Zero Tolerance for `any`
