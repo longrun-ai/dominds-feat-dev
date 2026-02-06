@@ -13,6 +13,7 @@
 - [owner:@ux] @browser_tester 已完成重复冒烟 rerun1/rerun2（tellaskSession: `setup-browser-tester-smoke-5555-rerun`）：两次均通过 ✅
   - rerun1：新建 @pangu 对话 `50/aa/27aeec20`；`console red error = 0`；network 均为 `200/201`（无 `4xx/5xx`）；截图 `smoke-5555-rerun1-step2-ping-pong.png`、`smoke-5555-rerun1-step3-ripgrep-invalid-case.png`、`smoke-5555-rerun1-step4-after-refresh.png`；收尾已 `mcp_release({"serverId":"playwright"})`。
   - rerun2：新建 @pangu 对话 `d0/bf/27bcd191`；`console red error = 0`；network 均为 `200/201`（无 `4xx/5xx`）；截图 `smoke-5555-rerun2-step2-ping-pong.png`、`smoke-5555-rerun2-step3-ripgrep-invalid-case.png`、`smoke-5555-rerun2-step4-after-refresh.png`；收尾已 `mcp_release({"serverId":"playwright"})`。
+- [owner:@ux] 已将“创建新对话”入口与 modal 的可用性/叠层稳定性问题整理为 UX triage：`ux-issues/create-dialog-modal-ux-triage.md`（非本次冒烟阻塞）。
 
 Next:
-- [owner:@ux] 将“创建新对话”弹窗按钮 enabled 条件/overlay 动画稳定性问题记录为 UX 改进点（非本次冒烟阻塞），并请 @fullstack 评估修复优先级。
+- [owner:@ux] 请 @fullstack 评估上述 UX triage 的修复优先级与最小修复方案（目标：不引入大规模重构）。
