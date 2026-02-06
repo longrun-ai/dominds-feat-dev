@@ -1,371 +1,219 @@
 # WebUI Testing Guide
 
-This guide covers the Dominds WebUI end-to-end (E2E) testing approach, including real-time LLM streaming, dialog persistence, and helper utilities for browser automation.
+本指南定义 Dominds WebUI 的 E2E 测试机制，目标是让测试方式长期可复用、可交接、可回归。
 
-## Quick Start
+## 1. 适用范围与硬约束
 
-1. Start the dev server: `./dev-server.sh`
-2. Open frontend: `http://localhost:5555` (wait for "Connected" status)
-3. Create a dialog: `New Dialog` → Create
-4. Send messages and observe streaming behavior
+### 1.1 适用范围
 
-## Architecture Overview
+- 目标系统：`http://localhost:5555` 上的 Dominds WebUI。
+- 目标测试：端到端用户旅程（创建对话、发送消息、错误可见、刷新恢复等）。
+- 目标读者：`@browser_tester`、`@ux`、`@fullstack` 及后续接手回归人员。
 
-| Concept                    | Description                                                                                      |
-| -------------------------- | ------------------------------------------------------------------------------------------------ |
-| **Restoration API**        | `restoreDialogHierarchy()` restores full dialog trees on page reload                             |
-| **Implicit Serialization** | All state changes persist automatically (no manual save calls)                                   |
-| **File Persistence**       | Append-only JSONL rounds; Q4H/reminders use overwrite mode                                       |
-| **Event Delivery**         | Backend emits LLM lifecycle events via (Pub/Sub)Chan; frontend updates per chunk                 |
-| **UI Generation**          | Tracking begins on `dlg_generating_start`; phases (thinking/saying/calling) update incrementally |
+### 1.2 硬约束（必须遵守）
 
-### Generation Lifecycle Events
+- 禁止直接调用 HTTP/WS API。
+- 禁止运行脚本（包括浏览器控制台脚本、shell 脚本、测试驱动脚本）。
+- 所有操作必须通过浏览器中的“模拟人类交互”完成（键盘、鼠标、触控）。
+- 结果必须可复现，并附证据（截图 + 关键观测点）。
 
-```
-dlg_generating_start
-  → dlg_thinking_start / chunk / finish
-  → dlg_saying_start / chunk / finish
-  → dlg_calling_start / headline_chunk / body_chunk / finish
-→ dlg_generating_finish
-```
+> 说明：本约束用于保证“测试结果反映真实用户体验”，避免脚本捷径掩盖真实交互缺陷。
 
-## Runtime Environment
+## 2. 运行环境
 
-- **Frontend**: `http://localhost:5555`
-- **Backend**: `http://localhost:5556`
-- **Logs**: `logs/` directory (dev-server wrapper stdout/stderr)
-- **Workspace (rtws)**: `ux-rtws/` (dev-server runs processes with this as cwd)
-- **Persistence**: `ux-rtws/.dialogs/run/<dialogId>/round-*.jsonl`
+- 前端地址：`http://localhost:5555`
+- 后端地址：`http://localhost:5556`
+- 开发启动方式：`./dev-server.sh`
+- WebUI Dev/UX 运行时工作区（rtws）：`ux-rtws/`
+- 日志目录：`logs/`
 
-Note: the repo root has its own `.minds/` for DevOps/feat-dev work; WebUI dev/UX uses `ux-rtws/.minds/` instead.
+## 3. 第 1 轮方法盘点（保留 / 淘汰）
 
-## Project Structure
+### 3.1 保留的方法（继续使用）
 
-| Layer    | Location                                   | Purpose                                     |
-| -------- | ------------------------------------------ | ------------------------------------------- |
-| Backend  | `dominds/main/`                            | WebSocket server, dialog logic, persistence |
-| Frontend | `dominds/webapp/`                          | React WebUI components                      |
-| Testing  | `webapp/static/testing/e2e-test-helper.js` | Browser-based test utilities                |
+1. 浏览器内真实交互路径测试（点击 New Dialog、输入消息、发送、刷新页面）。
+2. 关键流程截图留证（至少覆盖创建、成功回复、刷新恢复）。
+3. 轻量观测控制台与网络面板（仅观察，不注入脚本、不手工发包）。
+4. 失败后重跑验证（同一旅程至少二次复核，确认非偶发）。
 
-## Shadow DOM Structure
+### 3.2 淘汰的方法（不再推荐）
 
-The DOM uses Shadow DOM extensively for component encapsulation:
+1. `window.__e2e__` / `window.__domObservation__` 控制台 helper 驱动测试。
+2. 通过脚本触发发送、等待、断言等“半自动 E2E”方式。
+3. 直接调用 HTTP/WS 接口来模拟用户行为。
+4. 依赖后端驱动脚本（例如 `tests/driving/*`）来替代 WebUI 交互验收。
 
-```
-document.querySelector('dominds-app')           // Light DOM host
-  └── .shadowRoot                               // Shadow DOM root
-      ├── .header
-      ├── .main-content
-      │   ├── .sidebar
-      │   │   ├── .sidebar-header
-      │   │   │   ├── #new-dialog-btn
-      │   │   │   └── dominds-team-members (right side)
-      │   │   └── .sidebar-content
-      │   │       └── dominds-dialog-list
-      │   └── .content-area
-      │       ├── .toolbar
-      │       ├── .dialog-section
-      │       │   ├── .conversation-scroll-area
-      │       │   ├── .q4h-panel-container (inline, collapsible)
-      │       │   │   ├── .q4h-toggle-bar (clickable, triangle arrow leftmost)
-      │       │   │   └── .q4h-content (scrollable)
-      │       │   └── .input-section (sticky bottom)
-      │       │       └── .q4h-input-container
-      │       │           └── .shadowRoot → textarea, send button
-      └── dominds-dialog-list
-          └── .shadowRoot → dialog items
-```
+淘汰原因：
 
-### Quick Selector Reference
+- 与“仅人类交互”硬约束冲突。
+- 容易产生“脚本通过但用户旅程失败”的假阳性。
+- 对交接者门槛高，且复现路径不直观。
 
-| Target            | Selector                                                            |
-| ----------------- | ------------------------------------------------------------------- |
-| App host          | `document.querySelector('dominds-app')`                             |
-| Q4H toggle bar    | `app.shadowRoot.querySelector('.q4h-toggle-bar')`                   |
-| Q4H resize handle | `app.shadowRoot.querySelector('.q4h-resize-handle')`                |
-| Q4H panel         | `app.shadowRoot.querySelector('.q4h-panel-container')`              |
-| Input area        | `app.shadowRoot.querySelector('dominds-q4h-input')`                 |
-| Textarea          | `inputArea.shadowRoot.querySelector('[data-testid="chat-input"]')`  |
-| Send button       | `inputArea.shadowRoot.querySelector('[data-testid="send-button"]')` |
-| Dialog container  | `app.shadowRoot.querySelector('[data-testid="chat-thread"]')`       |
-| Sidebar           | `app.shadowRoot.querySelector('dominds-dialog-list')`               |
+## 4. 新版流程草案（仅浏览器操作）
 
-## E2E Helper API
+### Phase A：准备
 
-Testing utilities are available in the browser console:
+1. 打开 `http://localhost:5555`。
+2. 确认页面已连接（可见正常主界面，非错误占位）。
+3. 打开浏览器 DevTools（Console + Network）用于观察（只读）。
 
-- **Core functions**: `window.__e2e__`
-- **DOM utilities**: `window.__domObservation__`
+### Phase B：执行核心旅程（推荐最小冒烟）
 
-### Messaging
+1. 点击左侧 `New Dialog`。
+2. 在创建对话弹窗中完成必要项并点击创建。
+3. 在输入框发送 `ping`。
+4. 等待 agent 回复，确认出现 `pong` 或等价成功响应。
+5. 刷新页面。
+6. 验证刷新后：
+   - 对话仍存在于列表中。
+   - 历史消息仍可见。
+   - 输入框可继续交互。
 
-| Function                    | Returns                                     | Description                             |
-| --------------------------- | ------------------------------------------- | --------------------------------------- |
-| `fillAndSend(msg)`          | `Promise<string>`                           | Sends message, returns msgId            |
-| `waitStreamingComplete(id)` | `Promise<boolean>`                          | Waits for generation bubble to complete |
-| `snapshot()`                | Object                                      | Returns full chat state                 |
-| `counts()`                  | `{userCount, bubbleCount, incompleteCount}` | Returns message/bubble counts           |
-| `noLingering()`             | `boolean`                                   | True if no incomplete bubbles           |
+### Phase C：证据采集
 
-**Example:**
+至少提供三张截图（命名可参考）：
 
-```javascript
-const msgId = await fillAndSend('your message here');
-await waitStreamingComplete(msgId);
-const state = await snapshot();
-```
+- `e2e-create-dialog-modal.png`：创建对话入口与弹窗可用。
+- `e2e-ping-pong-success.png`：消息往返成功。
+- `e2e-refresh-recovery-ping-pong.png`：刷新后恢复成功。
 
-### Dialog Management
+同时记录：
 
-| Function                              | Description                     |
-| ------------------------------------- | ------------------------------- |
-| `createDialog(callsign, taskDocPath)` | Creates a new dialog            |
-| `selectDialog(text)`                  | Selects dialog by text or ID    |
-| `selectDialogById(rootId)`            | Selects dialog by root ID       |
-| `getCurrentDialogInfo()`              | Returns current dialog metadata |
+- Console 摘要：是否存在阻断性错误（有/无 + 关键报错）。
+- Network 摘要：是否出现明显失败请求或 ws 中断（有/无 + 关键条目）。
 
-### Subdialog Navigation
+### Phase D：收尾
 
-| Function                             | Description                          |
-| ------------------------------------ | ------------------------------------ |
-| `openSubdialog(rootId, subdialogId)` | Opens a subdialog via call site link |
-| `getSubdialogHierarchy()`            | Returns parent-to-current path       |
-| `navigateToParent()`                 | Navigates back to supdialog          |
+1. 若使用 MCP 租约：执行 `mcp_release({"serverId":"playwright"})` 释放。
+2. 将步骤、结果、证据、异常点按模板回贴。
 
-### State Inspection
+## 5. 稳定性与耗时（第 2 轮量化基线）
 
-| Function                                 | Description                   |
-| ---------------------------------------- | ----------------------------- |
-| `waitUntil(fn, timeoutMs?, intervalMs?)` | Polls until condition is true |
-| `checkConsoleErrors(options?)`           | Checks for console errors     |
-| `getQ4HCount()`                          | Gets current Q4H count        |
-| `openQ4HPanel()`                         | Opens Q4H panel via toggle    |
-| `waitForQ4HBadge(timeoutMs)`             | Waits for Q4H badge to appear |
-| `waitForQ4HClear(timeoutMs)`             | Waits for Q4H badge to clear  |
+基于两轮“纯人类交互”回归实测：
 
-### Console Error Tracking
+- Round 1：总耗时 `9` 分钟（准备 `2` / 执行 `3` / 证据 `3` / 收尾 `1`），失败点 `1`，恢复耗时 `1` 分钟。
+- Round 2：总耗时 `8` 分钟（准备 `1` / 执行 `4` / 证据 `2` / 收尾 `1`），失败点 `1`，恢复耗时 `1` 分钟。
+- 两轮汇总：总耗时 `17` 分钟、失败点 `2`、恢复耗时 `2` 分钟。
 
-`fillAndSend()` and `waitStreamingComplete()` automatically check for console errors (threshold: 0).
+失败分类计数（两轮汇总）：
 
-```javascript
-// Manual error check
-const errors = checkConsoleErrors({ clear: true, threshold: 0 });
-```
+- 页面：`0`
+- 连接：`0`
+- 数据污染：`0`
+- 元素波动：`2`
 
-## Testing Patterns
+### 5.1 跑法对比（旧法 vs 新法）
 
-### Deterministic Input
+- 旧法（固定 sleep + 弱校验）：等待成本高，且容易“等过头/等错对象”。
+- 新法（显式等待 `pong` + 关键节点截图）：耗时更短，失败定位更直接。
 
-Use exact message texts for reproducible results. LLM behavior varies with phrasing:
+## 6. 最小稳定流程（最终草案）
 
-```javascript
-// Avoid - non-deterministic
-await fillAndSend('analyze this please');
+每轮回归按以下顺序执行：
 
-// Use - exact text
-await fillAndSend('COPY-PASTE EXACTLY: analyze the requirements');
-```
+1. 打开 `http://localhost:5555` 并确认主界面可交互。
+2. 点击 `New Dialog`，完成创建并确认进入可输入态。
+3. 发送 `ping`，显式等待 `pong`（或等价成功响应）。
+4. 收到响应后立即截图（不做固定长等待）。
+5. 普通刷新页面，确认历史消息仍在。
+6. 刷新后再发送 1 条最小探针并收到响应。
+7. 采集证据（截图 + console/network 摘要）。
+8. 完成收尾（如使用 MCP，释放租约）。
 
-### Bubble Lifecycle Verification
+## 7. 反模式清单（必须禁止）
 
-```javascript
-const msgId = await fillAndSend(message);
-await waitStreamingComplete(msgId);
+- 直接调用 HTTP/WS API 模拟用户行为。
+- 运行脚本（含控制台 helper、shell 脚本、测试驱动脚本）。
+- 固定 sleep 作为主等待策略。
+- 同一轮重复抓取同类冗余证据（同视角多张截图）。
+- 为“刷新恢复验证”额外新开无关会话。
 
-const state = await snapshot();
-assert(state.incompleteCount === 0); // All bubbles completed
-assert(state.bubbleCount === expectedCount);
-```
+## 8. 失败恢复策略与风险缓解
 
-### Stream Error Handling
+### 8.1 页面异常
 
-Errors during streaming appear only in the active session (not persisted):
+- 风险：页面空白或不可交互。
+- 缓解：手动刷新后重走最小链路；仍失败则记录关键错误并上报。
 
-```javascript
-await waitStreamingComplete(msgId);
-const errors = await checkConsoleErrors();
-assert(state.incompleteCount === 0); // Stream still completes
-```
+### 8.2 连接异常
 
-### Persistence Reload Verification
+- 风险：请求/连接异常导致响应中断。
+- 缓解：执行一次状态复核 + 一次重试；若持续失败，归类连接问题并上报。
 
-After switching dialogs, verify restored state:
+### 8.3 数据污染/恢复异常
 
-```javascript
-const counts = await counts();
-assert(counts.incompleteCount === 0); // No live streaming
-assert(counts.bubbleCount === 2); // Previous messages restored
+- 风险：刷新后消息或对话状态不一致。
+- 缓解：先重选目标对话，再刷新复核；仍异常按高优先级缺陷处理。
 
-// Full parity check
-const before = await snapshot();
-const after = await snapshot();
-assert(JSON.stringify(before) === JSON.stringify(after));
-```
+### 8.4 元素波动（本轮主风险）
 
-### Three-Retry Pattern for LLM Behavior
+- 风险：元素时序波动导致点击/等待超时。
+- 缓解：采用显式可见状态等待，保留“一次状态复核 + 一次重试”的最小恢复链路。
 
-LLMs may describe actions without executing them:
+## 9. 最终二值化验收 Gate（G1~G8）
 
-```javascript
-let attempts = 0;
-while (attempts < 3) {
-  await fillAndSend(message);
-  await waitStreamingComplete();
-  if (checkCondition()) break;
-  attempts++;
-}
-// Document as known LLM issue if all retries fail
+- G1（创建可用）：可成功创建新对话并进入可输入态。
+- G2（首轮往返）：发送 `ping` 后收到 `pong`（或等价成功响应）。
+- G3（刷新恢复）：刷新后历史消息仍可见。
+- G4（恢复后可交互）：刷新后再次发送最小探针并收到响应。
+- G5（Console 门禁）：无阻断性 error。
+- G6（Network 门禁）：无阻断性失败请求/连接中断。
+- G7（证据完整）：关键截图与摘要齐全。
+- G8（流程合规）：全程仅人类交互，无 API 直连、无脚本。
+
+判定规则：任一 Gate 失败即该轮 `Fail`；全部通过为 `Pass`。
+
+## 10. 证据留存要求
+
+每轮至少留存：
+
+- 三张关键截图：创建成功、`ping/pong` 成功、刷新恢复成功。
+- Console 摘要：是否有阻断性错误（有/无 + 关键行）。
+- Network 摘要：是否有阻断性失败（有/无 + 关键条目）。
+- 量化记录：总耗时、失败点数、恢复耗时、失败分类计数。
+
+## 11. 缺陷报告模板（建议）
+
+复制以下结构回贴：
+
+```md
+### WebUI E2E 回归报告（日期/执行人）
+
+- 环境：`http://localhost:5555`（浏览器：xxx）
+- 版本/分支：xxx
+
+#### 执行步骤
+1. ...
+2. ...
+
+#### 实际结果
+- pass/fail：...
+- 关键现象：...
+
+#### 证据
+- 截图：`xxx.png`
+- Console 摘要：...
+- Network 摘要：...
+
+#### 失败恢复与重试
+- 是否重试：是/否
+- 重试次数：...
+- 重试结果：...
+
+#### 结论
+- 是否可验收：是/否
+- 后续建议：...
 ```
 
-### Failure Classification
+## 12. 代码锚点（便于 cross-check）
 
-| Symptom                  | Check          | Type         | Resolution      |
-| ------------------------ | -------------- | ------------ | --------------- |
-| No event emitted         | Backend logs   | Code Bug     | → wpe           |
-| Event logged, UI missing | DOM query      | Code Bug     | → coder         |
-| LLM describes, no action | Events in logs | LLM Behavior | Refine prompts  |
-| WebSocket disconnects    | Console + logs | Environment  | Restart servers |
-
-### Q4H Testing with Mocks
-
-Agent-initiated Q4H is testable with two-response mocks:
-
-```json
-{
-  "responses": [
-    {
-      "message": "analyze requirements",
-      "role": "user",
-      "response": "I need to ask about budget. @human: What's the budget?"
-    },
-    {
-      "message": "what's the budget?",
-      "role": "user",
-      "response": "With $50k budget, I recommend..."
-    }
-  ]
-}
-```
-
-### Q4H Panel Testing
-
-The Q4H panel is an inline, collapsible section in the dialog area:
-
-```javascript
-// Get current Q4H count
-const count = await getQ4HCount();
-
-// Open the Q4H panel by clicking the toggle bar
-await openQ4HPanel();
-
-// Wait for Q4H badge to appear (when agent requests Q4H)
-await waitForQ4HBadge();
-
-// Wait for Q4H badge to clear (after human responds)
-await waitForQ4HClear();
-```
-
-## State Machines
-
-### Dialog State
-
-```
-active → suspended (waiting) → resumed
-```
-
-### Q4H State
-
-```
-No Q4H → Pending (suspend) → Answered (resume) → Cleared
-```
-
-The Q4H panel displays inline between the conversation area and input section. When a Q4H request is pending, the toggle bar shows a badge indicator. Clicking the toggle bar opens/collapses the Q4H content area.
-
-**Resize & State Memory:**
-
-- The Q4H panel features a resize handle (`.q4h-resize-handle`) at the top.
-- Users can drag the handle to adjust the panel's expanded height.
-- The panel's expanded height is preserved in `lastQ4HExpandedHeight` state.
-- When collapsed and then re-expanded, it restores the previous height.
-- Layout uses flexbox; the input section has `flex-shrink: 0` to maintain visibility during resizing.
-
-## DOM Observation Utilities
-
-Available via `window.__domObservation__`:
-
-### Shadow DOM Waiting
-
-```javascript
-waitForShadowElement(host, selector, opts); // Wait for element
-waitForShadowElementHidden(host, selector, opts); // Wait for removal
-```
-
-### Light DOM Waiting
-
-```javascript
-waitForElement(selector, opts); // Wait for element
-waitForElementGone(selector, opts); // Wait for removal
-```
-
-### Mutation-Based Waiting
-
-```javascript
-waitForDomChange(fn, opts); // Wait until condition met
-```
-
-## Validation Checklist
-
-- [ ] Frontend shows LLM generation lifecycle events
-- [ ] Streaming element removed when complete
-- [ ] Messages persist in `ux-rtws/.dialogs/run/<dialogId>/`
-- [ ] No blocking errors in backend logs
-- [ ] Per-chunk updates visible without bubble flash
-- [ ] Dialog hierarchy restores on page reload
-- [ ] Q4H panel opens/closes via toggle bar
-- [ ] Q4H badge appears and clears appropriately
-
-## Troubleshooting
-
-| Issue               | Solution                                                      |
-| ------------------- | ------------------------------------------------------------- |
-| Not connected       | Verify ports 5555/5556 free, dev server running               |
-| No streaming chunks | Verify provider keys; run `llm-streaming.ts`                  |
-| Persistence gaps    | Check JSONL files in `ux-rtws/.dialogs/run/<dialogId>/`       |
-| Restoration fails   | Refresh browser; check `restoreDialogHierarchy()`             |
-| Q4H panel not found | Verify `.q4h-toggle-bar` and `.q4h-panel-container` selectors |
-
-### Diagnostic Commands
-
-```bash
-# Server status
-./dev-server.sh status
-
-# Backend logs
-tail -n 200 logs/backend-stdout.log
-tail -n 80 logs/backend-stderr.log
-
-# Round events
-cat ux-rtws/.dialogs/run/*/round-*.jsonl | head -n 50
-
-# Stream verification
-pnpm -C dominds tsx tests/driving/llm-streaming.ts --agent=gd --prompt="check"
-
-# Event dispatch check
-pnpm -C dominds tsx tests/driving/dialog-driving.ts --agent=gd --task=test-tracks.md
-```
-
-## Code References
-
-| Component          | Path                                                        |
-| ------------------ | ----------------------------------------------------------- |
-| Driver streaming   | `dominds/main/llm/driver.ts`                                |
-| Persistence        | `dominds/main/persistence.ts`                               |
-| Event registry     | `dominds/main/evt-registry.ts`                              |
-| Frontend WebSocket | `dominds/webapp/src/services/websocket.ts`                  |
-| Streaming UI       | `dominds/webapp/src/components/dominds-dialog-container.ts` |
-| Q4H Panel UI       | `dominds/webapp/src/components/dominds-q4h-panel.ts`        |
-| Test helper        | `dominds/webapp/static/testing/e2e-test-helper.js`          |
+- 主应用容器：`dominds/webapp/src/components/dominds-app.tsx`
+- 创建对话流：`dominds/webapp/src/components/create-dialog-flow.ts`
+- 输入组件：`dominds/webapp/src/components/dominds-q4h-input.ts`
+- Q4H 面板：`dominds/webapp/src/components/dominds-q4h-panel.ts`
+- WS 客户端：`dominds/webapp/src/services/websocket.ts`
+- HTTP 客户端：`dominds/webapp/src/services/api.ts`
 
 ---
 
-Last Updated: 2025-12-31 (updated Q4H UI structure - inline panel with toggle bar)
+Last Updated: 2026-02-06 (v2: quantified baseline + G1~G8 gates)

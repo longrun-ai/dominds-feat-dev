@@ -1,13 +1,14 @@
-- [owner:@ux] 已新增 `.minds/mcp.yaml`：注册 MCP serverId `playwright`（stdio），命令 `npx -y @playwright/mcp@latest`，并统一加前缀 `playwright_`。
-- [owner:@ux] 已更新 `.minds/team.yaml`：新增成员 `browser_tester`，授予 toolsets：`memory`、`playwright`、`mcp_admin`；并通过 `team_mgmt_validate_team_cfg()` 校验 ✅。
-- [owner:@ux] 已新增/更新 `.minds/team/browser_tester/persona.zh.md` 与 `.minds/team/browser_tester/checklist.zh.md`：默认只测 `http://localhost:5555`，不可访问时先提醒 @human。
-- [owner:@ux] @browser_tester 已完成最小冒烟与两次重跑（tellaskSession: `setup-browser-tester-smoke-5555`、`setup-browser-tester-smoke-5555-rerun`）：首页加载、`ping -> pong`、可控错误可见、刷新恢复均通过；每轮收尾均已 `mcp_release({"serverId":"playwright"})`。
-- [owner:@ux] 已将“创建新对话”入口与 modal 可用性/叠层问题整理为 UX triage：`ux-issues/create-dialog-modal-ux-triage.md`。
-- [owner:@ux] @human 已确认并固化执行口径：前后端一体 repo 整体一次性改到位，不留向后兼容层，不背历史包袱；已写入 `AGENTS.md` 与 `.minds/env.zh.md/.minds/env.en.md`。
-- [owner:@ux] @fullstack 已按该口径完成重构主线并回贴关键改动落位：`dominds/main/shared/types/wire.ts`、`dominds/main/server/api-routes.ts`、`dominds/main/server/create-dialog-contract.ts`、`dominds/main/server/websocket-handler.ts`、`dominds/webapp/src/components/create-dialog-flow.ts`、`dominds/webapp/src/components/dominds-app.tsx`、`dominds/webapp/src/services/api.ts`。
-- [owner:@ux] 门禁结果（@cmdr）：`pnpm -C dominds run lint:types` ✅（exit_code=0），`pnpm -C dominds run build` ✅（exit_code=0）。
-- [owner:@ux] E2E 复核结果（@browser_tester，tellaskSession: `create-dialog-modal-holistic-refactor-e2e`）：A/B/C/D/E 全部 `pass`，并回贴原始值、截图与 console/network 摘要；测试租约已释放（`mcp_release({"serverId":"playwright"})`）。
-- [owner:@ux] 当前结论：该重构任务已达到可验收状态，建议进入合入流程。
+- [owner:@ux] 已完成 Playwright MCP 与 `browser_tester` 团队成员配置：`.minds/mcp.yaml` 与 `.minds/team.yaml` 已落地并校验通过。
+- [owner:@ux] WebUI E2E 协作主线（tellaskSession: `webui-testing-guide-optimize-e2e`）已完成两轮迭代：@browser_tester 提供真实执行量化包，@fullstack 完成文档定稿。
+- [owner:@ux] 两轮量化基线已确认：Round1=9min（失败1次/元素波动1/恢复1min/已恢复）、Round2=8min（失败1次/元素波动1/恢复1min/已恢复）。
+- [owner:@ux] 文档已对齐最新实现并去除低效方法：`docs/webui-testing-guide.md` 已明确淘汰固定长 sleep、console helper、脚本驱动、API 直连。
+- [owner:@ux] 硬约束已固化：WebUI E2E 禁止直接 HTTP/WS API、禁止脚本、仅允许浏览器键盘/鼠标/触控模拟人类交互。
+- [owner:@ux] 最终结构已落位：最小稳定流程、反模式清单、失败恢复策略（含元素波动）、G1~G8 二值化验收 gate、证据留存最小集。
+- [owner:@ux] 关键核对通过（@ux 复核）：`docs/webui-testing-guide.md:90`（量化基线）、`docs/webui-testing-guide.md:110`（最小稳定流程）、`docs/webui-testing-guide.md:123`（反模式）、`docs/webui-testing-guide.md:153`（G1~G8）、`docs/webui-testing-guide.md:166`（证据留存）。
+- [owner:@ux] 当前结论：`setup-browser-tester.tsk` 的核心目标已达成，可作为长期回归与交接基线使用；测试租约释放约束已在流程中保留。
+- [owner:@ux] 已启动 `ux-stories/` 文档收敛评估：完成 10 篇盘点，发现 7 篇仍依赖已删除的 helper 注入片段（`/testing/dom-observation-utils.js`、`/testing/e2e-test-helper.js`），存在明显过时内容。
+- [owner:@ux] 已形成收敛方向：仅保留少数高价值场景做“现代化改造（纯人类交互、无 helper 依赖、二值化 gate）”，其余重复/低收益/过时 story 计划删除。
 
 Next:
-- [owner:@ux] 如 @human 确认，进入合入前留档：由 @fullstack 回贴“最终删除清单 + 关键 diff 锚点”作为变更归档。
+- [owner:@ux] 向 @human 回贴“保留/删除”建议清单并确认后执行批量清理。
+- [owner:@ux] 对保留文档执行统一现代化模板改造（前置条件、最小流程、失败恢复、证据最小集、Pass/Fail gate）。
