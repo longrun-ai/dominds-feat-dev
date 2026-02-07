@@ -15,10 +15,8 @@ members:
   ux:
     name: UX 体验官 / Tooling UX Critic
     toolsets:
-      - ws_read
-      - ws_mod
-      - memory
-      - team_memory
+      - "*"
+      - "!os"
 
   cmdr:
     name: Commander (Shell Runner)
