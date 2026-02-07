@@ -6,6 +6,14 @@
   - Priming：`dominds/main/agent-priming.ts` 的 distillation 用 `driveDialogStream(..., { persistMode: 'internal', skipTaskdoc: true, content: <distill directive> })` 显式锚定为“综合提炼”，并确保 distillation 不受具体差遣牒注入影响；输出要求为 6~12 条结论 bullet 且禁止元话语。
   - Docs：`dominds/docs/dominds-agent-priming.zh.md` 与 `dominds/docs/dominds-agent-priming.md` 已补充 internal prompt + distillation 跳过 Taskdoc 的实现说明与约束。
 - [owner:@ux] 已按反馈移除“fallback note / fallbackEntry + 继续对话”的降级路径：priming 失败恢复为 fatal interrupt（对话置 `interrupted` 并输出错误 bubble）；调度层仅吞掉 promise rejection 以避免 unhandled rejection（不产出任何 fallback 内容）。
+- [owner:@prompt] 已更新 FBR 规范：system prompt 禁止任何工具说明；“无工具提示”必须独立注入且与其完全一致。更新文档 `dominds/docs/fbr.zh.md`、`dominds/docs/fbr.md`，并新增实现细节草案 `dominds/docs/fbr-implementation.zh.md`、`dominds/docs/fbr-implementation.md`。
+- [owner:@prompt] 已发起 @fullstack 审议与落地诉请：按 FBR 规范完成 system prompt 与无工具提示的实现整合，并清理 FBR prompt 的工具硬编码。
+- [owner:@prompt] 已收到 @fullstack 回贴：声称已完成代码调整（未跑测试），待对照规范补齐差异点（“无工具提示”需包含 rtws/文件/浏览器/shell 无访问声明；FBR system prompt 前缀细节需核对；工具提示策略需对齐）。
+- [owner:@ux] 已完成 FBR 结构性重构并补齐文档：
+  - `main/llm/driver.ts` 新增统一 `DrivePolicy`（集中声明 FBR/非FBR差异：`effectiveSystemPrompt`、`effectiveAgentTools`、`prependedContextMessages`、`tellaskPolicy`、`allowFunctionCalls`），并由同一 `buildDriveContextMessages(...)` 组装上下文，移除主流程中零散 `unshift/push` FBR 特判。
+  - 流式/非流式两条路径统一改为 `resolveDrivePolicyViolationKind(...)` 做违规判定，确保 FBR 对 tool/function call 与非 `@tellasker` tellask 的强制拦截语义一致。
+  - 文档已从“候选”升级为“已落地”：`dominds/docs/fbr-implementation.zh.md`、`dominds/docs/fbr-implementation.md`，并在 `dominds/docs/fbr.zh.md`、`dominds/docs/fbr.md` 增补“实现原则（防误改）”章节，明确“同一上下文流水线，仅策略字段差异”。
+- [owner:@ux] 已补强 FBR 隔离硬闸门：`main/llm/driver.ts` 新增 `validateDrivePolicyInvariants(...)`，若发现 FBR 分支出现“非 FBR system prompt / 非空 tools / 非 `tellasker_only` / 缺失或不一致的 no-tools notice”等回流污染，直接 fail-fast 抛出 `FBR policy isolation violation`。
 
 复查要点（新对话复查必看）：
 - internal prompt 不得出现在对话历史/持久化存储/前端可见消息中（只能影响本次 drive 的 LLM 上下文）。

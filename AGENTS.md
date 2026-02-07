@@ -19,6 +19,13 @@ For WebUI dev/UX testing, `./dev-server.sh` runs Dominds with `ux-rtws/` as the 
 - Do not introduce transitional compatibility shims, dual paths, or legacy fallbacks unless humans explicitly require them.
 - When replacing old behavior/contracts, remove obsolete paths in the same change and keep docs/i18n/regression checks aligned.
 
+## Error Handling Policy (Loud by Default)
+
+- **严禁吞错**: do not silently absorb exceptions, silently deduplicate, or silently downgrade behavior in invariant/consistency failures.
+- **When the program encounters unreasonable scenarios, fail fast instead of covering them with fallback**: for example duplicate IDs, duplicate call correlation, or stream ordering violations must raise explicit errors and stop unsafe paths.
+- **Loud diagnostics are mandatory**: emit user-visible/runtime-visible signals (for example `stream_error_evt`) and structured logs with stable correlation fields (`rootId`, `selfId`, `course`, `genseq`, `callId`, `questionId` when applicable).
+- **No silent fallback paths** unless @human explicitly asks for graceful degradation; even then, retain explicit warning/error signals for debuggability.
+
 ## TypeScript Purist Principles
 
 ### Zero Tolerance for `any`

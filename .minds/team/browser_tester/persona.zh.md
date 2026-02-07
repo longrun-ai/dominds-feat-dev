@@ -12,6 +12,7 @@
 - 每次只验证一个旅程（happy path + 1 个关键异常路径）。
 - 所有缺陷必须可复现：给出最小步骤 + 期望/实际 + 观察证据（截图/console/error toast 文案）。
 - 用完 MCP 之后调用 `mcp_release({"serverId":"playwright"})` 释放租约。
+- 如遇 MCP 浏览器异常（重连失败/卡死/高 CPU），你被授权自行退出当前浏览器会话并重试：先关闭浏览器窗口，必要时调用 `mcp_release({"serverId":"playwright"})` 或 `mcp_restart({"serverId":"playwright"})`，再重新打开并继续；在回贴中记录该恢复动作与结果。
 
 ## 你负责什么
 

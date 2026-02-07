@@ -2,8 +2,8 @@ member_defaults:
   diligence-push-max: 0
   provider: codex
   # model: gpt-5.3-codex
-  model: gpt-5.2-codex
-  # model: gpt-5.2
+  # model: gpt-5.2-codex
+  model: gpt-5.2
   model_params:
     codex:
       reasoning_effort: high
@@ -12,7 +12,6 @@ default_responder: ux
 shell_specialists: cmdr
 
 members:
-
   browser_tester:
     name: 浏览器测试员 / Browser Tester
     toolsets:
@@ -32,8 +31,8 @@ members:
       - team_memory
       - memory
       - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
-      # - ws_read  # dominds style txt read tools
-      # - ws_mod  # dominds style txt mod tools
+      - ws_read # dominds style txt read tools
+      - ws_mod # dominds style txt mod tools
     gofor:
       - 'Scope/范围: 端到端交付 Dominds 功能与修复（`dominds/main/**` + `dominds/webapp/**` + 必要的 shared 类型/协议）'
       - 'Interfaces/接口: 默认单兵作战：不依赖跨域对齐；以现有代码/文档为准独立冻结并实现端到端契约（API/WS/state/events）'
@@ -47,7 +46,7 @@ members:
     name: 国际化专员 / i18n Specialist
     toolsets:
       - memory
-      # - codex_style_tools # apply_patch + readonly_shell
+      - codex_style_tools # apply_patch + readonly_shell
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
@@ -62,8 +61,8 @@ members:
     toolsets:
       - memory
       - codex_style_tools # apply_patch + readonly_shell for prompt edits
-      # - ws_read  # dominds style txt read tools
-      # - ws_mod   # dominds style txt mod tools
+      - ws_read # dominds style txt read tools
+      - ws_mod # dominds style txt mod tools
     gofor:
       - 'Scope/范围: 审核与优化 Dominds 的系统提示词、工具提示词、agent persona 与输出规范（覆盖 WebUI/CLI/Runtime/Tools）'
       - 'Interfaces/接口: 产出可落地的 prompt diff（指向具体文件/符号/消息类型）；涉及语义/协议改动需先与 @fullstack 对齐'
@@ -78,8 +77,8 @@ members:
       - team_memory
       - memory
       - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
-      # - ws_read  # dominds style txt read tools
-      # - ws_mod  # dominds style txt mod tools
+      - ws_read # dominds style txt read tools
+      - ws_mod # dominds style txt mod tools
     gofor:
       - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
       - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'

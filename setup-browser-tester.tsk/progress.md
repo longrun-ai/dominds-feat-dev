@@ -3,12 +3,13 @@
 - [owner:@ux] 两轮量化基线已确认：Round1=9min（失败1次/元素波动1/恢复1min/已恢复）、Round2=8min（失败1次/元素波动1/恢复1min/已恢复）。
 - [owner:@ux] 文档已对齐最新实现并去除低效方法：`docs/webui-testing-guide.md` 已明确淘汰固定长 sleep、console helper、脚本驱动、API 直连。
 - [owner:@ux] 硬约束已固化：WebUI E2E 禁止直接 HTTP/WS API、禁止脚本、仅允许浏览器键盘/鼠标/触控模拟人类交互。
-- [owner:@ux] 最终结构已落位：最小稳定流程、反模式清单、失败恢复策略（含元素波动）、G1~G8 二值化验收 gate、证据留存最小集。
-- [owner:@ux] 关键核对通过（@ux 复核）：`docs/webui-testing-guide.md:90`（量化基线）、`docs/webui-testing-guide.md:110`（最小稳定流程）、`docs/webui-testing-guide.md:123`（反模式）、`docs/webui-testing-guide.md:153`（G1~G8）、`docs/webui-testing-guide.md:166`（证据留存）。
-- [owner:@ux] 当前结论：`setup-browser-tester.tsk` 的核心目标已达成，可作为长期回归与交接基线使用；测试租约释放约束已在流程中保留。
-- [owner:@ux] 已启动 `ux-stories/` 文档收敛评估：完成 10 篇盘点，发现 7 篇仍依赖已删除的 helper 注入片段（`/testing/dom-observation-utils.js`、`/testing/e2e-test-helper.js`），存在明显过时内容。
-- [owner:@ux] 已形成收敛方向：仅保留少数高价值场景做“现代化改造（纯人类交互、无 helper 依赖、二值化 gate）”，其余重复/低收益/过时 story 计划删除。
+- [owner:@ux] 当前结论：`setup-browser-tester.tsk` 核心目标达成，可作为长期回归与交接基线。
+- [owner:@ux] `ux-stories/` 收敛已执行：按 @human 确认批量删除 6 篇低价值/过时文档，仅保留 4 篇高价值场景（`new-dialog-create-modal-regression.md`、`dlg-stop-resume.md`、`mcp-toolset.md`、`work-ui-lang.md`）。
+- [owner:@ux] 文档状态修正：`ux-stories/new-dialog-create-modal-regression.md` 已恢复（误删后已补回），当前保留集完整。
+- [owner:@ux] 已采纳 @human 建议切换执行策略：进入“@browser_tester 实操先行、@fullstack 同步改文档、按轮次验证封板”的一步到位流程（tellaskSession: `ux-stories-modernize-practical-loop`）。
+- [owner:@ux] 已更新 `ux-stories/new-dialog-create-modal-regression.md` 预期：允许不存在的 taskdoc 路径；“创建失败”检查改为可选。
+- [owner:@ux] 已更新 @browser_tester persona：浏览器异常可自主关闭并重试（必要时 `mcp_release`/`mcp_restart`），并要求回贴恢复动作。
 
 Next:
-- [owner:@ux] 向 @human 回贴“保留/删除”建议清单并确认后执行批量清理。
-- [owner:@ux] 对保留文档执行统一现代化模板改造（前置条件、最小流程、失败恢复、证据最小集、Pass/Fail gate）。
+- [owner:@ux] 等待 @browser_tester 重新补齐 new-dialog Step2/Step6，并推进其余三篇实操验证回贴。
+- [owner:@ux] 实操证据到齐后统一封板 4 篇现代化文档。

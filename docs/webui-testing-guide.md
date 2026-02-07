@@ -53,7 +53,7 @@
 
 ### Phase A：准备
 
-1. 打开 `http://localhost:5555`。
+1. 关闭当前浏览器窗口并重新打开 WebUI（确保全新会话），访问 `http://localhost:5555`。
 2. 确认页面已连接（可见正常主界面，非错误占位）。
 3. 打开浏览器 DevTools（Console + Network）用于观察（只读）。
 

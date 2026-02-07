@@ -2,3 +2,4 @@
 - [owner:@ux] `browser_tester` 只做浏览器端 E2E 走查与缺陷复现：不直接改代码、不跑需要 `os`/shell 的命令。
 - [owner:@ux] WebUI E2E 测试禁止直接调用 HTTP/WS API；不允许运行脚本；所有动作必须通过浏览器中的键盘、鼠标、触控等“模拟人类用户操作”完成。
 - [owner:@ux] 协作迭代以“稳定性优先、效率次之、可复现可交接”为准绳，未达成前持续优化并回贴证据。
+- [owner:@ux] 新约束：`ux-rtws/` 下禁止配置 Playwright MCP 与 `browser_tester` 成员；所有 WebUI 测试仅允许由外层 rtws（repo root）智能体执行。
