@@ -1,15 +1,9 @@
 - [owner:@ux] 已完成 Playwright MCP 与 `browser_tester` 团队成员配置：`.minds/mcp.yaml` 与 `.minds/team.yaml` 已落地并校验通过。
-- [owner:@ux] WebUI E2E 协作主线（tellaskSession: `webui-testing-guide-optimize-e2e`）已完成两轮迭代：@browser_tester 提供真实执行量化包，@fullstack 完成文档定稿。
-- [owner:@ux] 两轮量化基线已确认：Round1=9min（失败1次/元素波动1/恢复1min/已恢复）、Round2=8min（失败1次/元素波动1/恢复1min/已恢复）。
-- [owner:@ux] 文档已对齐最新实现并去除低效方法：`docs/webui-testing-guide.md` 已明确淘汰固定长 sleep、console helper、脚本驱动、API 直连。
-- [owner:@ux] 硬约束已固化：WebUI E2E 禁止直接 HTTP/WS API、禁止脚本、仅允许浏览器键盘/鼠标/触控模拟人类交互。
-- [owner:@ux] 当前结论：`setup-browser-tester.tsk` 核心目标达成，可作为长期回归与交接基线。
-- [owner:@ux] `ux-stories/` 收敛已执行：按 @human 确认批量删除 6 篇低价值/过时文档，仅保留 4 篇高价值场景（`new-dialog-create-modal-regression.md`、`dlg-stop-resume.md`、`mcp-toolset.md`、`work-ui-lang.md`）。
-- [owner:@ux] 文档状态修正：`ux-stories/new-dialog-create-modal-regression.md` 已恢复（误删后已补回），当前保留集完整。
-- [owner:@ux] 已采纳 @human 建议切换执行策略：进入“@browser_tester 实操先行、@fullstack 同步改文档、按轮次验证封板”的一步到位流程（tellaskSession: `ux-stories-modernize-practical-loop`）。
-- [owner:@ux] 已更新 `ux-stories/new-dialog-create-modal-regression.md` 预期：允许不存在的 taskdoc 路径；“创建失败”检查改为可选。
-- [owner:@ux] 已更新 @browser_tester persona：浏览器异常可自主关闭并重试（必要时 `mcp_release`/`mcp_restart`），并要求回贴恢复动作。
+- [owner:@ux] WebUI E2E 走查口径已简化：`@browser_tester` 逐篇回贴 `Pass/Fail/Blocked` + 关键发现（纯文本）即可；证据（截图/日志）仅在 Fail/Blocked 时可选最小化。
+- [owner:@ux] `ux-stories/` 已收敛为 4 篇高价值场景：`new-dialog-create-modal-regression.md`、`dlg-stop-resume.md`、`mcp-toolset.md`、`work-ui-lang.md`。
+- [owner:@ux] `docs/webui-testing-guide.md` 已对齐：E2E 仅浏览器键盘/鼠标/触控交互；禁止脚本/console helper 注入；禁止绕过 UI 直连 HTTP/WS API；测试完必须 `mcp_release({"serverId":"playwright"})`。
 
 Next:
-- [owner:@ux] 等待 @browser_tester 重新补齐 new-dialog Step2/Step6，并推进其余三篇实操验证回贴。
-- [owner:@ux] 实操证据到齐后统一封板 4 篇现代化文档。
+- [owner:@ux] 发起 `@browser_tester` 按 4 篇 story 逐步实操的反馈轮（逐篇 `Pass/Fail/Blocked` + 关键发现），收集“卡点/歧义/易碎步骤/耗时点”。
+- [owner:@ux] 汇总反馈后，与 `@fullstack` 联动修复阻塞点；并迭代 `ux-stories/*.md`（步骤、等待策略、失败恢复 SOP）。
+- [owner:@ux] 复跑确认稳定性与效率提升；以 `@browser_tester` 明确认可“顺手、可靠、可复跑”为封板口径。

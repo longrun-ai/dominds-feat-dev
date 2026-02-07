@@ -14,22 +14,22 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 
 ## Minimal Flow
 
-1) Open the Tools activity panel.
+1. Open the Tools activity panel.
    - Expect: toolsets list is visible and grouped by toolset.
 
-2) Refresh the Tools registry (use the UI refresh button if available).
+2. Refresh the Tools registry (use the UI refresh button if available).
    - Expect: registry timestamp updates or list refreshes.
 
-3) Expand a toolset and confirm tools are listed.
+3. Expand a toolset and confirm tools are listed.
    - Expect: tool names are visible under the toolset.
 
-4) Open the Problems panel.
+4. Open the Problems panel.
    - Expect: panel opens and shows current problems count.
 
-5) Create a dialog and ask the testee agent to call one MCP tool.
+5. Create a dialog and ask the testee agent to call one MCP tool.
    - Expect: tool call appears in the dialog UI and completes.
 
-6) Re-open Tools panel and confirm toolsets remain listed.
+6. Re-open Tools panel and confirm toolsets remain listed.
    - Expect: toolset list still present after tool call.
 
 ## Failure Recovery
@@ -39,12 +39,10 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 - If tool call fails, retry once with a different tool or a simpler instruction.
 - If the tool call fails with `browserType.launchPersistentContext` (Chrome "existing session"), close all Playwright-controlled Chrome windows, call `mcp_release({"serverId":"playwright"})`, then `mcp_restart({"serverId":"playwright"})`, and retry once. If it still fails, mark as blocked and attach the error log screenshot.
 
-## Evidence Minimal Set
+## Optional Evidence (Fail/Blocked only)
 
-- Screenshot: Tools panel showing toolset grouping.
-- Screenshot: one expanded toolset with tools listed.
-- Screenshot: Problems panel open (even if count is 0).
-- Screenshot: dialog showing a successful MCP tool call.
+- For Pass: no evidence required.
+- For Fail/Blocked: attach 1~2 screenshots that best explain the failure/blocked state.
 
 ## Binary Pass/Fail Gates
 

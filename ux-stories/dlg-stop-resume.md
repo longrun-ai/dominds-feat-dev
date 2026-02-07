@@ -13,19 +13,19 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 
 ## Minimal Flow
 
-1) Create a new dialog via toolbar New Dialog.
+1. Create a new dialog via toolbar New Dialog.
    - Expect: a dialog is selected and input is enabled.
 
-2) Send a prompt to force a long response (ask for a long list, no tools).
+2. Send a prompt to force a long response (ask for a long list, no tools).
    - Expect: primary action switches to Stop and input becomes disabled while streaming.
 
-3) Click Stop.
+3. Click Stop.
    - Expect: streaming stops and a resume/continue panel appears in the dialog.
 
-4) Click Continue/Resume in the dialog.
+4. Click Continue/Resume in the dialog.
    - Expect: response continues or resumes; input is disabled during resume and re-enables when done.
 
-5) Start another long response, then click toolbar Emergency Stop.
+5. Start another long response, then click toolbar Emergency Stop.
    - Expect: streaming stops and the global resume count increases.
    - Note: click the icon inside the button; clicking the count text may not trigger the action.
    - Emergency Stop only works when proceeding count > 0.
@@ -34,11 +34,11 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
    - No toast is expected; confirmation appears only when clicking the icon and proceeding count > 0.
    - If streaming is visible but proceeding count stays 0, treat as run-state update issue.
 
-6) Click toolbar Resume All.
+6. Click toolbar Resume All.
    - Expect: the interrupted dialog resumes and the resume count decreases to 0.
    - Resume All only works when resumable count > 0 and dialogs are in interrupted state.
 
-7) In the second tab, observe stop/resume state.
+7. In the second tab, observe stop/resume state.
    - Expect: within 5s, stop/resume state and counts match the first tab.
 
 ## Failure Recovery
@@ -48,12 +48,10 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 - If Stop/Resume controls do not appear, refresh once and repeat steps 1-4.
 - If cross-tab state does not update, wait 5s and refresh the second tab once.
 
-## Evidence Minimal Set
+## Optional Evidence (Fail/Blocked only)
 
-- Screenshot: primary action in Stop mode while streaming.
-- Screenshot: resume/continue panel visible after Stop.
-- Screenshot: toolbar showing Emergency Stop and Resume All counts.
-- Screenshot: second tab showing matching stop/resume state.
+- For Pass: no evidence required.
+- For Fail/Blocked: attach 1~2 screenshots that best explain the failure/blocked state.
 
 ## Binary Pass/Fail Gates
 

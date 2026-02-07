@@ -13,19 +13,19 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 
 ## Minimal Flow
 
-1) Observe the current UI language label in the header dropdown.
+1. Observe the current UI language label in the header dropdown.
    - Expect: a visible label (e.g. English or Chinese).
 
-2) Open the UI language dropdown and switch to the other language.
+2. Open the UI language dropdown and switch to the other language.
    - Expect: dropdown closes and the header label updates.
 
-3) Verify visible UI copy changes language (e.g. connection status text).
+3. Verify visible UI copy changes language (e.g. connection status text).
    - Expect: at least one visible label reflects the new language.
 
-4) Refresh the page.
+4. Refresh the page.
    - Expect: selected UI language persists after reload.
 
-5) Create or select a dialog and send a short message.
+5. Create or select a dialog and send a short message.
    - Expect: reply renders and the UI remains in the selected language.
 
 ## Failure Recovery
@@ -34,11 +34,10 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 - If language does not change, switch twice (A->B->A) and retry once.
 - If the page fails to load after refresh, reload once and continue.
 
-## Evidence Minimal Set
+## Optional Evidence (Fail/Blocked only)
 
-- Screenshot: header language before switching.
-- Screenshot: header language after switching.
-- Screenshot: header language after refresh (persistence).
+- For Pass: no evidence required.
+- For Fail/Blocked: attach 1~2 screenshots that best explain the failure/blocked state.
 
 ## Binary Pass/Fail Gates
 

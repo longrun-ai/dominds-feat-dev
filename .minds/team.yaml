@@ -16,6 +16,9 @@ members:
     name: 浏览器测试员 / Browser Tester
     toolsets:
       - memory
+      - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
+      - ws_read # dominds style txt read tools
+      - ws_mod # dominds style txt mod tools
       - playwright
       - mcp_admin
     gofor:

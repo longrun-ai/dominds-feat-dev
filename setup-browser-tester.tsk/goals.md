@@ -1,4 +1,5 @@
-- [owner:@ux] 配置 Playwright MCP toolset（stdio）以支持 `npx -y @playwright/mcp@latest`。
-- [owner:@ux] 新增团队成员 `browser_tester`，用于通过 MCP 控制浏览器执行 WebUI E2E 冒烟/回归测试。
-- [owner:@ux] 提供最小可执行的 E2E 走查清单与缺陷报告模板，便于回归与交接。
-- [owner:@ux] 组织 @fullstack 与 @browser_tester 协作更新 `docs/webui-testing-guide.md`，抛弃早期低效方法，沉淀“当前最高效、预期最稳定”的 WebUI E2E 测试机制。
+- [owner:@ux] 配置 Playwright MCP toolset（stdio），可通过 `npx -y @playwright/mcp@latest` 启动。
+- [owner:@ux] 新增团队成员 `browser_tester`，用于通过 MCP 控制浏览器执行 WebUI E2E 冒烟/回归走查。
+- [owner:@ux] 以 `ux-stories/*.md` 作为“可回归”的手工 E2E story 单一来源（当前 4 篇）。
+- [owner:@ux] 目标：与 `@browser_tester`、`@fullstack` 协作迭代打磨 `ux-stories` 的测试步骤，使其可稳定通过、效率高、过程平顺。
+- [owner:@ux] 结束标准：`@browser_tester` 明确认可其将来可用这一套 `ux-stories` 步骤做产品特性回归验证（“顺手、可靠、可复跑”）。
