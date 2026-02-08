@@ -20,6 +20,7 @@ members:
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
       - playwright
+      - playwright2
       - mcp_admin
     gofor:
       - 'Scope/范围: 使用 Playwright MCP 控制浏览器做 E2E 冒烟测试与回归走查（WebUI/关键旅程）'

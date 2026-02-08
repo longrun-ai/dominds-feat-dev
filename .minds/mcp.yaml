@@ -4,10 +4,22 @@ servers:
     truely-stateless: false
     transport: stdio
     command: npx
-    args: ['-y', '@playwright/mcp@latest']
+    # Use a workspace-local profile dir to avoid collisions with other Playwright MCP runs.
+    args: ['-y', '@playwright/mcp@latest', '--user-data-dir', '.cache/ms-playwright/mcp-chrome-profile-playwright']
     env: {}
     tools:
       whitelist: []
       blacklist: []
-    # transform:
-    #   - prefix: 'playwright_'
+
+  playwright2:
+    truely-stateless: false
+    transport: stdio
+    command: npx
+    # Isolated mode reduces "existing session" flakiness when running multiple MCP instances.
+    args: ['-y', '@playwright/mcp@latest', '--isolated', '--user-data-dir', '.cache/ms-playwright/mcp-chrome-profile-playwright2']
+    env: {}
+    tools:
+      whitelist: []
+      blacklist: []
+    transform:
+      - prefix: 'pw2_'

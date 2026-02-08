@@ -9,6 +9,7 @@ dist
 
 .dialogs/
 logs/
+.cache/
 
 # Local checkout of the dominds repository (intentionally not tracked here)
 /dominds/

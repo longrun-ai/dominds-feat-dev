@@ -27,6 +27,8 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
    - Expect: panel opens and shows current problems count.
 
 5. Create a dialog and ask the testee agent to call one MCP tool.
+   - Use the lightweight MCP tool `env_echo` (do NOT use Playwright in this story).
+   - Example instruction: "Call MCP tool `env_echo` with keys=[\"PATH\"] and payload=\"ping\"; reply done."
    - Expect: tool call appears in the dialog UI and completes.
 
 6. Re-open Tools panel and confirm toolsets remain listed.
@@ -37,7 +39,9 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 - If Tools panel is empty, refresh once and reopen.
 - If Problems panel does not open, refresh page once and retry.
 - If tool call fails, retry once with a different tool or a simpler instruction.
-- If the tool call fails with `browserType.launchPersistentContext` (Chrome "existing session"), close all Playwright-controlled Chrome windows, call `mcp_release({"serverId":"playwright"})`, then `mcp_restart({"serverId":"playwright"})`, and retry once. If it still fails, mark as blocked and attach the error log screenshot.
+- If the tool call fails with `browserType.launchPersistentContext` (Chrome "existing session"), close all Playwright-controlled Chrome windows, call `mcp_release({"serverId":"playwright"})`, then retry once.
+  - If it still fails, you MAY call `mcp_restart({"serverId":"playwright"})` once and retry once more (record that you did this).
+  - If it still fails, mark as blocked and attach the error log screenshot.
 
 ## Optional Evidence (Fail/Blocked only)
 

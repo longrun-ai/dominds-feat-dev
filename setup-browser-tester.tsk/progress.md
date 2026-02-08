@@ -1,9 +1,14 @@
-- [owner:@ux] 已完成 Playwright MCP 与 `browser_tester` 团队成员配置：`.minds/mcp.yaml` 与 `.minds/team.yaml` 已落地并校验通过。
-- [owner:@ux] WebUI E2E 走查口径已简化：`@browser_tester` 逐篇回贴 `Pass/Fail/Blocked` + 关键发现（纯文本）即可；证据（截图/日志）仅在 Fail/Blocked 时可选最小化。
-- [owner:@ux] `ux-stories/` 已收敛为 4 篇高价值场景：`new-dialog-create-modal-regression.md`、`dlg-stop-resume.md`、`mcp-toolset.md`、`work-ui-lang.md`。
-- [owner:@ux] `docs/webui-testing-guide.md` 已对齐：E2E 仅浏览器键盘/鼠标/触控交互；禁止脚本/console helper 注入；禁止绕过 UI 直连 HTTP/WS API；测试完必须 `mcp_release({"serverId":"playwright"})`。
+- [owner:@ux] 已落地轻量 MCP stdio server（用于 story4 功能性测试）：`ux-rtws/mcp/env-var-echo-mcp-server.js`（工具名 `env_echo`）。
+- [owner:@ux] 已为 dev-server(rtws=`ux-rtws/`) 创建 `ux-rtws/.minds/mcp.yaml`：仅注册轻量 `env_echo`，用于 `ux-stories/mcp-toolset.md`，避免把 Playwright 等重量级 MCP server 作为测试目标。
+- [owner:@ux] 已更新 `ux-stories/mcp-toolset.md`：对话内触发 MCP tool call 改为调用 `env_echo`（不再要求 Playwright snapshot）。
+- [owner:@ux] 已固化“整备操作”口径：每轮开始允许一次 `./dev-server.sh restart` 与必要时一次 `mcp_restart` 作为正常整备；仅当中途频繁恢复动作才能继续推进时，该轮不计入达标（需永久修复后再连续两轮）。
+- [owner:@ux] `@cmdr` 已核验并可整备重启 `./dev-server.sh`：frontend/backend 端口 `5555/5556` 监听且 `HTTP 200`。
+- [owner:@ux] 团队协作护栏已写入：`.minds/env.zh.md` / `.minds/env.en.md` 追加 dev-server 热重载风险与 owner 自检责任边界；并新增团队记忆 `collaboration-guardrails.md`。
+
+Known issues (from round-1/2):
+- [owner:@ux] story1（`new-dialog-create-modal-regression.md`）：toast/通知历史 gate 未通过（Notification history 长期为空）。
+- [owner:@ux] story2（`dlg-stop-resume.md`）：全局 `Resume all/全部继续` 计数不归零（对话内继续可归零；跨 tab 计数可同步）。
 
 Next:
-- [owner:@ux] 发起 `@browser_tester` 按 4 篇 story 逐步实操的反馈轮（逐篇 `Pass/Fail/Blocked` + 关键发现），收集“卡点/歧义/易碎步骤/耗时点”。
-- [owner:@ux] 汇总反馈后，与 `@fullstack` 联动修复阻塞点；并迭代 `ux-stories/*.md`（步骤、等待策略、失败恢复 SOP）。
-- [owner:@ux] 复跑确认稳定性与效率提升；以 `@browser_tester` 明确认可“顺手、可靠、可复跑”为封板口径。
+- [owner:@ux] 诉请 `@cmdr` 做一次整备 `./dev-server.sh restart` 后，请 `@browser_tester` 先复跑 `ux-stories/mcp-toolset.md`（env_echo）确认 story4 可稳定 Pass。
+- [owner:@ux] 诉请 `@fullstack` 针对 story1/story2 做永久修复；修复完成后组织 `@browser_tester` 在同一套 steps 下连续 2 轮复跑全套 4 篇并回贴；达标后向 `@human` 诉请验收封板。

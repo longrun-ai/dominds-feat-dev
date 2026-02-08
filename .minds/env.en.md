@@ -28,3 +28,12 @@ This Dominds environment uses a “globally installed/linked” `dominds` WebUI,
 `./dev-server.sh` starts the dev servers with `ux-rtws/` as the rtws (for UX testing, without polluting the root workspace’s `.minds/` and `.dialogs/`).
 
 **Note**: the current environment is not an instance started by `./dev-server.sh`.
+
+### Team Collaboration Guardrails (WebUI E2E / dev-server)
+
+- **Hot reload / passive-change risk**: while `./dev-server.sh` is running, `@fullstack` changes under `dominds/**` may be picked up by Vite/backend hot reload and can invalidate `@browser_tester`’s in-flight regression runs.
+  - Recommendation: when `@browser_tester` is running the “2 consecutive rounds” acceptance runs, `@fullstack` should avoid landing/enabling changes that trigger hot reload; if changes are necessary, announce in the mainline, pause the acceptance run, then do a “prep restart” and restart the rounds.
+
+- **Owner responsibility for typecheck/build**: commands like `pnpm -C dominds run lint:types` / build / tests are the change owner’s self-check.
+  - Do not push these back to the tellask requester (tellaskee should not ask the tellasker to run them).
+  - If shell execution is needed, you may ask `@cmdr` to run them as a proxy for the owner’s self-check; this must not be used to offload responsibility.

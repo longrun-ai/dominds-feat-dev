@@ -1,5 +1,6 @@
-- [owner:@ux] MCP 服务器以租约方式使用：测试完必须调用 `mcp_release({"serverId":"playwright"})` 释放。
+- [owner:@ux] MCP 服务器以租约方式使用：测试完必须调用 `mcp_release({"serverId":"<serverId>"})` 释放。
 - [owner:@ux] `browser_tester` 只做浏览器端 E2E 走查与缺陷复现：不直接改代码、不跑需要 `os`/shell 的命令。
 - [owner:@ux] WebUI E2E 测试禁止直接调用 HTTP/WS API；不允许运行脚本；所有动作必须通过浏览器中的键盘、鼠标、触控等“模拟人类用户操作”完成。
-- [owner:@ux] 新约束：`ux-rtws/` 下禁止配置 Playwright MCP 与 `browser_tester` 成员；所有 WebUI 测试仅允许由外层 rtws（repo root）智能体执行。
-- [owner:@ux] 新口径：不再使用 DoD/证据包口径。`@browser_tester` 逐篇回贴 `Pass/Fail/Blocked` + 关键发现（纯文本）即可；证据（截图/日志）仅在 Fail/Blocked 时可选最小化，且以“能说明问题”为准（不追求全面）。
+- [owner:@ux] 新口径：不再使用 DoD/证据包口径。`@browser_tester` 逐篇回贴 `Pass/Fail/Blocked` + 关键发现（纯文本）即可；证据（截图/日志）仅在 Fail/Blocked 时可选最小化。
+- [owner:@ux] `./dev-server.sh` 的 backend rtws 为 `ux-rtws/`：允许在 `ux-rtws/.minds/mcp.yaml` 配置“轻量 MCP server”（用于 `ux-stories/mcp-toolset.md` 的功能性测试）；禁止在 `ux-rtws/.minds/team.yaml` 定义 `browser_tester`（成员与授权以 repo root `.minds/team.yaml` 为准）。
+- [owner:@ux] `ux-stories/mcp-toolset.md` 不得使用 Playwright 等重量级 MCP server 作为测试目标；应使用简单 MCP server 完成 Dominds MCP 支持的功能性测试（必要时可自制测试用 MCP server，落在 `ux-rtws/` 内）。

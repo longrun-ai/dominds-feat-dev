@@ -24,6 +24,15 @@
 - 允许使用 Playwright MCP 工具来“代替人手”完成点击/输入/刷新等浏览器操作。
 - 但仍禁止任何形式的自写脚本/console helper 注入，以及绕过 UI 的 API/WS 直连。
 
+补充澄清（恢复/排障步骤的合法性）：
+
+- 为保证“测试流程能完整跑通并可复现”，允许使用以下**运维型恢复步骤**（不属于产品交互捷径）：
+  - `mcp_release({"serverId":"playwright"})` / `mcp_restart({"serverId":"playwright"})`（来自 `mcp_admin`，用于回收/重启 MCP 租约资源）。
+  - `./dev-server.sh restart`（仅由 `@cmdr` 执行，用于恢复 dev-server 环境）。
+- 这些恢复动作必须在回贴中明确记录（做了什么 + 结果）。
+- 每轮开始时允许做一次“整备重启”（例如先 `./dev-server.sh restart`、必要时 `mcp_restart({"serverId":"playwright"})`），以获得干净环境；这类整备不视为“意外”。
+- 若测试中途需要频繁/重复依赖恢复动作才能继续推进（例如反复 `mcp_restart` / 反复重启 dev-server 才能跑完），该轮**不计入达标**；应协调 `@fullstack`/`@cmdr` 做永久修复后再复跑。
+
 ## 2. 运行环境
 
 - 前端地址：`http://localhost:5555`
@@ -37,7 +46,19 @@
 补充约束（测试执行侧）：
 
 - WebUI E2E 的**执行智能体**必须从 repo root（外层 rtws）运行，以使用 `./.minds/` 下的 MCP toolset 与 `browser_tester` 成员配置。
-- `ux-rtws/` 仅用于承载 WebUI dev/UX 运行时数据；禁止在 `ux-rtws/.minds/**` 下配置 Playwright MCP 与 `browser_tester` 成员。
+- `ux-rtws/` 仅用于承载 WebUI dev/UX 运行时数据（`./dev-server.sh` 的 backend rtws）。
+  - `ux-rtws/.minds/team.yaml`：保持最小化；禁止在此定义 `browser_tester`（成员与权限以 repo root 的 `.minds/team.yaml` 为准）。
+  - `ux-rtws/.minds/mcp.yaml`：为使 `./dev-server.sh` 环境下的 Tools panel 可回归，允许在此配置 Playwright MCP（被测后端将从该 rtws 加载 MCP toolsets）。
+
+并行测试说明（避免 profile data dir 冲突）：
+
+- 默认要求：`ux-stories/*.md` 串行执行（同一时间只跑一个 story / 一个 Playwright MCP 实例）。
+- 如确需并行：必须配置多套 Playwright MCP toolset（不同 `serverId` + `transform` 前缀区分工具名），并确保每套使用隔离的浏览器 profile data dir；每个并行测试只使用其绑定的那一套 toolset。
+
+Story4（MCP 支持功能性测试）的约束：
+
+- `ux-stories/mcp-toolset.md` 不应以 Playwright 等重量级 MCP server 作为测试目标。
+- 优先使用一个“轻量 MCP server”验证 Dominds 的 MCP 支持链路（Tools 面板/Problems/对话内 tool call 可见性/完成态）。
 
 ### 2.1 macOS 权限前置（如适用）
 

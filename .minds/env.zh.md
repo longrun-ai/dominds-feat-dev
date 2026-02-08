@@ -28,3 +28,12 @@
 `./dev-server.sh` 会以 `ux-rtws/` 作为 rtws 启动开发服务器（便于 UX 测试，不污染根工作区的 `.minds/` 与 `.dialogs/`）。
 
 **注意**： 当前环境并非由 `./dev-server.sh` 启动的实例。
+
+### 团队协作护栏（WebUI E2E / dev-server）
+
+- **dev-server 热重载/被动变更风险**：`./dev-server.sh` 运行期间，`@fullstack` 对 `dominds/**` 的改动可能被 Vite/后端热重载吸收，从而影响 `@browser_tester` 的进行中回归。
+  - 建议：当 `@browser_tester` 正在做“连续 2 轮”验收跑时，`@fullstack` 应避免合入/启用会触发热重载的变更；必须改动时，先在主线明确宣告并暂停该轮验收，改动后重新做“整备重启”再重新计轮次。
+
+- **构建/类型检查责任边界**：诸如 `pnpm -C dominds run lint:types` / build / tests 属于“改动 owner”的自检责任。
+  - 禁止把这类命令通过 tellask 回推给诉请者（tellaskee 不应要求 tellasker 代为执行）。
+  - 若需要 shell 执行，仅可诉请 `@cmdr`，并明确这是“owner 自检的代跑”，不得作为把责任转移给他人的手段。

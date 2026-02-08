@@ -1,0 +1,13 @@
+version: 1
+servers:
+  # Lightweight MCP server for UX story mcp-toolset (functional MCP support test).
+  # Avoid using heavyweight MCP servers (e.g. Playwright) as the test target.
+  env_echo:
+    truely-stateless: true
+    transport: stdio
+    command: node
+    args: ['mcp/env-var-echo-mcp-server.js']
+    env: {}
+    tools:
+      whitelist: []
+      blacklist: []
