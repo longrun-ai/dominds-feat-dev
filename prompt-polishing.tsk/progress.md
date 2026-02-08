@@ -5,3 +5,11 @@
   - 系统提示中“严格匹配 schema”改为 best-effort 校验口径（zh/en 同步），并在 `codex_style_tools` 工具集文案前置硬拒绝点说明。
 - [owner:@prompt] 类型检查：`pnpm -C dominds run lint:types` 已通过（@fullstack 回执 exit_code=0）。
 - [owner:@prompt] 运行时冒烟：已在“构建并重启后”触发 `.minds/`、`.dialogs/` 的 `readonly_shell` 拒绝分支与 `read_file` 读取 `.minds/*` 的拒绝分支，确认新文案生效。
+- [owner:@prompt] 2026-02-08：继续打磨（P0/P1）并已落地生效：
+  - Dominds 内置工具参数校验（`validateArgs/validateValue`）新增 best-effort 校验：primitive `enum` + primitive `const`。
+  - primitive `enum` 的错误提示增强为：包含 `got` 与允许值列表（截断显示）。primitive `const` 的错误提示同样包含 `got`。
+  - 系统提示 best-effort 口径补齐：明确包含 `primitive enum / primitive const`，并显式说明复杂关键字（pattern/format/min/max/oneOf 等）不保证。
+  - 类型检查回执：`pnpm -C dominds run lint:types` 已通过（@cmdr 回执 exit_code=0）。
+  - 构建与生效核对：用户已执行 `pnpm -C dominds build` 并手工重启；已在 `dist/` 中核对新文案与逻辑存在（含 `must be one of ...; got ...` / `must be <const>; got ...`）。
+  - 提交：相关改动已提交（`dominds` repo head: `a4679f6`）。
+  - 备注：`dominds/package.json` 的 version bump 为用户预备改动，暂不作为本任务交付要求。
