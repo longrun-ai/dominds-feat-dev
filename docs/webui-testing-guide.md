@@ -116,6 +116,11 @@ Add evidence only when useful:
 - 1–2 screenshots for Fail/Blocked
 - up to ~3 relevant Console lines and up to ~3 relevant Network entries (no full dumps)
 
+Evidence and scratch files:
+
+- Do **not** drop `.md` / `.png` artifacts in the repo root.
+- Store any test-generated notes/screenshots under `artifacts/` (repo-relative but git-ignored).
+
 ### Phase D: Cleanup
 
 If you used a Playwright MCP lease, release it:
