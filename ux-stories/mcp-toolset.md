@@ -1,11 +1,28 @@
-# Dominds WebUI E2E: MCP Toolsets + Tools Registry
+# WebUI E2E: MCP Toolsets + Tools Registry
 
 Scope: Tools panel, toolset grouping, Problems panel, and tool call visibility.
-Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injection. Only keyboard/mouse/touch.
+
+Hard constraints:
+
+- NO HTTP/WS API direct calls.
+- NO scripts (browser console helpers, shell scripts, test drivers).
+- Only “human UI interactions” (keyboard/mouse/touch). Playwright MCP is allowed as the _driver_.
+
+Round rules:
+
+- If this is the first story of the round: ask `@cmdr` to run `./dev-server.sh prep` (clear-records + restart) before testing.
+- Continue policy: even if this story is **Fail**, continue running the remaining stories; stop the _round_ only if the environment is **Blocked**.
+- Report format: reply `Pass` / `Fail` / `Blocked` + 1~5 key findings (text). Evidence (1~2 screenshots) is optional and only recommended for Fail/Blocked.
+
+Ops-only recovery actions (allowed; record if used):
+
+- Standard round prep (recommended before each round): `./dev-server.sh prep` (via `@cmdr`) to `clear-records + restart`.
+- `./dev-server.sh restart` (via `@cmdr`) for a clean dev environment.
+- `mcp_release({"serverId":"<your-playwright-serverId>"})` / `mcp_restart({"serverId":"<your-playwright-serverId>"})` to recover a stuck Playwright lease.
 
 ## Preconditions
 
-- WebUI reachable (e.g. http://127.0.0.1:5555/).
+- WebUI reachable (e.g. `http://localhost:5555/`).
 - Start from a fresh browser session (close the current browser window and reopen the WebUI).
 - At least one MCP toolset is already configured and connected (pre-arranged).
 - Connection status shows connected.
@@ -38,10 +55,8 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 
 - If Tools panel is empty, refresh once and reopen.
 - If Problems panel does not open, refresh page once and retry.
-- If tool call fails, retry once with a different tool or a simpler instruction.
-- If the tool call fails with `browserType.launchPersistentContext` (Chrome "existing session"), close all Playwright-controlled Chrome windows, call `mcp_release({"serverId":"playwright"})`, then retry once.
-  - If it still fails, you MAY call `mcp_restart({"serverId":"playwright"})` once and retry once more (record that you did this).
-  - If it still fails, mark as blocked and attach the error log screenshot.
+- If tool call fails, retry once with a simpler instruction.
+- If Playwright driver is stuck (cannot interact with the browser), use the ops-only recovery actions above, then retry once.
 
 ## Optional Evidence (Fail/Blocked only)
 
@@ -56,3 +71,7 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 - Problems panel opens and is readable.
 - An MCP tool call can be triggered from the dialog and completes.
 - Toolsets remain visible after the tool call.
+
+Pass rule: all gates must pass. Any failure => Fail.
+
+Note: this story is a product-chain check (MCP toolset visibility + tool call in dialog). Do not substitute a heavyweight MCP server (e.g. Playwright) as the _test target_.

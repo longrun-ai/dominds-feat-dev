@@ -88,6 +88,27 @@ case "${1:-start}" in
 	show_status
 	exit 0
 	;;
+"clear-records")
+	echo "🧹 Clearing WebUI dev RTWS dialog records (ux-rtws/.dialogs/)..."
+	if [ -x "$RTWS_DIR/clear-records.sh" ]; then
+		"$RTWS_DIR/clear-records.sh"
+		exit $?
+	fi
+	rm -rf "$RTWS_DIR/.dialogs/"
+	echo "✅ Cleared: $RTWS_DIR/.dialogs/"
+	exit 0
+	;;
+"prep")
+	echo "🧹 Round prep: clear records + force restart..."
+	pkill -f "tsx.*dominds/main/(server|cli)\\.ts" 2>/dev/null
+	pkill -f "vite.*--port(=| )5555" 2>/dev/null
+	sleep 2
+	if [ -x "$RTWS_DIR/clear-records.sh" ]; then
+		"$RTWS_DIR/clear-records.sh" || true
+	else
+		rm -rf "$RTWS_DIR/.dialogs/" || true
+	fi
+	;;
 "restart")
 	echo "🔄 Force restarting development servers..."
 	pkill -f "tsx.*dominds/main/(server|cli)\\.ts" 2>/dev/null
@@ -114,11 +135,13 @@ case "${1:-start}" in
 	exit 0
 	;;
 *)
-	echo "Usage: $0 [start|restart|stop|status]"
+	echo "Usage: $0 [start|prep|restart|clear-records|stop|status]"
 	echo ""
 	echo "Commands:"
 	echo "  start    - Start development servers (default, shows status if already running)"
+	echo "  prep     - Round prep: clear records + force restart servers"
 	echo "  restart  - Force restart development servers"
+	echo "  clear-records - Delete dev RTWS dialog records (ux-rtws/.dialogs/)"
 	echo "  stop     - Stop development servers"
 	echo "  status   - Show current server status"
 	exit 1

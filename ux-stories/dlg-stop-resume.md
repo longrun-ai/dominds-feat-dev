@@ -1,11 +1,28 @@
-# Dominds WebUI E2E: Dialog Stop / Resume (Per-dlg + Global Operator Controls)
+# WebUI E2E: Dialog Stop / Resume (Per-dialog + Global Controls)
 
-Scope: WebUI dialog stop/resume controls and cross-tab sync.
-Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injection. Only keyboard/mouse/touch.
+Scope: dialog Stop/Resume controls + global operator controls + cross-tab sync.
+
+Hard constraints:
+
+- NO HTTP/WS API direct calls.
+- NO scripts (browser console helpers, shell scripts, test drivers).
+- Only “human UI interactions” (keyboard/mouse/touch). Playwright MCP is allowed as the _driver_.
+
+Round rules:
+
+- If this is the first story of the round: ask `@cmdr` to run `./dev-server.sh prep` (clear-records + restart) before testing.
+- Continue policy: even if this story is **Fail**, continue running the remaining stories; stop the _round_ only if the environment is **Blocked**.
+- Report format: reply `Pass` / `Fail` / `Blocked` + 1~5 key findings (text). Evidence (1~2 screenshots) is optional and only recommended for Fail/Blocked.
+
+Ops-only recovery actions (allowed; record if used):
+
+- Standard round prep (recommended before each round): `./dev-server.sh prep` (via `@cmdr`) to `clear-records + restart`.
+- `./dev-server.sh restart` (via `@cmdr`) for a clean dev environment.
+- `mcp_release({"serverId":"<your-playwright-serverId>"})` / `mcp_restart({"serverId":"<your-playwright-serverId>"})` to recover a stuck Playwright lease.
 
 ## Preconditions
 
-- WebUI reachable (e.g. http://127.0.0.1:5555/).
+- WebUI reachable (e.g. `http://localhost:5555/`).
 - Start from a fresh browser session (close the current browser window and reopen the WebUI).
 - At least one team member is available so a dialog can be created.
 - Connection status shows connected.
@@ -35,7 +52,8 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
    - If streaming is visible but proceeding count stays 0, treat as run-state update issue.
 
 6. Click toolbar Resume All.
-   - Expect: the interrupted dialog resumes and the resume count decreases to 0.
+   - Expect: the interrupted dialog resumes.
+   - Expect: resumable count decreases; **should** reach 0 when all dialogs are resumed.
    - Resume All only works when resumable count > 0 and dialogs are in interrupted state.
 
 7. In the second tab, observe stop/resume state.
@@ -59,5 +77,10 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 - Clicking Stop halts streaming within 2s and shows a resume/continue panel.
 - Clicking Continue/Resume resumes output and input re-enables after completion.
 - Emergency Stop halts streaming and increases the resume count.
-- Resume All reduces the resume count to 0 and resumes output.
+- Resume All resumes output.
+- Resume count reaches 0 after all resumable dialogs are resumed.
 - Second tab reflects stop/resume state within 5s.
+
+Pass rule: all gates must pass. Any failure => Fail.
+
+Known issue (as of 2026-02-09): global `Resume all / 全部继续` count may not return to 0 even though the dialog resumes. If observed, mark **Fail (resume count gate)** and continue to the next story.

@@ -1,11 +1,28 @@
-# Dominds WebUI E2E: Work Language vs UI Language
+# WebUI E2E: Work Language vs UI Language
 
 Scope: WebUI UI-language dropdown behavior and persistence.
-Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injection. Only keyboard/mouse/touch.
+
+Hard constraints:
+
+- NO HTTP/WS API direct calls.
+- NO scripts (browser console helpers, shell scripts, test drivers).
+- Only “human UI interactions” (keyboard/mouse/touch). Playwright MCP is allowed as the _driver_.
+
+Round rules:
+
+- If this is the first story of the round: ask `@cmdr` to run `./dev-server.sh prep` (clear-records + restart) before testing.
+- Continue policy: even if this story is **Fail**, continue running the remaining stories; stop the _round_ only if the environment is **Blocked**.
+- Report format: reply `Pass` / `Fail` / `Blocked` + 1~5 key findings (text). Evidence (1~2 screenshots) is optional and only recommended for Fail/Blocked.
+
+Ops-only recovery actions (allowed; record if used):
+
+- Standard round prep (recommended before each round): `./dev-server.sh prep` (via `@cmdr`) to `clear-records + restart`.
+- `./dev-server.sh restart` (via `@cmdr`) for a clean dev environment.
+- `mcp_release({"serverId":"<your-playwright-serverId>"})` / `mcp_restart({"serverId":"<your-playwright-serverId>"})` to recover a stuck Playwright lease.
 
 ## Preconditions
 
-- WebUI reachable (e.g. http://127.0.0.1:5555/).
+- WebUI reachable (e.g. `http://localhost:5555/`).
 - Start from a fresh browser session (close the current browser window and reopen the WebUI).
 - Header UI language dropdown is visible.
 - Connection status shows connected.
@@ -46,3 +63,7 @@ Hard constraints: NO API/WS direct calls, NO scripts, NO console helper injectio
 - At least one visible UI label updates to the selected language.
 - Selected language persists after refresh.
 - Sending a message does not revert UI language.
+
+Pass rule: all gates must pass. Any failure => Fail.
+
+Note: this story validates **UI language** only. Work-language correctness is out of scope under the no-script/no-API rule.
