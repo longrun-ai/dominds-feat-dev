@@ -25,7 +25,7 @@ This rtws is for Dominds self-development.
 
 ### Done Criteria (Code Changes)
 
-- For any code change, you must run `pnpm -C dominds lint:types` and make sure typecheck passes before considering the work done.
+- For any code change, you must tellask `!?@cmdr` yourself (rather than seeking delegation) to run `pnpm -C dominds lint:types` and make sure typecheck passes before considering the work done.
 
 ### Collaboration Note (environment-related)
 
