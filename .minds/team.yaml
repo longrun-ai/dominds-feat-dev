@@ -61,10 +61,18 @@ members:
       - 'Regression/回归: 确保新增文案在 zh/en 同步；必要时请 @cmdr 代跑 lint/build/typecheck'
 
   prompt:
+    provider: minimaxi.com-coding-plan
+    model: MiniMax-M2.1
+    model_params:
+      anthropic:
+        temperature: 0.2
+    fbr_model_params:
+      anthropic:
+        temperature: 1.0
     name: 提示词专员 / Prompt Engineer
     toolsets:
       - memory
-      - codex_style_tools # apply_patch + readonly_shell for prompt edits
+      # - codex_style_tools # apply_patch + readonly_shell for prompt edits
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
