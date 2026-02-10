@@ -19,6 +19,16 @@ For WebUI dev/UX testing, `./dev-server.sh` runs Dominds with `ux-rtws/` as the 
 - Do not introduce transitional compatibility shims, dual paths, or legacy fallbacks unless humans explicitly require them.
 - When replacing old behavior/contracts, remove obsolete paths in the same change and keep docs/i18n/regression checks aligned.
 
+## Value-First Engineering Policy (Mean & Lean)
+
+- Do NOT optimize for "minimal change / minimal fix / minimal blast radius" as a default objective.
+- Default objective is end-to-end business value and user value at system level, not local diff size.
+- Deliver meaningful feature outcomes over local patching; complete the full behavior path across backend/frontend/contracts when needed.
+- Keep the system globally **mean & lean**: prefer fewer layers, fewer concepts, and fewer optional branches.
+- Simple and direct solutions are often better than clever ones; prioritize readability, debuggability, and maintainability.
+- Reject over-engineering and local micro-optimizations that improve local metrics while degrading global architecture/design/code coherence.
+- In tradeoffs, prioritize long-term total cost (comprehension, maintenance, regression risk) over local or short-term optimization gains.
+
 ## Error Handling Policy (Loud by Default)
 
 - **严禁吞错**: do not silently absorb exceptions, silently deduplicate, or silently downgrade behavior in invariant/consistency failures.
@@ -187,6 +197,6 @@ This repo uses two runtime workspaces:
 - Read-only git commands (`git status`, `git diff`, `git log`, `git show`, `git blame`) are allowed.
 - **Parallel worktree edits are normal**: assume humans and other agents may modify the same worktree concurrently. Do not assume exclusive control or that the working tree stays stable during a task.
 - **Monitor diffs to avoid clobbering**: re-check `git status` / `git diff` (and `git -C dominds status` / `git -C dominds diff` when working in `dominds/`) before making edits to files, and especially before any “cleanup” actions.
-- **Never touch other people's in-flight work**: if you notice edits that are clearly unrelated to the requested task, do not refactor, restructure, or “fix up” those areas. Only make minimal, targeted edits required by the user request.
+- **Never touch other people's in-flight work**: if you notice edits that are clearly unrelated to the requested task, do not refactor, restructure, or "fix up" those areas. Scope your edits to the requested business outcome and required end-to-end behavior closure, without touching unrelated WIP.
 - **Only fix compile errors opportunistically**: it is OK to do a small, localized compile/lint fix when you are already touching the exact file/area, but do not make broader logic/structure changes in someone else’s WIP to “clean things up”.
 - **Do not change the staging area without asking**: after you finish your own work, you may propose staging only your changes and unstaging others, but you MUST ask the user for explicit approval before running any `git add`, `git restore --staged`, `git reset <path>`, etc.
