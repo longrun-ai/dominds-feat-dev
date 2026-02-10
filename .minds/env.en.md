@@ -27,6 +27,13 @@ This rtws is for Dominds self-development.
 
 - For any code change, you must tellask `!?@cmdr` yourself (rather than seeking delegation) to run `pnpm -C dominds lint:types` and make sure typecheck passes before considering the work done.
 
+### Test Run Rules (rtws Isolation)
+
+- When running script tests via `pnpm -C dominds/tests run rtws -- ...`, default mode is **isolated rtws**: each run copies `tests/script-rtws` into a unique temp directory before execution.
+- Because isolation is the default, script tests are safe to run in parallel; do not rely on shared-rtws serial assumptions anymore.
+- Use `--shared-rtws` for debugging only; this mode runs directly in `tests/script-rtws`, is prone to cross-test pollution, and must not be used concurrently.
+- To keep failure artifacts for debugging, set `DOMINDS_TEST_RTWS_KEEP_TMP=1`; the test CLI will preserve the temporary rtws path.
+
 ### Collaboration Note (environment-related)
 
 - While `./dev-server.sh` is running, changes under `dominds/**` can trigger hot reload and interfere with in-flight browser regression.

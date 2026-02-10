@@ -121,10 +121,22 @@ pnpm run format             # Prettier format (code + markdown)
 ### Testing
 
 ```bash
-# Run tests using pnpm
-pnpm -C dominds/tests run parsing
-pnpm -C dominds/tests run realtime
+# List available test scripts
+pnpm -C dominds/tests run
+
+# Run a named test script
+pnpm -C dominds/tests run <script-name>
+
+# Run a script-file test via the rtws runner
+pnpm -C dominds/tests run rtws -- <script.ts>
 ```
+
+`pnpm -C dominds/tests run rtws -- ...` uses **isolated rtws by default**:
+
+- Each run copies `dominds/tests/script-rtws` into a unique temp rtws and executes there.
+- Parallel runs are safe by default (no shared-rtws cross-test pollution).
+- `--shared-rtws` is debug-only and must not be used concurrently.
+- Use `DOMINDS_TEST_RTWS_KEEP_TMP=1` to keep temp rtws for post-failure debugging.
 
 ### CLI Tools
 

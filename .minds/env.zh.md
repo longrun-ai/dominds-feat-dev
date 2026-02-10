@@ -27,6 +27,13 @@
 
 - 凡是修改了代码，智能体必须自行直接诉请 `!?@cmdr` （而非推脱给他人）执行 `pnpm -C dominds lint:types`，并且类型检查通过，才算改到位。
 
+### 测试运行约定（rtws 隔离）
+
+- 使用 `pnpm -C dominds/tests run rtws -- ...` 运行脚本测试时，默认是**隔离 rtws**：每次执行都会把 `tests/script-rtws` 复制到独立临时目录后再运行。
+- 因为默认隔离，脚本测试可以安全并发运行，不应再依赖共享 `tests/script-rtws` 的串行假设。
+- `--shared-rtws` 仅用于调试；该模式会直接使用 `tests/script-rtws`，容易产生并发污染，禁止并发跑多个用例。
+- 需要保留失败现场时，设置 `DOMINDS_TEST_RTWS_KEEP_TMP=1`，测试 CLI 会保留本次临时 rtws 路径用于排查。
+
 ### 协作提醒（环境相关）
 
 - `./dev-server.sh` 运行期间，`dominds/**` 改动可能触发热重载，影响进行中的浏览器回归。
