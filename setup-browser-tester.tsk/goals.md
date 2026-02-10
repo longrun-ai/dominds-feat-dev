@@ -1,8 +1,11 @@
+## Goals
 - [owner:@ux] 配置 Playwright MCP toolset（stdio），可通过 `npx -y @playwright/mcp@latest` 启动。
 - [owner:@ux] 新增团队成员 `browser_tester`，用于通过 MCP 控制浏览器执行 WebUI E2E 冒烟/回归走查。
 - [owner:@ux] 以 `ux-stories/*.md` 作为“可回归”的手工 E2E story 单一来源（当前 4 篇）。
-- [owner:@ux] 目标：与 `@browser_tester`、`@fullstack` 协作迭代打磨 `ux-stories` 的测试步骤，使其可稳定通过、效率高、过程平顺。
-- [owner:@ux] 结束标准（封板/验收口径）：在 `./dev-server.sh` 启动的 dev 环境（无 auth）下，`@browser_tester` 能按同一套 `ux-stories` 步骤**连续 2 轮**完成 4 篇 story 的执行与回贴，且两轮均“无意外”（顺手、可靠、可复跑）。
+- [owner:@ux] 将 `ux-stories/dlg-stop-resume.md` 的可测试性改进扩大为 **全 WebUI 的系统性可测试性改造**：覆盖所有核心功能界面与关键操作链路（不仅限于 stop/resume）。
+- [owner:@ux] 以 `docs/webui-ux-testability-v1.md` 作为 v1 “覆盖面（in/out-scope）+ MUST/SHOULD 最低规范 + 稳定标识规范 + 回归包映射缺口”的主口径，并在达标前保持与 `ux-stories` 同步。
+- [owner:@ux] 目标：与 `@browser_tester`、`@fullstack` 协作迭代打磨 WebUI 的“可测试性标准 + 覆盖清单 + UX 走查”，使 `ux-stories` 可稳定通过、效率高、过程平顺。
+- [owner:@ux] 结束标准（封板/验收口径）：在 `./dev-server.sh` 启动的 dev 环境（无 auth）下，基于同一套 `ux-stories` 步骤 **连续 2 轮**完成所有 story 的执行与回贴，且两轮均“无意外”（顺手、可靠、可复跑）。
   - 每轮开始允许做一次“整备重启”（如 `./dev-server.sh restart`，必要时 `mcp_restart({"serverId":"playwright"})`）以获得干净环境；这类整备不视为“意外”。
   - “不作为停止条件但需记录并继续跑完其它篇目”的情况：WebUI 不可达/未 connected、macOS 权限弹窗/Gatekeeper、MCP toolset 未连导致 story4 无法做、以及可绕过的 UI bug。
   - 重要澄清（@human）：若测试中途需要频繁/重复依赖恢复动作才能继续推进（例如反复 `mcp_restart` / 反复重启 dev-server 才能跑完），该轮**不计入达标**；需协调 `@fullstack`/`@cmdr` 做永久修复，修复后再连续 2 轮跑通，避免“单次临时解决”蒙混过关。

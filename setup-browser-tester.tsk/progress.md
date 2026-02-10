@@ -1,25 +1,34 @@
-- [owner:@ux] 已落地轻量 MCP stdio server（用于 MCP story 功能性测试）：`ux-rtws/mcp/env-var-echo-mcp-server.js`（工具名 `env_echo`）。
-- [owner:@ux] 已为 dev-server(rtws=`ux-rtws/`) 创建 `ux-rtws/.minds/mcp.yaml`：仅注册轻量 `env_echo`，用于 `ux-stories/mcp-toolset.md`，避免把 Playwright 等重量级 MCP server 作为测试目标。
-- [owner:@ux] 已更新并现代化 `ux-stories/*.md`（4 篇统一模板）：补齐 hard constraints / round rules（单篇 Fail 继续跑完其它 story；每轮开始先 `./dev-server.sh prep`）/ ops-only recovery actions / Pass rule，并把已知问题显式化以便稳定复跑。
-- [owner:@ux] 已把“每轮标准整备动作”固化为工具：`./dev-server.sh prep`（`clear-records + restart`）并写入 `ux-stories` 与测试指南。
-- [owner:@ux] `docs/webui-testing-guide.md` 已重写为英文版本（去翻译腔、讲清硬规则/整备/回贴/门禁），并与 `ux-stories` 口径一致。
+## Progress
 
-已跑通的单篇回归：
-- [owner:@ux] story3（`ux-stories/mcp-toolset.md`）在标准整备后复跑：结论 Pass；Tools/Problems 面板可用；`env_echo` MCP tool call 可见且完成。
+范围与口径（v1）
+- [owner:@ux] v1 UX 主口径：`docs/webui-ux-testability-v1.md`（覆盖面 in/out-scope + MUST/SHOULD + 稳定标识规范 + 回归包映射缺口）。
+- [owner:@ux] v1 可分派卡片（含 PR 切片计划）：`ux-issues/webui-testability-v1-cards.md`（PR-1..PR-4 对应 Story2/1/3/5 的 P0 闭环）。
+- [owner:@ux] v0 原则与初始 backlog：`ux-issues/webui-testability-overhaul.md`。
 
-2026-02-09 专项复测（story1+story2）：
-- [owner:@ux] `@browser_tester` 起初 **Blocked**（Playwright 侧访问 `localhost:5555/5556`、`127.0.0.1` 对应端口均 `ERR_CONNECTION_REFUSED`），已先释放租约避免占用：`mcp_release({"serverId":"playwright"})`。
-- [owner:@ux] `@cmdr` 随后已执行 `./dev-server.sh prep`，并验证 `http://localhost:5555/`（frontend）与 `http://localhost:5556/`（backend）均 HTTP 200（rtws=`ux-rtws/`）。
-- [owner:@ux] story1（`ux-stories/new-dialog-create-modal-regression.md`）专项复测结论 **Pass**：触发确定性 toast（例如点击“复制链接”触发“链接已复制。”）后，顶部“通知历史”非空且包含新触发记录；关闭再打开仍在。
-- [owner:@ux] story2（`ux-stories/dlg-stop-resume.md`）专项复测结论 **Pass**：对话内继续/顶部紧急停止 + 全局“全部继续”路径下，`全部继续` 计数可从 1 → 0 正常归零（本次专项未做跨 tab 校验）。
-- [owner:@ux] `@browser_tester` 收尾释放租约：`mcp_release({"serverId":"playwright2"})`。
+回归 suite（单一来源）
+- [owner:@ux] suite 顺序：`ux-stories/README.md`（Story0..5）。
+- [owner:@ux] 新增抓手：Story0 `ux-stories/setup-smoke.md`（/setup）、Story5 `ux-stories/q4h-panel-input.md`（Ask→Select→Answer）。
+- [owner:@ux] 测试指南：`docs/webui-testing-guide.md`（指向 suite README 的 canonical 顺序）。
 
-2026-02-09 story4 单跑（`ux-stories/work-ui-lang.md`）：
-- [owner:@ux] `@cmdr` 执行 `./dev-server.sh prep` exit_code=0，并验证 `http://localhost:5555/` 与 `http://localhost:5556/` 均 HTTP 200（rtws=`ux-rtws/`）。
-- [owner:@ux] `@browser_tester` 回贴结论 **Pass**：UI language 下拉可见；中英切换生效且刷新后持久化；创建/选择对话后发送消息不导致 UI language 回退。
-- [owner:@ux] 记录一个可绕过的小交互点：一次出现“发送”按钮短暂不可用（对话运行中态），点击输入区旁“⌘”按钮后恢复可发送（需后续观察是否应优化）。
-- [owner:@ux] `@browser_tester` 收尾释放租约：`mcp_release({"serverId":"playwright"})`；并额外释放 `mcp_release({"serverId":"playwright2"})` 以避免残留占用。
+关键决策：跨 tab/跨客户端一致性模型
+- [owner:@ux] 以 **后端事件推送** 为唯一来源（等价跨机器客户端同步），**不做任何前端 tab 间通信机制**（已写入 `docs/webui-ux-testability-v1.md`、`ux-issues/webui-testability-v1-cards.md`，并在 story2 增补说明）。
 
-Next:
-- [owner:@ux] 组织 `@browser_tester` 在同一套 `ux-stories` steps 下跑“连续 2 轮”全套 4 篇（每轮开始允许 1 次 `prep` 整备；中途频繁恢复不计入达标），并回贴每篇 `Pass/Fail/Blocked` + 关键发现。
-- [owner:@ux] 两轮均达标后，向 `@human` 诉请验收封板。
+已知阻塞点与修复状态（Story2 / Resume all）
+- [owner:@ux] 2026-02-09 Round 1（两轮窗口）结果：story1 Pass、story2 Fail、story3 Pass、story4 Pass；因此 Round 1 不计入达标。
+- [owner:@ux] story2 Fail 点：全局 `Resume all` 计数未能稳定归零且跨 tab 不一致（未满足“归零 + 5s 内一致”gate）。
+- [owner:@ux] issue：`ux-issues/resume-all-cross-tab-sync.md`。
+
+实现推进（PR-1 / Story2 稳定化）
+- [owner:@ux] `@fullstack` 已落盘 PR-1（Story2 稳定化）相关改造（主要触达 `dominds/webapp/src/components/dominds-app.tsx`、`dominds/webapp/src/components/dominds-q4h-input.ts`、`dominds/webapp/src/i18n/ui.ts`）。
+- [owner:@ux] 2026-02-10 `@cmdr` 代跑类型检查通过：`pnpm -C dominds run lint:types` exit code 0（`tsc -p main/tsconfig.json --noEmit && tsc -p webapp/src/tsconfig.json --noEmit`）。
+
+可测试性增强（已落地一项）
+- [owner:@ux] Story1 toast 触发定位已从“依赖 tooltip 文案”改为稳定定位：优先使用 dialog list icon button 的 `data-action="dialog-share-link"`（见 `ux-stories/new-dialog-create-modal-regression.md`）。
+
+环境可用性确认（避免验收启动阻塞）
+- [owner:@ux] `browser_tester` 成员已存在：`.minds/team.yaml`。
+- [owner:@ux] Playwright MCP toolset（stdio）已配置：`.minds/mcp.yaml`（`playwright` / `playwright2`）。
+
+Next（重开对话后继续）
+- [owner:@ux] 续推 `@fullstack` 按 `ux-issues/webui-testability-v1-cards.md` 的 PR-1→PR-4 顺序继续落地（每个 PR 合并后先跑 1 次单轮 smoke）。
+- [owner:@ux] 在 PR-1 后执行：`@cmdr` 跑 `./dev-server.sh prep` + 5555/5556 可达验证 → `@browser_tester` 先跑 1 轮 suite（Story0..5），重点复核 Story2 gates；稳定后再重启“两轮连续验收窗口”。

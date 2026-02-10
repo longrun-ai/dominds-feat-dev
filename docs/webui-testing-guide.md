@@ -102,7 +102,9 @@ If you exceed the budget (or need the same recovery repeatedly), the round does 
 
 ### Phase B: Execute
 
-Run the four stories in `ux-stories/*.md` in order. Follow each story’s constraints, steps, and binary gates.
+Run the suite in the canonical order defined in `ux-stories/README.md`. Follow each story’s constraints, steps, and binary gates.
+
+Note: some toolbar controls use intentional “click target semantics”. For example, `Emergency stop` / `Resume all` may be implemented as an icon `<button>` inside a display-only “pill” that also shows a count. Always follow the current story instructions for what is clickable.
 
 ### Phase C: Report
 
@@ -181,6 +183,10 @@ If you need the smallest reliable smoke check, use this sequence:
 
 - Mitigation: rely on explicit “visible/interactive” states and keep recovery to “one re-check + one retry”.
 
+### 8.5 Environment build mismatch (WebUI not updated)
+
+If a story expects specific stable IDs / DOM structure (e.g. stop/resume toolbar controls split into icon button + count span), but the UI you see does not match (missing IDs, wrong click targets), treat the run as `Blocked` due to environment build mismatch.
+
 ## 9) Binary acceptance gates (G1–G8)
 
 - G1: A new dialog can be created and becomes input-ready.
@@ -219,10 +225,12 @@ Copy/paste and fill this in:
 
 #### Per-story results
 
+- Story 0 (`ux-stories/setup-smoke.md`): Pass / Fail / Blocked
 - Story 1 (`ux-stories/new-dialog-create-modal-regression.md`): Pass / Fail / Blocked
 - Story 2 (`ux-stories/dlg-stop-resume.md`): Pass / Fail / Blocked
 - Story 3 (`ux-stories/mcp-toolset.md`): Pass / Fail / Blocked
 - Story 4 (`ux-stories/work-ui-lang.md`): Pass / Fail / Blocked
+- Story 5 (`ux-stories/q4h-panel-input.md`): Pass / Fail / Blocked
 
 #### Key findings (1–5)
 

@@ -60,7 +60,9 @@ Ops-only recovery actions (allowed; record if used):
 
 6. Toast + notification history (regression gate)
 
-- Trigger a deterministic toast: in the dialog list row, click the `Copy link` / `复制链接` icon button (tooltip text).
+- Trigger a deterministic toast: in the dialog list row, click the share/copy-link icon button.
+  - Preferred stable locator: the icon button with `data-action="dialog-share-link"`.
+  - If you cannot find any `data-action="dialog-share-link"` button in the dialog list, treat it as **environment build mismatch** (or missing testability hook) and mark `Blocked`.
 - Expect: a toast appears (`Link copied` / `链接已复制` OR `Copy failed` / `复制失败`).
 - Open notification history (header button tooltip `Notification history` / `通知历史`).
 - Expect: history is **not empty**, and includes the most recent toast message.

@@ -2,6 +2,9 @@
 
 Scope: dialog Stop/Resume controls + global operator controls + cross-tab sync.
 
+Note (Dominds sync model): cross-client consistency must be achieved via backend event push only.
+Do not add or rely on any browser-local tab-to-tab communication mechanisms.
+
 Hard constraints:
 
 - NO HTTP/WS API direct calls.
@@ -44,7 +47,10 @@ Ops-only recovery actions (allowed; record if used):
 
 5. Start another long response, then click toolbar Emergency Stop.
    - Expect: streaming stops and the global resume count increases.
-   - Note: click the icon inside the button; clicking the count text may not trigger the action.
+   - Note (click target semantics): click the **icon button** `#toolbar-emergency-stop`.
+     - Do NOT click the pill container `#toolbar-emergency-stop-pill` (display-only).
+     - Do NOT click the count text `#toolbar-emergency-stop-count` (display-only).
+   - Keyboard spot-check (do once per round): Tab focus to `#toolbar-emergency-stop`, then press Enter/Space to open the confirm dialog.
    - Emergency Stop only works when proceeding count > 0.
    - Confirm the Emergency Stop dialog; cancel is a no-op.
    - If output continues beyond ~5s after confirm and resume count stays 0, treat as a bug.
@@ -54,6 +60,10 @@ Ops-only recovery actions (allowed; record if used):
 6. Click toolbar Resume All.
    - Expect: the interrupted dialog resumes.
    - Expect: resumable count decreases; **should** reach 0 when all dialogs are resumed.
+   - Note (click target semantics): click the **icon button** `#toolbar-resume-all`.
+     - Do NOT click the pill container `#toolbar-resume-all-pill` (display-only).
+     - Do NOT click the count text `#toolbar-resume-all-count` (display-only).
+   - Keyboard spot-check (do once per round): Tab focus to `#toolbar-resume-all`, then press Enter/Space.
    - Resume All only works when resumable count > 0 and dialogs are in interrupted state.
 
 7. In the second tab, observe stop/resume state.
@@ -65,6 +75,7 @@ Ops-only recovery actions (allowed; record if used):
 - If the testee refuses or calls tools instead, mark as testee non-cooperation (not a UI defect) and stop this story.
 - If Stop/Resume controls do not appear, refresh once and repeat steps 1-4.
 - If cross-tab state does not update, wait 5s and refresh the second tab once.
+- If you cannot find/click `#toolbar-emergency-stop` / `#toolbar-resume-all` (or the new `*-pill` / `*-count` IDs), treat it as **environment build mismatch** (outdated UI build not yet effective). Record as `Blocked` and stop this story.
 
 ## Optional Evidence (Fail/Blocked only)
 
@@ -79,8 +90,9 @@ Ops-only recovery actions (allowed; record if used):
 - Emergency Stop halts streaming and increases the resume count.
 - Resume All resumes output.
 - Resume count reaches 0 after all resumable dialogs are resumed.
+- Emergency Stop / Resume All icon buttons are keyboard accessible: Tab focuses `#toolbar-emergency-stop` / `#toolbar-resume-all`, Enter/Space activates (Emergency Stop shows confirm).
 - Second tab reflects stop/resume state within 5s.
 
 Pass rule: all gates must pass. Any failure => Fail.
 
-Known issue (as of 2026-02-09): global `Resume all / 全部继续` count may not return to 0 even though the dialog resumes. If observed, mark **Fail (resume count gate)** and continue to the next story.
+Known issue (historical; observed 2026-02-09): global `Resume all / 全部继续` count may not return to 0 even though the dialog resumes. If observed, mark **Fail (resume count gate)** and continue to the next story.

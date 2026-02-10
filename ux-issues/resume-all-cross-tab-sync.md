@@ -3,7 +3,7 @@
 ## Status (updated: 2026-02-10)
 
 - Direction corrected and implemented.
-- Current state: **code fix landed in workspace**, gate re-validation pending manual 2-tab UX run.
+- Current state: **PR-1 code fix landed in workspace**, typecheck passed; gate re-validation pending manual 2-tab UX run.
 
 ## Direction correction
 
