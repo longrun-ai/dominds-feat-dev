@@ -2,21 +2,16 @@
 
 ## 0. 当前状态（2026-02-11）
 
-1. `func_result`“临时态 -> 正式态替换”已做前置实测验证（基于 `codex-auth` 的 Responses API 探针）。
-2. 探针结论：同一 `call_id` 在“每轮仅注入一个有效 result”的前提下可稳定工作。
-3. 已确认迁移策略更新：先删除 dlg driver v1，再推进 tellask 函数化改造。
-4. 已确认语法债处理：`tellasker streaming parser` 及其 `!?@...` 流式解析链路在本次改造中可彻底移除，不保留历史兼容。
-5. 执行顺序调整：为保证重构中段可持续编译/测试通过，parser 删除延后到收尾阶段执行。
-6. Phase 0 进展：v1 driver 主文件已删除，`driver-entry` 已固定 v2，v1 parity/engine-switch 测试脚本已移除。
-7. Phase B 进展（已完成）：driver-v2 已接入 tellask-special 函数通道（`tellaskBack`/`tellask`/`tellaskSessionless`/`askHuman`），并实现 special call 的 `func_result` 动态上下文投影（pending 不持久化、按 callId 投影临时态/正式态）。
-8. 运行时切换进展：driver-v2 主链路已停止“执行”文本 `!?@...` 诉请，诉请触发入口仅剩函数调用（文本链路只保留收尾待删的 parser 相关展示/诊断遗留）。
-9. 持久化与回放进展：tellask-special 调用已持久化为 `func_call_record`，回放时按 special 函数重建 `teammate_call_*` 事件，不复用 generic function-call UI。
-10. 清理进展：`executeTellaskCalls`（parser 输入入口）已删除，保留 tellask-special executor；相关 driver-v2 集成用例已改为 function-call 触发并通过。
-11. 尾项待清理：`TellaskStreamParser` 仍存在于 agent-priming/diag 与 tellask 专项测试；属于收尾删除范围，不再影响 driver-v2 主运行时链路。
-12. 类型债清理进展：`UserTextGrammar` 已删除，用户输入语法已收敛为 `markdown`（不再存在 `grammar: 'tellask'` 分支）。
-13. 协议收敛进展：`tellask_result_msg` 已迁移为 `mentionList + tellaskContent`，不再依赖 `tellaskHead`。
-14. 语义分流进展：tellask-special executor 已以函数名分流（`tellaskBack` / `tellask` / `tellaskSessionless` / `askHuman`），不再依赖 `tellasker/human` 特殊 id 路由。
-15. 提示词收敛进展：主系统提示中的 tellask 参数语义已更新为 `targetAgentId/sessionSlug/tellaskContent`，并明确禁止 `!?@...` 文本诉请通道。
+1. `func_result`“临时态 -> 正式态替换”已做前置实测验证（`codex-auth` / Responses API 探针），并确认可行。
+2. 探针结论固化：同一 `call_id` 采用“上下文组装时动态投影 + 每轮仅一个有效 result”可稳定工作。
+3. v1 driver 已删除，`driver-entry` 固定 v2，v1 parity/engine-switch 脚本已移除。
+4. driver-v2 tellask-special 通道已落地：`tellaskBack` / `tellask` / `tellaskSessionless` / `askHuman`。
+5. tellask-special 执行入口已重构为函数参数直驱（`mentionList + tellaskContent + callId + callKind`），不再保留 `firstMention/tellaskHead` 形状。
+6. 语义分流已完全由函数名决定；不再依赖 `tellasker/human` 特殊 id。
+7. 协议字段已收敛为 `mentionList + tellaskContent`；`tellaskHead` 已从运行时主链路移除。
+8. `tellasker streaming parser` 及 `!?@...` 文本诉请链路已彻底删除（含 `main/tellask.ts`、diag parser 工具、对应专项测试）。
+9. 提示词与模型可见文案已收敛到函数工具语义，不再出现 `!?@...` 文本诉请语法。
+10. 关键验证已通过：`lint:types`、`driver-v2:integration`、`tellask:typeb-registered-dedupe`。
 
 ## 1. 目标与边界
 
@@ -93,12 +88,12 @@
 3. 删除测试中所有 v1 parity / engine-switch 脚本与用例。
 4. 清理文档中“可切换到 v1”的描述，统一为 v2 基线。
 
-## 3.1.2 tellasker streaming parser 删除范围（显式清单，收尾阶段执行）
+## 3.1.2 tellasker streaming parser 删除范围（显式清单，已完成）
 
-1. 删除 `TellaskStreamParser` 与 `!?@...` 行语法解析依赖链。
-2. 删除仅用于该 parser 的流式事件桥接代码与对应测试。
-3. 将 tellask 触发入口统一为函数工具调用，不再接受文本诉请语法作为调用通道。
-4. 历史解析兼容、回放兼容不保留。
+1. 已删除 `TellaskStreamParser` 与 `!?@...` 行语法解析依赖链。
+2. 已删除仅用于该 parser 的流式事件桥接代码与对应测试。
+3. tellask 触发入口已统一为函数工具调用，不再接受文本诉请语法作为调用通道。
+4. 历史解析兼容、回放兼容不保留（按既定决策执行）。
 
 ## 3.2 tellask 函数定义与参数约束
 
@@ -196,18 +191,18 @@
 1. 在 `auth-doctor.ts` 增加 `func_result` 临时->正式替换探针。
 2. 验证 Responses API 可行性并沉淀结果（结论：可行）。
 
-### Phase B: 后端主改造
+### Phase B: 后端主改造（已完成）
 
 1. v2-only 化与 tellask-special channel 接入。
 2. tellask 家族函数 schema 与执行管线接入（`tellaskBack`/`tellask`/`tellaskSessionless`/`askHuman`）。
 3. context 动态注入层实现 + 持久化规则重构。
 
-### Phase C: 协议与前端
+### Phase C: 协议与前端（已完成）
 
 1. 事件与深链改造。
 2. tellask UI pending/settled 切换实现。
 
-### Phase D: Prompt/文档/测试收口
+### Phase D: Prompt/文档/测试收口（已完成）
 
 1. 提示词迁移与 i18n 对齐。
 2. 测试矩阵补齐与回归。
@@ -224,7 +219,7 @@
 6. 并发 tellask 无 callId 串扰、无时序错配。
 7. v1 代码路径已删除，类型检查与关键回归通过。
 
-## 7. 建议的首批改造顺序（实施优先级）
+## 7. 实际执行顺序（已完成）
 
 1. 删除 v1 driver 与入口切换（固定 v2）。
 2. driver-v2 tellask-special channel + callId 统一。
