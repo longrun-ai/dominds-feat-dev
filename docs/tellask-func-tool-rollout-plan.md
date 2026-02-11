@@ -7,6 +7,16 @@
 3. 已确认迁移策略更新：先删除 dlg driver v1，再推进 tellask 函数化改造。
 4. 已确认语法债处理：`tellasker streaming parser` 及其 `!?@...` 流式解析链路在本次改造中可彻底移除，不保留历史兼容。
 5. 执行顺序调整：为保证重构中段可持续编译/测试通过，parser 删除延后到收尾阶段执行。
+6. Phase 0 进展：v1 driver 主文件已删除，`driver-entry` 已固定 v2，v1 parity/engine-switch 测试脚本已移除。
+7. Phase B 进展（已完成）：driver-v2 已接入 tellask-special 函数通道（`tellaskBack`/`tellask`/`tellaskSessionless`/`askHuman`），并实现 special call 的 `func_result` 动态上下文投影（pending 不持久化、按 callId 投影临时态/正式态）。
+8. 运行时切换进展：driver-v2 主链路已停止“执行”文本 `!?@...` 诉请，诉请触发入口仅剩函数调用（文本链路只保留收尾待删的 parser 相关展示/诊断遗留）。
+9. 持久化与回放进展：tellask-special 调用已持久化为 `func_call_record`，回放时按 special 函数重建 `teammate_call_*` 事件，不复用 generic function-call UI。
+10. 清理进展：`executeTellaskCalls`（parser 输入入口）已删除，保留 tellask-special executor；相关 driver-v2 集成用例已改为 function-call 触发并通过。
+11. 尾项待清理：`TellaskStreamParser` 仍存在于 agent-priming/diag 与 tellask 专项测试；属于收尾删除范围，不再影响 driver-v2 主运行时链路。
+12. 类型债清理进展：`UserTextGrammar` 已删除，用户输入语法已收敛为 `markdown`（不再存在 `grammar: 'tellask'` 分支）。
+13. 协议收敛进展：`tellask_result_msg` 已迁移为 `mentionList + tellaskContent`，不再依赖 `tellaskHead`。
+14. 语义分流进展：tellask-special executor 已以函数名分流（`tellaskBack` / `tellask` / `tellaskSessionless` / `askHuman`），不再依赖 `tellasker/human` 特殊 id 路由。
+15. 提示词收敛进展：主系统提示中的 tellask 参数语义已更新为 `targetAgentId/sessionSlug/tellaskContent`，并明确禁止 `!?@...` 文本诉请通道。
 
 ## 1. 目标与边界
 
@@ -16,20 +26,22 @@
 
 1. 让原生支持 function/tool calling 的模型更稳定地产生正确诉请调用。
 2. 保留 tellask 编排语义（并发、互斥锁、可挂起与恢复、支线生命周期）而非降级为普通工具执行。
-3. 统一协议语义：tellask 系列进入“特殊工具通道”，但执行器仍为 `executeTellaskCalls`。
+3. 统一协议语义：tellask 系列进入“特殊工具通道”，由 tellask-special executor 处理，不再依赖文本 parser 入口。
 
 ### 1.2 已确认决策（按你的结论固化）
 
-1. 不使用 `executeFunctionCalls` 执行诉请；继续保留并强化 `executeTellaskCalls`。
-2. `tellaskBack` 可牺牲，默认不保留回问能力。
+1. 不使用 generic `executeFunctionCalls` 执行诉请；诉请由 tellask-special executor 独立处理（已移除 parser 入口 `executeTellaskCalls`）。
+2. 保留 `tellaskBack`，Type A 回问改为独立函数，不再依赖特殊 target id。
 3. 前端与深链单独改造，不复用现有函数调用 UI。
 4. 历史兼容可放弃（旧记录可丢弃/不迁移）。
 5. tellask 仍并发执行，互斥锁机制保留。
 6. `func_result` 采用“动态注入临时态 -> 后续替换为正式态”技术路线。
-7. tellask 家族函数拆分：`tellask`、`tellaskSessionless`、`askHuman`（由 `@human` 改名而来）。
+7. tellask 家族函数拆分：`tellaskBack`、`tellask`、`tellaskSessionless`、`askHuman`。
 8. v1 driver 可删除，迁移基于 v2。
 9. `callId` 统一来自模型函数调用 `call_id`。
 10. `tellasker streaming parser`（含 `!?@...` 行语法解析与相关回放路径）本次直接删除，不保留兼容层。
+11. 不再使用 `tellasker` / `human` 特殊 id 进行语义分流，统一由函数名区分语义与执行路径。
+12. `tellaskBack` 能力仅在 FBR 的“技术性禁用函数工具”场景下受限；在正常支线（函数工具可用）中保持完整可用。
 
 ### 1.3 非目标
 
@@ -41,9 +53,11 @@
 ### 2.1 架构策略
 
 1. 输入侧：提示词与工具定义引导模型输出 tellask 系列 function call。
-2. 执行侧：在 driver-v2 中识别 tellask 系列函数，走专用 `executeTellaskCalls` 管线。
+2. 执行侧：在 driver-v2 中识别 tellask 系列函数，走专用 tellask-special executor。
 3. 上下文侧：不持久化“临时 `func_result`”，仅在组装上下文时按 pending 状态动态注入。
 4. 展示侧：前端仍用 tellask 专属 UI/事件链路，不复用 generic function-call 组件。
+5. 语义分流：Type A/B/C/Q4H 均由函数名决定，不再通过 `@tellasker` / `@human` 这类特殊 mention 解析。
+6. 能力边界：FBR 若因策略进入“禁函数工具”模式，将连带无法发起 `tellaskBack`；除此之外不损失回问能力。
 
 ### 2.2 `func_result` 动态注入（核心）
 
@@ -64,7 +78,8 @@
 1. 删除/下线 v1 driver 入口与依赖引用，确保运行时只走 v2（作为第一步）。
 2. 在 v2 tool call 分发中新增 tellask-special channel：
    - tellask 家族函数命中后，不进入 generic `executeFunctionCalls`。
-   - 转入 `executeTellaskCalls`，保留 suspend/subdialog/queue 编排语义。
+   - 转入 tellask-special executor，保留 suspend/subdialog/queue 编排语义。
+   - 由函数名直接选择分支：`tellaskBack`(Type A)、`tellask`(Type B)、`tellaskSessionless`(Type C)、`askHuman`(Q4H)。
 3. `callId` 映射策略：
    - 统一使用模型提供的 `call_id` 作为跨层关联主键。
    - 移除 tellask 语法时代的本地 callId 生成路径。
@@ -88,6 +103,7 @@
 ## 3.2 tellask 函数定义与参数约束
 
 1. 新函数集合：
+   - `tellaskBack`
    - `tellask`
    - `tellaskSessionless`
    - `askHuman`
@@ -121,9 +137,10 @@
 ## 3.5 Prompt 与语义规范
 
 1. system prompt 移除 tellask 诉请语法说明。
-2. 明确 tellask 家族函数的使用条件、参数字段、并发行为。
-3. 对 `askHuman` 给出触发规则（何时必须回到人类）。
-4. zh 语义为基准，同步 en 文案，不反向翻译 zh。
+2. 明确 tellask 家族函数的使用条件、参数字段、并发行为（含 `tellaskBack` 仅用于回问上游对话）。
+3. 明确 FBR 特例：若当前回合策略禁用函数工具，`tellaskBack` 属于已知技术性不可用能力，并在提示词中显式告知。
+4. 对 `askHuman` 给出触发规则（何时必须回到人类）。
+5. zh 语义为基准，同步 en 文案，不反向翻译 zh。
 
 ## 3.6 测试体系
 
@@ -182,7 +199,7 @@
 ### Phase B: 后端主改造
 
 1. v2-only 化与 tellask-special channel 接入。
-2. tellask 家族函数 schema 与执行管线接入。
+2. tellask 家族函数 schema 与执行管线接入（`tellaskBack`/`tellask`/`tellaskSessionless`/`askHuman`）。
 3. context 动态注入层实现 + 持久化规则重构。
 
 ### Phase C: 协议与前端
@@ -200,10 +217,12 @@
 ## 6. 验收标准（DoD）
 
 1. 模型在无 tellask 语法提示的情况下可稳定使用 tellask 家族函数完成诉请。
-2. 支线未完成时主线可继续；上下文中仅有临时有效 result。
-3. 支线完成后后续轮次自动呈现正式 result，且替换关系正确。
-4. 并发 tellask 无 callId 串扰、无时序错配。
-5. v1 代码路径已删除，类型检查与关键回归通过。
+2. Type A 回问仅通过 `tellaskBack`，不再依赖 `@tellasker` 特殊 id。
+3. 在正常支线（函数工具可用）中，`tellaskBack` 可用且行为正确；在 FBR 禁函数工具模式下有清晰可见的受限提示。
+4. 支线未完成时主线可继续；上下文中仅有临时有效 result。
+5. 支线完成后后续轮次自动呈现正式 result，且替换关系正确。
+6. 并发 tellask 无 callId 串扰、无时序错配。
+7. v1 代码路径已删除，类型检查与关键回归通过。
 
 ## 7. 建议的首批改造顺序（实施优先级）
 
