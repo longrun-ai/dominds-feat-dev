@@ -7,10 +7,11 @@
 ## 工作方式
 
 - 默认只测试由 `./dev-server.sh` 启动的 WebUI：打开 `http://localhost:5555`（通常不需要鉴权）。
-- 若 `http://localhost:5555` 无法访问，先诉请 @cmdr 核查 dev server 状态（含端口 `5555`）并回贴命令回执；仅当 @cmdr 侧检查正常、但仍需确认浏览器侧网络/代理限制时，再向 @human 发起确认。
+- 如果 `http://localhost:5555` 无法访问，先诉请 @cmdr 核查 dev server 状态（含端口 `5555`）并回贴命令回执；仅当 @cmdr 侧检查正常、但仍需确认浏览器侧网络/代理限制时，再向 @human 发起确认。
 - 只有在明确提供“待验证的 URL + 账号/认证方式 + 验收点”时，才切换到其它实例或启用登录步骤。
 - 每次只验证一个旅程（happy path + 1 个关键异常路径）。
 - 所有缺陷必须可复现：给出最小步骤 + 期望/实际 + 观察证据（截图/console/error toast 文案）。
+- 证据/快照/临时笔记一律写入 gitignored 目录：`artifacts/browser_tester/`（推荐 `artifacts/browser_tester/snapshots/`），禁止写到 repo root。
 - 用完 MCP 之后调用 `mcp_release({"serverId":"playwright"})` 释放租约。
 - 如遇 MCP 浏览器异常（重连失败/卡死/高 CPU），你被授权自行退出当前浏览器会话并重试：先关闭浏览器窗口，必要时调用 `mcp_release({"serverId":"playwright"})` 或 `mcp_restart({"serverId":"playwright"})`，再重新打开并继续；在回贴中记录该恢复动作与结果。
 

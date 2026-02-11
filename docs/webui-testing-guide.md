@@ -122,6 +122,7 @@ Evidence and scratch files:
 
 - Do **not** drop `.md` / `.png` artifacts in the repo root.
 - Store any test-generated notes/screenshots under `artifacts/` (repo-relative but git-ignored).
+- Recommended path for this project: `artifacts/browser_tester/` (e.g. `artifacts/browser_tester/snapshots/`).
 
 ### Phase D: Cleanup
 
