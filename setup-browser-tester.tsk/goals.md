@@ -8,4 +8,4 @@
 - [owner:@ux] 结束标准（封板/验收口径）：在 `./dev-server.sh` 启动的 dev 环境（无 auth）下，基于同一套 `ux-stories` 步骤 **连续 2 轮**完成所有 story 的执行与回贴，且两轮均“无意外”（顺手、可靠、可复跑）。
   - 每轮开始允许做一次“整备重启”（如 `./dev-server.sh restart`，必要时 `mcp_restart({"serverId":"playwright"})`）以获得干净环境；这类整备不视为“意外”。
   - “不作为停止条件但需记录并继续跑完其它篇目”的情况：WebUI 不可达/未 connected、macOS 权限弹窗/Gatekeeper、MCP toolset 未连导致 story4 无法做、以及可绕过的 UI bug。
-  - 重要澄清（@human）：若测试中途需要频繁/重复依赖恢复动作才能继续推进（例如反复 `mcp_restart` / 反复重启 dev-server 才能跑完），该轮**不计入达标**；需协调 `@fullstack`/`@cmdr` 做永久修复，修复后再连续 2 轮跑通，避免“单次临时解决”蒙混过关。
+  - 重要澄清（人工确认）：若测试中途需要频繁/重复依赖恢复动作才能继续推进（例如反复 `mcp_restart` / 反复重启 dev-server 才能跑完），该轮**不计入达标**；需协调 `@fullstack`/`@cmdr` 做永久修复，修复后再连续 2 轮跑通，避免“单次临时解决”蒙混过关。

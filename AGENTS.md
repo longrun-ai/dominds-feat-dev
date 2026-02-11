@@ -34,7 +34,7 @@ For WebUI dev/UX testing, `./dev-server.sh` runs Dominds with `ux-rtws/` as the 
 - **严禁吞错**: do not silently absorb exceptions, silently deduplicate, or silently downgrade behavior in invariant/consistency failures.
 - **When the program encounters unreasonable scenarios, fail fast instead of covering them with fallback**: for example duplicate IDs, duplicate call correlation, or stream ordering violations must raise explicit errors and stop unsafe paths.
 - **Loud diagnostics are mandatory**: emit user-visible/runtime-visible signals (for example `stream_error_evt`) and structured logs with stable correlation fields (`rootId`, `selfId`, `course`, `genseq`, `callId`, `questionId` when applicable).
-- **No silent fallback paths** unless @human explicitly asks for graceful degradation; even then, retain explicit warning/error signals for debuggability.
+- **No silent fallback paths** unless a human explicitly asks for graceful degradation; even then, retain explicit warning/error signals for debuggability.
 
 ## TypeScript Purist Principles
 
