@@ -6,18 +6,18 @@
 2. 探针结论固化：同一 `call_id` 采用“上下文组装时动态投影 + 每轮仅一个有效 result”可稳定工作。
 3. v1 driver 已删除，`driver-entry` 固定 v2，v1 parity/engine-switch 脚本已移除。
 4. driver-v2 tellask-special 通道已落地：`tellaskBack` / `tellask` / `tellaskSessionless` / `askHuman`。
-5. tellask-special 执行入口已重构为函数参数直驱（`mentionList + tellaskContent + callId + callKind`），不再保留 `firstMention/tellaskHead` 形状。
+5. tellask-special 执行入口已重构为函数参数直驱（`mentionList + tellaskContent + callId + callKind`），不再保留 `旧解析字段组合` 形状。
 6. 语义分流已完全由函数名决定；不再依赖 `tellasker/human` 特殊 id。
-7. 协议字段已收敛为 `mentionList + tellaskContent`；`tellaskHead` 已从运行时主链路移除。
-8. `tellasker streaming parser` 及 `!?@...` 文本诉请链路已彻底删除（含 `main/tellask.ts`、diag parser 工具、对应专项测试）。
-9. 提示词与模型可见文案已收敛到函数工具语义，不再出现 `!?@...` 文本诉请语法。
+7. 协议字段已收敛为 `mentionList + tellaskContent`；`旧诉请头字段` 已从运行时主链路移除。
+8. `tellasker streaming parser` 及 `旧文本诉请语法` 文本诉请链路已彻底删除（含 `main/tellask.ts`、diag parser 工具、对应专项测试）。
+9. 提示词与模型可见文案已收敛到函数工具语义，不再出现 `旧文本诉请语法` 文本诉请语法。
 10. 关键验证已通过：`lint:types`、`driver-v2:integration`、`tellask:typeb-registered-dedupe`。
 
 ## 1. 目标与边界
 
 ### 1.1 目标
 
-将当前 tellask 诉请语法（`!?@...`）迁移为模型原生函数调用入口，核心目标：
+将当前 tellask 诉请语法（`旧文本诉请语法`）迁移为模型原生函数调用入口，核心目标：
 
 1. 让原生支持 function/tool calling 的模型更稳定地产生正确诉请调用。
 2. 保留 tellask 编排语义（并发、互斥锁、可挂起与恢复、支线生命周期）而非降级为普通工具执行。
@@ -34,7 +34,7 @@
 7. tellask 家族函数拆分：`tellaskBack`、`tellask`、`tellaskSessionless`、`askHuman`。
 8. v1 driver 可删除，迁移基于 v2。
 9. `callId` 统一来自模型函数调用 `call_id`。
-10. `tellasker streaming parser`（含 `!?@...` 行语法解析与相关回放路径）本次直接删除，不保留兼容层。
+10. `tellasker streaming parser`（含 `旧文本诉请语法` 行语法解析与相关回放路径）本次直接删除，不保留兼容层。
 11. 不再使用 `tellasker` / `human` 特殊 id 进行语义分流，统一由函数名区分语义与执行路径。
 12. `tellaskBack` 能力仅在 FBR 的“技术性禁用函数工具”场景下受限；在正常支线（函数工具可用）中保持完整可用。
 
@@ -51,7 +51,7 @@
 2. 执行侧：在 driver-v2 中识别 tellask 系列函数，走专用 tellask-special executor。
 3. 上下文侧：不持久化“临时 `func_result`”，仅在组装上下文时按 pending 状态动态注入。
 4. 展示侧：前端仍用 tellask 专属 UI/事件链路，不复用 generic function-call 组件。
-5. 语义分流：Type A/B/C/Q4H 均由函数名决定，不再通过 `@tellasker` / `@human` 这类特殊 mention 解析。
+5. 语义分流：Type A/B/C/Q4H 均由函数名决定，不再通过 `特殊 mention id` 这类特殊 mention 解析。
 6. 能力边界：FBR 若因策略进入“禁函数工具”模式，将连带无法发起 `tellaskBack`；除此之外不损失回问能力。
 
 ### 2.2 `func_result` 动态注入（核心）
@@ -90,7 +90,7 @@
 
 ## 3.1.2 tellasker streaming parser 删除范围（显式清单，已完成）
 
-1. 已删除 `TellaskStreamParser` 与 `!?@...` 行语法解析依赖链。
+1. 已删除 `TellaskStreamParser` 与 `旧文本诉请语法` 行语法解析依赖链。
 2. 已删除仅用于该 parser 的流式事件桥接代码与对应测试。
 3. tellask 触发入口已统一为函数工具调用，不再接受文本诉请语法作为调用通道。
 4. 历史解析兼容、回放兼容不保留（按既定决策执行）。
@@ -176,7 +176,7 @@
 
 ### R5. 移除 tellasker streaming parser 的连锁影响
 
-风险：前端事件、持久化回放、诊断工具中仍存在 `!?@...` 解析假设。  
+风险：前端事件、持久化回放、诊断工具中仍存在 `旧文本诉请语法` 解析假设。  
 对策：按“解析链路全删 + 函数调用链路全补”成对实施，禁止半迁移状态。
 
 ## 5. 分阶段执行计划
@@ -206,13 +206,13 @@
 
 1. 提示词迁移与 i18n 对齐。
 2. 测试矩阵补齐与回归。
-3. 删除 tellasker streaming parser 与 `!?@...` 语法通道相关代码/测试/文档。
+3. 删除 tellasker streaming parser 与 `旧文本诉请语法` 语法通道相关代码/测试/文档。
 4. 删除废弃代码与文档清理。
 
 ## 6. 验收标准（DoD）
 
 1. 模型在无 tellask 语法提示的情况下可稳定使用 tellask 家族函数完成诉请。
-2. Type A 回问仅通过 `tellaskBack`，不再依赖 `@tellasker` 特殊 id。
+2. Type A 回问仅通过 `tellaskBack`，不再依赖 `特殊 mention id` 特殊 id。
 3. 在正常支线（函数工具可用）中，`tellaskBack` 可用且行为正确；在 FBR 禁函数工具模式下有清晰可见的受限提示。
 4. 支线未完成时主线可继续；上下文中仅有临时有效 result。
 5. 支线完成后后续轮次自动呈现正式 result，且替换关系正确。
@@ -225,5 +225,5 @@
 2. driver-v2 tellask-special channel + callId 统一。
 3. context 动态注入实现（临时 result 注入与正式 result 替换）。
 4. 前端/深链改造（不复用 generic function-call UI）。
-5. 删除 tellasker streaming parser 与 `!?@...` 语法解析链。
+5. 删除 tellasker streaming parser 与 `旧文本诉请语法` 语法解析链。
 6. prompt 与测试收口，完成 provider 回归矩阵。
