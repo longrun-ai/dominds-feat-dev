@@ -13,8 +13,6 @@ logs/
 
 # Local test artifacts / scratch notes (store under `artifacts/`)
 /artifacts/
-/story*-after-*.md
-/story*-start*.md
 
 # Local checkout of the dominds repository (intentionally not tracked here)
 /dominds/
