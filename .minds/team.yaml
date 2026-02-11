@@ -46,7 +46,7 @@ members:
 
   i18n:
     provider: minimaxi.com-coding-plan
-    model: MiniMax-M2.1
+    model: MiniMax-M2.5
     name: 国际化专员 / i18n Specialist
     toolsets:
       - memory
@@ -62,7 +62,7 @@ members:
 
   prompt:
     provider: minimaxi.com-coding-plan
-    model: MiniMax-M2.1
+    model: MiniMax-M2.5
     model_params:
       anthropic:
         temperature: 0.2
