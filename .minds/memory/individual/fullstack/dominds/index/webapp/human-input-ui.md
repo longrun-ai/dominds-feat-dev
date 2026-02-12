@@ -16,5 +16,5 @@
   - `textarea.message-input` 自动高度：3–20 行（按行高计算）。手动拉高时 textarea 会随容器伸展。
   - send-on-enter 持久化：localStorage key=`dominds-send-on-enter`（'1' Enter 发送，'0' Enter 换行）。
 
-- Docs panel：`dominds/webapp/src/components/dominds-docs-panel.ts` 新增“团队管理手册”tab（`team-mgmt-toolset.md`）。
+- Docs panel：`dominds/webapp/src/components/dominds-docs-panel.ts` 新增“团队管理手册”tab（`team_mgmt-toolset.md`）。
 - i18n：UI 字符串集中在 `dominds/webapp/src/i18n/ui.ts`（新增 `keepGoingToggleAriaLabel`）。
