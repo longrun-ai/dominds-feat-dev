@@ -1,12 +1,23 @@
 member_defaults:
   diligence-push-max: 0
-  provider: codex
-  model: gpt-5.2
-  model_params:
-    codex:
-      reasoning_effort: high
+
+  # provider: codex
+  # # model: gpt-5.3-codex
+  # # model: gpt-5.2-codex
+  # model: gpt-5.2
+  # model_params:
+  #   codex:
+  #     reasoning_effort: high
+
   # provider: minimaxi.com-coding-plan
-  # model: MiniMax-M2.1
+  provider: minimaxi.com
+  model: MiniMax-M2.5
+  model_params:
+    anthropic:
+      temperature: 0.2
+  fbr_model_params:
+    anthropic:
+      temperature: 1.0
 
 default_responder: ux
 shell_specialists: cmdr
@@ -15,8 +26,8 @@ members:
   ux:
     name: UX 体验官 / Tooling UX Critic
     toolsets:
-      - "*"
-      - "!os"
+      - '*'
+      - '!os'
 
   cmdr:
     name: Commander (Shell Runner)

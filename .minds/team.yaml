@@ -1,12 +1,23 @@
 member_defaults:
   diligence-push-max: 0
-  provider: codex
-  # model: gpt-5.3-codex
-  # model: gpt-5.2-codex
-  model: gpt-5.2
+
+  # provider: codex
+  # # model: gpt-5.3-codex
+  # # model: gpt-5.2-codex
+  # model: gpt-5.2
+  # model_params:
+  #   codex:
+  #     reasoning_effort: high
+
+  # provider: minimaxi.com-coding-plan
+  provider: minimaxi.com
+  model: MiniMax-M2.5
   model_params:
-    codex:
-      reasoning_effort: high
+    anthropic:
+      temperature: 0.2
+  fbr_model_params:
+    anthropic:
+      temperature: 1.0
 
 default_responder: ux
 shell_specialists: cmdr
@@ -16,7 +27,7 @@ members:
     name: 浏览器测试员 / Browser Tester
     toolsets:
       - memory
-      - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
+      # - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
       - playwright
@@ -34,7 +45,7 @@ members:
     toolsets:
       - team_memory
       - memory
-      - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
+      # - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
@@ -45,12 +56,12 @@ members:
       - 'Regression/回归: 改动前后跑 `pnpm -C dominds run lint:types`/build/测试（按影响选择），并给出最小可复现步骤与验收点'
 
   i18n:
-    provider: minimaxi.com-coding-plan
-    model: MiniMax-M2.5
+    # provider: minimaxi.com-coding-plan
+    # model: MiniMax-M2.5
     name: 国际化专员 / i18n Specialist
     toolsets:
       - memory
-      - codex_style_tools # apply_patch + readonly_shell
+      # - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
@@ -61,18 +72,18 @@ members:
       - 'Regression/回归: 确保新增文案在 zh/en 同步；必要时请 @cmdr 代跑 lint/build/typecheck'
 
   prompt:
-    provider: minimaxi.com-coding-plan
-    model: MiniMax-M2.5
-    model_params:
-      anthropic:
-        temperature: 0.2
-    fbr_model_params:
-      anthropic:
-        temperature: 1.0
+    # provider: minimaxi.com-coding-plan
+    # model: MiniMax-M2.5
+    # model_params:
+    #   anthropic:
+    #     temperature: 0.2
+    # fbr_model_params:
+    #   anthropic:
+    #     temperature: 1.0
     name: 提示词专员 / Prompt Engineer
     toolsets:
       - memory
-      # - codex_style_tools # apply_patch + readonly_shell for prompt edits
+      # - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
@@ -88,7 +99,7 @@ members:
       - team-mgmt
       - team_memory
       - memory
-      - codex_style_tools # codex-rs style read/write tools, make chatgpt models feel home
+      # - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
