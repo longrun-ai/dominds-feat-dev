@@ -1,23 +1,23 @@
 member_defaults:
   diligence-push-max: 0
 
-  # provider: codex
-  # # model: gpt-5.3-codex
-  # # model: gpt-5.2-codex
+  provider: codex
+  model: gpt-5.3-codex
+  # model: gpt-5.2-codex
   # model: gpt-5.2
-  # model_params:
-  #   codex:
-  #     reasoning_effort: high
+  model_params:
+    codex:
+      reasoning_effort: high
 
   # provider: minimaxi.com-coding-plan
-  provider: minimaxi.com
-  model: MiniMax-M2.5
-  model_params:
-    anthropic:
-      temperature: 0.2
-  fbr_model_params:
-    anthropic:
-      temperature: 1.0
+  # provider: minimaxi.com
+  # model: MiniMax-M2.5
+  # model_params:
+  #   anthropic:
+  #     temperature: 0.2
+  # fbr_model_params:
+  #   anthropic:
+  #     temperature: 1.0
 
 default_responder: ux
 shell_specialists: cmdr
@@ -27,7 +27,7 @@ members:
     name: 浏览器测试员 / Browser Tester
     toolsets:
       - memory
-      # - codex_style_tools # readonly_shell/apply_patch/update_plan
+      - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
       - playwright
@@ -45,7 +45,7 @@ members:
     toolsets:
       - team_memory
       - memory
-      # - codex_style_tools # readonly_shell/apply_patch/update_plan
+      - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
@@ -61,7 +61,7 @@ members:
     name: 国际化专员 / i18n Specialist
     toolsets:
       - memory
-      # - codex_style_tools # readonly_shell/apply_patch/update_plan
+      - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
@@ -83,7 +83,7 @@ members:
     name: 提示词专员 / Prompt Engineer
     toolsets:
       - memory
-      # - codex_style_tools # readonly_shell/apply_patch/update_plan
+      - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
@@ -96,10 +96,10 @@ members:
   ux:
     name: UX 体验官 / UX Critic
     toolsets:
-      - team-mgmt
+      - team_mgmt
       - team_memory
       - memory
-      # - codex_style_tools # readonly_shell/apply_patch/update_plan
+      - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
