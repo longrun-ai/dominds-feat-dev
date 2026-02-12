@@ -1,5 +1,5 @@
 - [owner:@prompt] 2026-02-08：已完成对齐与落地：
-  - `readonly_shell` 命中 rtws root `.minds/` 的拒绝文案增加“team-mgmt/权限兜底”，`.dialogs/` 分支提示收敛为“子 rtws 复现”。
+  - `readonly_shell` 命中 rtws root `.minds/` 的拒绝文案增加“team_mgmt/权限兜底”，`.dialogs/` 分支提示收敛为“子 rtws 复现”。
   - `getAccessDeniedMessage()` 的 `.minds/**` 拒绝提示补齐同样兜底。
   - `update_plan` 的 `plan[].status` schema 补齐 `enum: [pending,in_progress,completed]`。
   - 系统提示中“严格匹配 schema”改为 best-effort 校验口径（zh/en 同步），并在 `codex_style_tools` 工具集文案前置硬拒绝点说明。
