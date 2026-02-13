@@ -1,0 +1,3 @@
+- [owner:@ux] 新建对话弹窗中，priming（Agent Priming）默认选项改为 `skip`。
+- [owner:@ux] Running Dialog List 中，当前对话与同 root 对话保持现有动效强度；其它 root 的对话节点动效高亮减弱到 70%。
+- [owner:@ux] 运行中对话列表在其它 root 正常进展事件时不重置当前 root 动效（避免全量渲染导致动画重启）。

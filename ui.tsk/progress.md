@@ -1,0 +1,6 @@
+- [owner:@ux] 已完成 `dominds/webapp/src/components/create-dialog-flow.ts`：priming 默认选项改为 `skip`（在无本地存储偏好时默认选 `skip`）。
+- [owner:@ux] 已完成 `dominds/webapp/src/components/running-dialog-list.ts`：当前对话及同 root 节点保持现有动效强度，非同 root 节点动效高亮衰减为 70%（通过 `intensity-dim` + CSS 变量）。
+- [owner:@ux] 已完成 `dominds/webapp/src/components/done-dialog-list.ts` / `archived-dialog-list.ts` 的 DOM 化改造，移除 listState/props 驱动的全量渲染与旧索引依赖。
+- [owner:@ux] 为运行中列表新增 `updateDialogEntry` 与局部 run-state DOM 更新逻辑；在 `dlg_run_state_evt` / `dlg_run_state_marker_evt` / `dlg_touched_evt` 中改为局部更新并抑制全量渲染，避免其它 root 进展事件重置动效。
+- [owner:@ux] `bumpDialogLastModified` 支持 `suppressRender`：运行中对话仅更新 DOM 时间戳，不触发列表全量重渲染（排序可能延后刷新）。
+- [owner:@ux] 已按你给的中文结构核对并保持：`针对原始诉请： @<responderId>` / `针对原始诉请： @<responderId> • <sessionSlug>`；并已同步英文同结构到 `dominds/main/shared/utils/inter-dialog-format.ts`。

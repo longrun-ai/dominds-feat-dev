@@ -1,0 +1,2 @@
+- [owner:@ux] 仅修改 `dominds/webapp` 相关实现，不变更后端协议。
+- [owner:@ux] 不改变当前对话及同 root 对话的动效强度，仅对其它 root 节点做衰减。

@@ -1,0 +1,9 @@
+- [owner:@ux] 已完成：读取 `team_mgmt` / `codex_style_tools` / `ws_read` / `ws_mod` / `memory` / `team_memory` 的 `index/tools/principles/scenarios/errors`（按可得范围）。
+- [owner:@ux] 已完成：与 `@prompt`、`@fullstack` 双线收敛 `man` 整体改进方向，形成统一方案骨架（信息架构规范 + 渲染链路分层 + 一致性校验门禁）。
+- [owner:@ux] 统一结论：先做 P0（固定五章骨架、`manualSpec` 元数据、缺失章节显式告警、基础结构测试），再做 P1（schema 驱动 `tools` 契约片段 + 示例校验器），最后 P2（全量迁移与 CI `manual:check` 门禁）。
+- [owner:@ux] P0 已由 @fullstack 落地：`sanitizeManualBody` 清理 H1、降级 H2/H3、移除 Template/模板标题；`man-structure` 测试新增输出扫描断言；`man-structure` 与 `man-missing-warning` 测试通过。
+- [owner:@ux] i18n：schema 生成段落中文化完成；中文手册模板英文占位已清理（`ws_mod.zh.md` / `team_mgmt.zh.md` / `txt-editing-tools.zh.md`）。
+- [owner:@ux] 已补齐：移除各 toolset index 手册中的 Overview/概述标题（含 `ws_read`/`ws_mod`/`team_mgmt`/`control`/`os`/`mcp_admin`/`memory`/`team_memory`/`codex_style_tools` 中英），避免与渲染章节标题重复；重新导出的 `man` 输出样例确认无 H1/H2、无 Template、schema 合并到 Tools、缺失告警可见。
+- [owner:@ux] 类型报错 `dominds/webapp/src/components/dominds-app.tsx`（`generatingDialogKeys`）按指示暂缓处理。
+- [owner:@ux] 按用户要求进入全量扫描与持续迭代：发现新问题直接修复，仅在全部手册 UX 问题干净后再汇报。
+- [owner:@ux] 已完成全量手册输出与复扫：非代码块无 H1/H2/Template/模板，zh/en 无互混；schema 标题均为 H4；仅见 npm config 警告。
