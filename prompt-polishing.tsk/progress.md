@@ -1,3 +1,11 @@
+- [owner:@prompt] 2026-02-13：阶段更新与分派
+  - 文档路径调整：已移动为 `docs/tellasker-terms-refactor.md`（用户调整）。
+  - 执行分派：@fullstack 负责代码实现/重构（tellaskBack 主线隐藏、subdialog 角色头部单点注入、FBR 特殊处理、前端 twin 同步等）；@i18n 负责相关文档 zh/en 同步更新；@prompt 负责答疑与验收。
+- [owner:@prompt] 2026-02-13：补强与验收
+  - 系统提示落地：内容标记首行规则、诉请阶段提醒义务、支线交付规则、FBR 例外与“一句式禁令：禁止一切 tellask”均已补强（zh/en）。
+  - 术语与文档同步：已完成 dominds-terminology / dialog-system / tellask-collab / fbr 等 zh/en 文档同步（@i18n 回贴可验收清单）。
+  - 运行时核验（当前会话范围）：支线系统提示已含首行标记/交付规则/FBR 例外，支线工具列表含 tellaskBack；主线工具列表无 tellaskBack。
+  - 类型检查回执：`pnpm -C dominds run lint:types` 已通过（@fullstack 回执 exit_code=0）。
 - [owner:@prompt] 2026-02-08：已完成对齐与落地：
   - `readonly_shell` 命中 rtws root `.minds/` 的拒绝文案增加“team_mgmt/权限兜底”，`.dialogs/` 分支提示收敛为“子 rtws 复现”。
   - `getAccessDeniedMessage()` 的 `.minds/**` 拒绝提示补齐同样兜底。
