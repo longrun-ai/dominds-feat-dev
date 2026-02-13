@@ -7,3 +7,4 @@
 - [owner:@ux] 类型报错 `dominds/webapp/src/components/dominds-app.tsx`（`generatingDialogKeys`）按指示暂缓处理。
 - [owner:@ux] 按用户要求进入全量扫描与持续迭代：发现新问题直接修复，仅在全部手册 UX 问题干净后再汇报。
 - [owner:@ux] 已完成全量手册输出与复扫：非代码块无 H1/H2/Template/模板，zh/en 无互混；schema 标题均为 H4；仅见 npm config 警告。
+- [owner:@fullstack] 已完成：补全 `readonly_shell` 白名单清单（zh/en `codex_style_tools/errors.md`）并补齐 `team_mgmt_list_providers` / `team_mgmt_list_models` 的工具说明与场景示例（zh/en `tools.md` + `scenarios.md` + 工具选择表）。
