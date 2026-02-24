@@ -9,8 +9,8 @@ member_defaults:
   #   codex:
   #     reasoning_effort: high
 
-  # provider: minimaxi.com-coding-plan
-  provider: minimaxi.com
+  provider: minimaxi.com-coding-plan
+  # provider: minimaxi.com
   model: MiniMax-M2.5
   model_params:
     anthropic:
