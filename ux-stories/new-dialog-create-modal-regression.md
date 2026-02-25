@@ -22,7 +22,7 @@ Ops-only recovery actions (allowed; record if used):
 
 ## Preconditions
 
-- WebUI reachable (typically `http://localhost:5555/`).
+- WebUI reachable (typically `http://localhost:<DOMINDS_FRONTEND_PORT>/`).
 - Start from a fresh browser session (close the current browser window and reopen the WebUI).
 - At least 1 team member configured for create-success steps.
 - To test the "no team members" path, ensure the team list is empty, then restore it after.

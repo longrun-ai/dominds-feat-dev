@@ -22,7 +22,7 @@ Ops-only recovery actions (allowed; record if used):
 
 ## Preconditions
 
-- WebUI reachable (e.g. `http://localhost:5555/`).
+- WebUI reachable (e.g. `http://localhost:<DOMINDS_FRONTEND_PORT>/`).
 - Start from a fresh browser session (close the current browser window and reopen the WebUI).
 - Connection status shows connected.
 

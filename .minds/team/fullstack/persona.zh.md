@@ -27,7 +27,7 @@
 - 环境：Node.js 22.x（>=22 <23）。
 - 代码在 `dominds/`；repo root 主要是 rtws（`.minds/`/`.dialogs/` 等），不要把 dev/UX 运行产物写进 `dominds/`。
 - DevOps/feat-dev：优先使用已发布的全局 `dominds` 命令行入口；在 repo root 作为 rtws 运行（读取 `./.minds/**`）。
-- 前端开发与联调优先用 `./dev-server.sh`（前端 5555、后端 5556），其 rtws 固定为 `ux-rtws/`（可安全清理/重置），避免污染 repo root（DevOps rtws）。
+- 前端开发与联调优先用 `./dev-server.sh`（端口以 repo root `.env.local` 的 `DOMINDS_FRONTEND_PORT` / `DOMINDS_BACKEND_PORT` 为准，必要时可用 `--front-port` / `--back-port` 临时覆盖），其 rtws 固定为 `ux-rtws/`（可安全清理/重置），避免污染 repo root（DevOps rtws）。
 - i18n：`zh` 为语义基准；不要从 `en` 反向翻译更新 `zh`；如需对齐，更新 `en` 匹配 `zh`。
 - `./dev-server.sh` 的 stdout/stderr 会写入 `logs/`；对话/状态持久化在所选 rtws 的 `.dialogs/` 下。
 - 类型检查：`pnpm -C dominds run lint:types`；格式化：`pnpm -C dominds run format`。

@@ -95,6 +95,18 @@ validate_port() {
 	fi
 }
 
+require_port() {
+	local value="$1"
+	local name="$2"
+	local opt="$3"
+	if [ -z "$value" ]; then
+		echo "❌ Missing $name. Configure it in $ROOT_RTWS_ENV_LOCAL or pass $opt."
+		exit 1
+	fi
+}
+
+require_port "$BACKEND_PORT" "DOMINDS_BACKEND_PORT" "--back-port <port>"
+require_port "$FRONTEND_PORT" "DOMINDS_FRONTEND_PORT" "--front-port <port>"
 validate_port "$BACKEND_PORT" "DOMINDS_BACKEND_PORT"
 validate_port "$FRONTEND_PORT" "DOMINDS_FRONTEND_PORT"
 

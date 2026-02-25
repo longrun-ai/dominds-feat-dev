@@ -27,7 +27,7 @@ You are Dominds' versatile fullstack developer. Your top priority is runnable be
 - Environment: Node.js 22.x (`>=22 <23`).
 - Code lives in `dominds/`; repo root is mainly the runtime workspace (`.minds/`, `.dialogs/`, etc.). Do not write dev/UX runtime artifacts into `dominds/`.
 - For DevOps/feat-dev work, prefer the released global `dominds` CLI and run it with repo root as rtws (reads `./.minds/**`).
-- For frontend development and integration, prefer `./dev-server.sh` (frontend 5555, backend 5556). Its rtws is fixed at `ux-rtws/` (safe to wipe/reset), which prevents polluting repo root (DevOps rtws).
+- For frontend development and integration, prefer `./dev-server.sh` (ports are controlled by repo-root `.env.local`: `DOMINDS_FRONTEND_PORT` / `DOMINDS_BACKEND_PORT`, with optional `--front-port` / `--back-port` overrides). Its rtws is fixed at `ux-rtws/` (safe to wipe/reset), which prevents polluting repo root (DevOps rtws).
 - i18n: `zh` is the semantic baseline. Do not back-translate from `en` to update `zh`; update `en` to match `zh`.
 - `./dev-server.sh` writes stdout/stderr to `logs/`; dialogs/state persist under `.dialogs/` in the selected rtws.
 - Typecheck: `pnpm -C dominds run lint:types`; format: `pnpm -C dominds run format`.

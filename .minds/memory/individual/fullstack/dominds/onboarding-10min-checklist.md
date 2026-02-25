@@ -10,8 +10,10 @@
 ## 1) 启动联调（rtws = `ux-rtws/`）
 
 1. 在 repo root 启动：`./dev-server.sh`
-2. 打开 WebUI：`http://localhost:5555`
-3. 后端端口：`http://localhost:5556`
+2. 打开 WebUI：`http://localhost:<DOMINDS_FRONTEND_PORT>`
+3. 后端端口：`http://localhost:<DOMINDS_BACKEND_PORT>`
+
+端口来源：repo root `.env.local` 中的 `DOMINDS_FRONTEND_PORT` / `DOMINDS_BACKEND_PORT`（或用 `--front-port` / `--back-port` 临时覆盖）。
 
 验证点：页面出现已连接状态（或能正常加载 dialog 列表）。
 
@@ -72,4 +74,3 @@
 - 刷新页面：dialog 列表与消息能从 `.dialogs/` 恢复
 - 切换 dialog：不会出现“残留 streaming bubble”
 - 查看 `latest.yaml`：`lastModified` 会随对话推进更新
-

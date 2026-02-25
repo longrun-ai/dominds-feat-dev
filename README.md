@@ -118,9 +118,14 @@ npm install -g dominds
 
 ### WebUI Dev Server (Dev/UX)
 
-Start both backend (5556) and frontend (5555) dev servers:
+Start dev servers (ports come from root `.env.local`:
+`DOMINDS_BACKEND_PORT` / `DOMINDS_FRONTEND_PORT`):
 
 ```bash
+# Example root .env.local
+# DOMINDS_FRONTEND_PORT=<frontend_port>
+# DOMINDS_BACKEND_PORT=<backend_port>
+
 ./dev-server.sh
 ```
 

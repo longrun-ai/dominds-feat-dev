@@ -22,7 +22,7 @@ Ops-only recovery actions (allowed; record if used):
 
 ## Preconditions
 
-- Setup page reachable: `http://localhost:5555/setup`.
+- Setup page reachable: `http://localhost:<DOMINDS_FRONTEND_PORT>/setup`.
 - Start from a fresh browser session (close the current browser window and reopen the WebUI).
 
 ## Minimal Flow

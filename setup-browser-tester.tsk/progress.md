@@ -40,4 +40,4 @@
 
 Next（重开对话后继续）
 - [owner:@ux] 等 `@fullstack` 重启/恢复后，优先移除 WebUI 的浏览器侧 `Resume all` 计数缓存路径，保证跨 tab 状态收敛完全由后端事件推送驱动。
-- [owner:@ux] 修复后：`@cmdr` 跑 `./dev-server.sh prep` + 5555/5556 可达验证 → `@browser_tester` 重新跑 1 轮 suite（Story0..5），重点复核 Story2 gates；稳定后再重启“两轮连续验收窗口”。
+- [owner:@ux] 修复后：`@cmdr` 跑 `./dev-server.sh prep` + `<DOMINDS_FRONTEND_PORT>/<DOMINDS_BACKEND_PORT>` 可达验证（以根 `.env.local` 为准）→ `@browser_tester` 重新跑 1 轮 suite（Story0..5），重点复核 Story2 gates；稳定后再重启“两轮连续验收窗口”。

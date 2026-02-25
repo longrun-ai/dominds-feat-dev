@@ -8,7 +8,7 @@ The goal is not “automation for automation’s sake”. The goal is to validat
 
 ### 1.1 Scope
 
-- Target UI: Dominds WebUI on `http://localhost:5555`.
+- Target UI: Dominds WebUI on `http://localhost:<DOMINDS_FRONTEND_PORT>`.
 - Target journeys: creating dialogs, sending messages, error visibility, refresh recovery, tool call visibility.
 - Audience: `@browser_tester`, `@ux`, `@fullstack`, and anyone who will take over regression runs later.
 
@@ -31,9 +31,11 @@ The goal is not “automation for automation’s sake”. The goal is to validat
 
 ### 2.1 Services
 
-- Frontend: `http://localhost:5555`
-- Backend: `http://localhost:5556`
+- Frontend: `http://localhost:<DOMINDS_FRONTEND_PORT>`
+- Backend: `http://localhost:<DOMINDS_BACKEND_PORT>`
 - Dev startup: `./dev-server.sh`
+
+Ports come from root `.env.local` (`DOMINDS_FRONTEND_PORT` / `DOMINDS_BACKEND_PORT`), or from `--front-port` / `--back-port` if you override for the current run.
 
 `./dev-server.sh` runs the backend with `ux-rtws/` as its runtime workspace (rtws). Seeing a banner like “Backend Runtime Workspace: .../ux-rtws” is expected in this dev setup.
 
@@ -97,7 +99,7 @@ If you exceed the budget (or need the same recovery repeatedly), the round does 
 
 0. Round prep: `@cmdr` runs `./dev-server.sh prep`.
 1. Start from a fresh browser session (close the browser window and reopen).
-2. Open `http://localhost:5555` and confirm the UI is usable and “connected”.
+2. Open `http://localhost:<DOMINDS_FRONTEND_PORT>` and confirm the UI is usable and “connected”.
 3. Open DevTools (Console + Network) for _observation only_ (no scripts, no manual requests).
 
 ### Phase B: Execute
@@ -149,7 +151,7 @@ Failure categories (both rounds):
 
 If you need the smallest reliable smoke check, use this sequence:
 
-1. Open `http://localhost:5555` and confirm the UI is interactive.
+1. Open `http://localhost:<DOMINDS_FRONTEND_PORT>` and confirm the UI is interactive.
 2. Click `New Dialog`, create a dialog, and confirm input is available.
 3. Send `ping`, explicitly wait for `pong` (or an equivalent success response).
 4. Immediately take one screenshot at success (no fixed sleeps).
@@ -218,8 +220,8 @@ Copy/paste and fill this in:
 ```md
 ### WebUI E2E Regression Report (date / runner)
 
-- Environment: `http://localhost:5555` (browser: ...)
-- Base URL used: `http://localhost:5555` / `http://127.0.0.1:5555` (if you had to switch, record why)
+- Environment: `http://localhost:<DOMINDS_FRONTEND_PORT>` (browser: ...)
+- Base URL used: `http://localhost:<DOMINDS_FRONTEND_PORT>` / `http://127.0.0.1:<DOMINDS_FRONTEND_PORT>` (if you had to switch, record why)
 - Platform (`uname -a`): ...
 - Runner agent rtws: repo root (outer rtws)
 - WebUI backend rtws (banner): ... (e.g. `ux-rtws`)

@@ -90,7 +90,11 @@ dominds tui --help
 ### Development
 
 ```bash
-# Start both backend (5556) and frontend (5555) dev servers
+# Start dev servers (ports come from root .env.local:
+# DOMINDS_BACKEND_PORT / DOMINDS_FRONTEND_PORT)
+# Example root .env.local:
+# DOMINDS_FRONTEND_PORT=<frontend_port>
+# DOMINDS_BACKEND_PORT=<backend_port>
 ./dev-server.sh
 
 # Server management commands
@@ -160,7 +164,7 @@ All CLI tools operate on the current working directory as the rtws by default; u
 
 ### Backend (`dominds/main/`)
 
-- **server.ts** — HTTP/WebSocket server entry point (port 5556 dev, 5666 prod)
+- **server.ts** — HTTP/WebSocket server entry point (dev port is provided by CLI/outer `dev-server.sh`; prod default is 5666)
 - **dialog.ts** — Dialog state machine (user ↔ agent conversations)
 - **llm/** — LLM integration layer (OpenAI, Anthropic)
 - **tools/** — Tool system with fs, os, mem (workspace memory), txt

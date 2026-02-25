@@ -63,7 +63,7 @@ Final direction:
 
 ## Repro (for final gate re-check)
 
-1. Open Tab A `http://localhost:5555/` (Connected).
+1. Open Tab A `http://localhost:<DOMINDS_FRONTEND_PORT>/` (Connected).
 2. Open Tab B same URL (Connected).
 3. Trigger a proceeding dialog, use header `Emergency stop`.
 4. Click header `Resume all`.
