@@ -4,8 +4,104 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOMINDS_DIR="$SCRIPT_DIR/dominds"
 RTWS_DIR="$SCRIPT_DIR/ux-rtws"
 LOGS_DIR="$SCRIPT_DIR/logs"
+ROOT_RTWS_ENV_LOCAL="$SCRIPT_DIR/.env.local"
+ROOT_RTWS_ENV_LOADED=false
 
 cd "$SCRIPT_DIR"
+
+print_usage() {
+	echo "Usage: $0 [start|prep|restart|clear-records|stop|status] [options]"
+	echo ""
+	echo "Options:"
+	echo "  --front-port <port>  Override frontend port for this run"
+	echo "  --back-port <port>   Override backend port for this run"
+	echo ""
+	echo "Commands:"
+	echo "  start         Start development servers (default, shows status if already running)"
+	echo "  prep          Round prep: clear records + force restart servers"
+	echo "  restart       Force restart development servers"
+	echo "  clear-records Delete dev RTWS dialog records (ux-rtws/.dialogs/)"
+	echo "  stop          Stop development servers"
+	echo "  status        Show current server status"
+}
+
+load_root_rtws_env_local() {
+	if [ ! -f "$ROOT_RTWS_ENV_LOCAL" ]; then
+		return
+	fi
+
+	set -a
+	# shellcheck disable=SC1090
+	if ! . "$ROOT_RTWS_ENV_LOCAL"; then
+		set +a
+		echo "❌ Failed to load root rtws env file: $ROOT_RTWS_ENV_LOCAL"
+		exit 1
+	fi
+	set +a
+
+	ROOT_RTWS_ENV_LOADED=true
+}
+
+load_root_rtws_env_local
+
+BACKEND_HOST="${DOMINDS_BACKEND_HOST:-127.0.0.1}"
+BACKEND_PORT="${DOMINDS_BACKEND_PORT:-5556}"
+FRONTEND_HOST="${DOMINDS_FRONTEND_HOST:-127.0.0.1}"
+FRONTEND_PORT="${DOMINDS_FRONTEND_PORT:-5555}"
+ACTION="start"
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	"--front-port")
+		if [ -z "${2:-}" ]; then
+			echo "❌ Missing value for --front-port"
+			print_usage
+			exit 1
+		fi
+		FRONTEND_PORT="$2"
+		shift 2
+		;;
+	"--back-port")
+		if [ -z "${2:-}" ]; then
+			echo "❌ Missing value for --back-port"
+			print_usage
+			exit 1
+		fi
+		BACKEND_PORT="$2"
+		shift 2
+		;;
+	"start" | "prep" | "restart" | "clear-records" | "stop" | "status")
+		ACTION="$1"
+		shift
+		;;
+	"-h" | "--help")
+		print_usage
+		exit 0
+		;;
+	*)
+		echo "❌ Unknown command/option: $1"
+		print_usage
+		exit 1
+		;;
+	esac
+done
+
+validate_port() {
+	local value="$1"
+	local name="$2"
+	if ! [[ "$value" =~ ^[0-9]+$ ]] || [ "$value" -lt 1 ] || [ "$value" -gt 65535 ]; then
+		echo "❌ Invalid $name: '$value' (must be an integer in [1, 65535])"
+		exit 1
+	fi
+}
+
+validate_port "$BACKEND_PORT" "DOMINDS_BACKEND_PORT"
+validate_port "$FRONTEND_PORT" "DOMINDS_FRONTEND_PORT"
+
+BACKEND_ORIGIN="http://${BACKEND_HOST}:${BACKEND_PORT}"
+FRONTEND_ORIGIN="http://${FRONTEND_HOST}:${FRONTEND_PORT}"
+BACKEND_PROC_PATTERN="tsx.*dominds/main/cli\\.ts.*webui.*(-p|--port)(=| )${BACKEND_PORT}([^0-9]|$)"
+FRONTEND_PROC_PATTERN="vite.*--port(=| )${FRONTEND_PORT}([^0-9]|$)"
 
 if [ ! -d "$RTWS_DIR" ]; then
 	echo "❌ Missing ux RTWS directory: $RTWS_DIR"
@@ -40,11 +136,11 @@ check_server_status() {
 	local tsx_running=false
 	local vite_running=false
 
-	if pgrep -f "tsx.*dominds/main/(server|cli)\\.ts" >/dev/null 2>&1; then
+	if pgrep -f "$BACKEND_PROC_PATTERN" >/dev/null 2>&1; then
 		tsx_running=true
 	fi
 
-	if pgrep -f "vite.*--port(=| )5555" >/dev/null 2>&1; then
+	if pgrep -f "$FRONTEND_PROC_PATTERN" >/dev/null 2>&1; then
 		vite_running=true
 	fi
 
@@ -59,13 +155,13 @@ check_server_status() {
 show_status() {
 	echo "=== Dominds Development Server Status ==="
 
-	if pgrep -f "tsx.*dominds/main/(server|cli)\\.ts" >/dev/null 2>&1; then
+	if pgrep -f "$BACKEND_PROC_PATTERN" >/dev/null 2>&1; then
 		echo "✅ Backend server (tsx) is running"
 	else
 		echo "❌ Backend server (tsx) is not running"
 	fi
 
-	if pgrep -f "vite.*--port(=| )5555" >/dev/null 2>&1; then
+	if pgrep -f "$FRONTEND_PROC_PATTERN" >/dev/null 2>&1; then
 		echo "✅ Frontend server (Vite) is running"
 	else
 		echo "❌ Frontend server (Vite) is not running"
@@ -77,13 +173,19 @@ show_status() {
 	echo "   - Frontend: $LOGS_DIR/frontend-stdout.log, frontend-stderr.log"
 	echo "📁 RTWS (process cwd): $RTWS_DIR/"
 	echo ""
+	if [ "$ROOT_RTWS_ENV_LOADED" = true ]; then
+		echo "⚙️  Config file: $ROOT_RTWS_ENV_LOCAL"
+	else
+		echo "⚙️  Config file: (not found) $ROOT_RTWS_ENV_LOCAL"
+	fi
+	echo ""
 	echo "🌐 Access URLs:"
-	echo "   - Frontend: http://localhost:5555"
-	echo "   - Backend:  http://localhost:5556"
+	echo "   - Frontend: $FRONTEND_ORIGIN"
+	echo "   - Backend:  $BACKEND_ORIGIN"
 }
 
 # Main script logic
-case "${1:-start}" in
+case "$ACTION" in
 "status")
 	show_status
 	exit 0
@@ -100,8 +202,8 @@ case "${1:-start}" in
 	;;
 "prep")
 	echo "🧹 Round prep: clear records + force restart..."
-	pkill -f "tsx.*dominds/main/(server|cli)\\.ts" 2>/dev/null
-	pkill -f "vite.*--port(=| )5555" 2>/dev/null
+	pkill -f "$BACKEND_PROC_PATTERN" 2>/dev/null
+	pkill -f "$FRONTEND_PROC_PATTERN" 2>/dev/null
 	sleep 2
 	if [ -x "$RTWS_DIR/clear-records.sh" ]; then
 		"$RTWS_DIR/clear-records.sh" || true
@@ -111,8 +213,8 @@ case "${1:-start}" in
 	;;
 "restart")
 	echo "🔄 Force restarting development servers..."
-	pkill -f "tsx.*dominds/main/(server|cli)\\.ts" 2>/dev/null
-	pkill -f "vite.*--port(=| )5555" 2>/dev/null
+	pkill -f "$BACKEND_PROC_PATTERN" 2>/dev/null
+	pkill -f "$FRONTEND_PROC_PATTERN" 2>/dev/null
 	sleep 2
 	;;
 "start")
@@ -126,8 +228,8 @@ case "${1:-start}" in
 "stop")
 	if check_server_status; then
 		echo "🛑 Stopping development servers..."
-		pkill -f "tsx.*dominds/main/(server|cli)\\.ts" 2>/dev/null
-		pkill -f "vite.*--port(=| )5555" 2>/dev/null
+		pkill -f "$BACKEND_PROC_PATTERN" 2>/dev/null
+		pkill -f "$FRONTEND_PROC_PATTERN" 2>/dev/null
 		echo "✅ Development servers stopped"
 	else
 		echo "ℹ️  No development servers are currently running"
@@ -135,15 +237,7 @@ case "${1:-start}" in
 	exit 0
 	;;
 *)
-	echo "Usage: $0 [start|prep|restart|clear-records|stop|status]"
-	echo ""
-	echo "Commands:"
-	echo "  start    - Start development servers (default, shows status if already running)"
-	echo "  prep     - Round prep: clear records + force restart servers"
-	echo "  restart  - Force restart development servers"
-	echo "  clear-records - Delete dev RTWS dialog records (ux-rtws/.dialogs/)"
-	echo "  stop     - Stop development servers"
-	echo "  status   - Show current server status"
+	print_usage
 	exit 1
 	;;
 esac
@@ -153,11 +247,11 @@ mkdir -p "$LOGS_DIR" >/dev/null 2>&1
 
 # Start backend and frontend with separate log files
 # Backend: runs with ux RTWS as process cwd (so repo root is never the RTWS)
-# NOTE: bind backend to 127.0.0.1 so Vite proxy targets (127.0.0.1:5556) work even on hosts where
+# NOTE: bind backend to 127.0.0.1 so Vite proxy targets (127.0.0.1:<port>) work even on hosts where
 # `localhost` resolves to IPv6-only (::1).
-(cd "$RTWS_DIR" && NODE_ENV=dev "$TSX_BIN" "$DOMINDS_DIR/main/cli.ts" webui -p 5556 -h 127.0.0.1 --mode dev --nobrowser) >"$LOGS_DIR/backend-stdout.log" 2>"$LOGS_DIR/backend-stderr.log" &
+(cd "$RTWS_DIR" && NODE_ENV=dev DOMINDS_DEV_FRONTEND_ORIGIN="$FRONTEND_ORIGIN" "$TSX_BIN" "$DOMINDS_DIR/main/cli.ts" webui -p "$BACKEND_PORT" -h "$BACKEND_HOST" --mode dev --nobrowser) >"$LOGS_DIR/backend-stdout.log" 2>"$LOGS_DIR/backend-stderr.log" &
 # Frontend: runs with ux RTWS as process cwd, but serves dominds/webapp as Vite root
-(cd "$RTWS_DIR" && "$VITE_BIN" "$DOMINDS_DIR/webapp" --port 5555 --strictPort) >"$LOGS_DIR/frontend-stdout.log" 2>"$LOGS_DIR/frontend-stderr.log" &
+(cd "$RTWS_DIR" && DOMINDS_DEV_BACKEND_ORIGIN="$BACKEND_ORIGIN" "$VITE_BIN" "$DOMINDS_DIR/webapp" --host "$FRONTEND_HOST" --port "$FRONTEND_PORT" --strictPort) >"$LOGS_DIR/frontend-stdout.log" 2>"$LOGS_DIR/frontend-stderr.log" &
 
 # Note: Servers are backgrounded (not fully detached) so they terminate
 # when the parent shell/IDE/agent terminates. This is intentional for
