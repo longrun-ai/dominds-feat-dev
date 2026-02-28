@@ -2,8 +2,8 @@ member_defaults:
   diligence-push-max: 0
 
   provider: codex
-  # model: gpt-5.3-codex
-  model: gpt-5.2-codex
+  model: gpt-5.3-codex
+  # model: gpt-5.2-codex
   # model: gpt-5.2
   model_params:
     codex:
@@ -41,6 +41,7 @@ members:
       - 'Regression/回归: 覆盖登录/设置/对话运行/错误恢复等关键路径；用完释放 MCP lease（mcp_release）'
 
   fullstack:
+    model: gpt-5.2
     name: 全栈开发 / Fullstack Developer
     toolsets:
       - team_memory
