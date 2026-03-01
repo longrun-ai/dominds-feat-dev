@@ -1,5 +1,3 @@
-## Progress
-
 范围与口径（v1）
 - [owner:@ux] v1 UX 主口径：`docs/webui-ux-testability-v1.md`（覆盖面 in/out-scope + MUST/SHOULD + 稳定标识规范 + 回归包映射缺口）。
 - [owner:@ux] v1 可分派卡片（含 PR 切片计划）：`ux-issues/webui-testability-v1-cards.md`（PR-1..PR-4 对应 Story2/1/3/5 的 P0 闭环）。
@@ -38,6 +36,12 @@
 - [owner:@ux] `browser_tester` 成员已存在：`.minds/team.yaml`。
 - [owner:@ux] Playwright MCP toolset（stdio）已配置：`.minds/mcp.yaml`（`playwright` / `playwright2`）。
 
+2026-03-01 回归复测（本轮）
+- [owner:@ux] 已执行环境整备：`./dev-server.sh prep` 与 `./dev-server.sh restart`，前后端可达（`http://127.0.0.1:5555/`、`http://127.0.0.1:5556/` 均 200）。
+- [owner:@ux] 期间出现 Playwright MCP 通道级阻塞（`browser_navigate` 超时 / `-32001`）；重启后最小导航采样恢复（`playwright` 与 `playwright2` 对 `/setup` 导航均成功）。
+- [owner:@ux] `@browser_tester` 本轮最终矩阵（Story0..5）：`Pass / Pass / Pass / Pass / Pass / Pass`。
+- [owner:@ux] Story2 重点 gate 结论：`Resume all` 归零通过；5s 内跨 tab 一致性通过。
+- [owner:@ux] 本轮未发现新的产品级回归缺陷，因此无代码修复提交。
+
 Next（重开对话后继续）
-- [owner:@ux] 等 `@fullstack` 重启/恢复后，优先移除 WebUI 的浏览器侧 `Resume all` 计数缓存路径，保证跨 tab 状态收敛完全由后端事件推送驱动。
-- [owner:@ux] 修复后：`@cmdr` 跑 `./dev-server.sh prep` + `<DOMINDS_FRONTEND_PORT>/<DOMINDS_BACKEND_PORT>` 可达验证（以根 `.env.local` 为准）→ `@browser_tester` 重新跑 1 轮 suite（Story0..5），重点复核 Story2 gates；稳定后再重启“两轮连续验收窗口”。
+- [owner:@ux] 按封板口径，安排“连续 2 轮且全篇无意外”的完整验收窗口（允许每轮开始前一次整备重启）；若再次出现需反复恢复动作的情况，不计入达标轮并转交永久修复。
