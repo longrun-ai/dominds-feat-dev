@@ -26,7 +26,7 @@ members:
   browser_tester:
     name: 浏览器测试员 / Browser Tester
     toolsets:
-      - memory
+      - personal_memory
       - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
@@ -45,7 +45,7 @@ members:
     name: 全栈开发 / Fullstack Developer
     toolsets:
       - team_memory
-      - memory
+      - personal_memory
       - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
@@ -61,7 +61,7 @@ members:
     # model: MiniMax-M2.5
     name: 国际化专员 / i18n Specialist
     toolsets:
-      - memory
+      - personal_memory
       - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
@@ -83,7 +83,7 @@ members:
     #     temperature: 1.0
     name: 提示词专员 / Prompt Engineer
     toolsets:
-      - memory
+      - personal_memory
       - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
@@ -99,7 +99,7 @@ members:
     toolsets:
       - team_mgmt
       - team_memory
-      - memory
+      - personal_memory
       - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
