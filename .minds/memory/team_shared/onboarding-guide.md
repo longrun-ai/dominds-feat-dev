@@ -3,7 +3,7 @@
 This is a practical checklist for team members (and contributors) to quickly build an accurate mental model of Dominds and produce shippable feature briefs with clear QA gates.
 
 ## 0) Guiding constraints (read first)
-- Dominds is **pre-release (Alpha/preview)**: see `dominds/docs/release-status.md`.
+- Dominds is **pre-release (Alpha/preview)**: see team shared memory `release-status.md`.
 - Dominds is **dogfooding-first**: optimize real agent/operator experience; remove sharp edges even if it needs refactors.
 - Prefer **root-cause fixes** and remove obsolete compatibility paths (“no compatibility baggage”).
 - Conclusions must be **anchored to docs + code** (file paths / symbols / message types), not memory.
@@ -15,7 +15,7 @@ This is a practical checklist for team members (and contributors) to quickly bui
 2. `dominds/docs/dominds-terminology.md` — Canonical vocabulary across prompts/docs (Taskdoc, Teammate Tellask, etc.).
 3. `dominds/docs/dialog-system.md` — Backend-driven driver; teammate tellasks; Q4H; suspension/resumption.
 4. `dominds/docs/encapsulated-taskdoc.md` — `*.tsk/` rules; why “single source of truth” matters.
-5. `dominds/docs/keep-going.md` — Root dialog auto-continue; budget; when forced to Q4H.
+5. `dominds/docs/diligence-push.md` — Root dialog auto-continue; budget; when forced to Q4H.
 6. `dominds/docs/dialog-persistence.md` — On-disk storage format; what is persisted and why.
 7. `dominds/docs/memory-system.md` — Minds, team memory, reminders; what is stable vs per-run.
 8. `dominds/docs/i18n.md` — Work language vs UI language; per-prompt language preference.
