@@ -8,6 +8,8 @@ member_defaults:
   # model: gpt-5.2
   model_params:
     codex:
+      # Fast Mode: same model/reasoning profile, but request priority processing.
+      service_tier: priority
       reasoning_effort: high
 
   # provider: minimaxi.com-coding-plan
