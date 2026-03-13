@@ -41,7 +41,7 @@ P0（直接影响 `ux-stories` 稳定回归）
   - Send / Stop / Resume（per-dialog + 全局控制）
   - 跨 tab 的关键状态/计数收敛（例如 resumable/proceeding count、interrupted/resumed 等）
 
-- **Q4H（Question for Human）链路（最小可用 + 可定位）**
+- **向人请示（Q4H）链路（最小可用 + 可定位）**
   - Q4H 面板可见性与选择/导航事件可用（`dominds/webapp/src/components/dominds-q4h-panel.ts`）
   - Q4H 输入框：禁用态、发送主按钮状态、placeholder i18n（`dominds/webapp/src/components/dominds-q4h-input.ts`）
 

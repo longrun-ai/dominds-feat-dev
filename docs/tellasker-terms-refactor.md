@@ -6,8 +6,8 @@ Date: 2026-02-13
 
 ## Decisions (confirmed)
 
-- Standard terms: "tellasker dialog / 诉请者对话" and "tellaskee dialog / 被诉请者对话".
-- Hierarchy terms remain: supdialog/subdialog (ZH: 上位对话/子对话) are for structural parent-child only.
+- Standard terms: use `tellasker dialog` in English copy and `诉请者对话` in Chinese copy; use `tellaskee dialog` in English copy and `被诉请者对话` in Chinese copy.
+- Hierarchy terms remain: use `supdialog/subdialog` in English copy and `上位对话/子对话` in Chinese copy for structural parent-child only.
 - "Sideline dialog" can be nested; it is not synonymous with "mainline". The tellasker can be any dialog.
 - tellaskBack is documented in glossary/collaboration/interaction protocols, but hidden from the mainline tool list.
 - Mainline calling tellaskBack should surface as a generic "function not found" (no custom error).
@@ -17,11 +17,18 @@ Date: 2026-02-13
 
 ## Terminology
 
-- tellasker dialog (诉请者对话): the dialog that issued the current tellask; caller for the current assignment.
-- tellaskee dialog (被诉请者对话): the dialog that is handling the current tellask (this dialog).
-- supdialog/subdialog (上位对话/子对话): structural parent-child in dialog hierarchy; not necessarily the caller.
-- mainline dialog (主线对话): root dialog owning shared Taskdoc.
-- sideline dialog (支线对话): any subdialog, including nested subdialogs.
+- EN:
+  - `tellasker dialog`: the dialog that issued the current tellask; caller for the current assignment.
+  - `tellaskee dialog`: the dialog that is handling the current tellask (this dialog).
+  - `supdialog/subdialog`: structural parent-child in dialog hierarchy; not necessarily the caller.
+  - `mainline dialog`: root dialog owning the shared task contract.
+  - `sideline dialog`: any subdialog, including nested subdialogs.
+- ZH:
+  - `诉请者对话`：发起当前诉请的对话；即当前差遣任务的调用方。
+  - `被诉请者对话`：正在处理当前诉请的对话（当前对话）。
+  - `上位对话/子对话`：对话层级中的结构性上下位关系；不必然等于调用关系。
+  - `主线对话`：承载共享差遣牒的根对话。
+  - `支线对话`：任意子对话，包括嵌套子对话。
 
 ## Subdialog course header (new requirement)
 
@@ -70,18 +77,18 @@ Add a tellasker-side reminder rule (applies to any dialog acting as tellasker):
 
 ## tellaskBack detection (content-only)
 
-Detection must rely only on exchanged content (no shared tool receipts):
+Detection must rely only on exchanged content (no shared tool receipts), but the first-line marker is runtime-injected into the inter-dialog transfer payload rather than hand-written by the agent:
 
 - ZH:
-  - "被诉请者必须在消息首行明确标注：`【tellaskBack】` 或 `【最终完成】`；无标注视为未遵守协议。"
-  - "若未完成目标/存在不确定/阻塞，必须使用 `【tellaskBack】` 并提出具体问题；不得直接给结果。"
-  - "仅当已完成全部目标，才可使用 `【最终完成】` 直接回贴。"
-  - "FBR 例外：仍需显式标注，例如 `【FBR‑直接回复】` / `【FBR‑仅推理】`。"
+  - "跨对话传递正文的首行标记由运行时自动注入；中文工作语言下使用 `【回问诉请】` / `【最终完成】` / `【FBR‑直接回复】` / `【FBR‑仅推理】`。不得要求被诉请者手写标记。"
+  - "若未完成目标/存在不确定/阻塞，必须调用 `tellaskBack({ tellaskContent: \"...\" })` 并提出具体问题；运行时会把回贴标记为 `【回问诉请】`；不得直接给结果。"
+  - "仅当已完成全部目标，才可直接回贴；运行时会自动标记 `【最终完成】`。"
+  - "FBR 例外：仍由运行时按语义自动标记，例如 `【FBR‑直接回复】` / `【FBR‑仅推理】`。"
 - EN:
-  - "The tellaskee must put an explicit first-line header: `【tellaskBack】` or `【Final】`. No header = non‑compliant."
-  - "If any objective is unfinished/uncertain/blocked, use `【tellaskBack】` and ask concrete questions; do not give a final result."
-  - "Only when all objectives are completed may `【Final】` be used to deliver the result."
-  - "FBR exception: still label explicitly, e.g. `【FBR‑Direct】` / `【FBR‑Reasoning Only】`."
+  - "The first-line marker is runtime-injected into the inter-dialog transfer payload rather than hand-written by the tellaskee; English work language uses `【TellaskBack】` / `【Completed】` / `【FBR‑Direct Reply】` / `【FBR‑Reasoning Only】`."
+  - "If any objective is unfinished/uncertain/blocked, call `tellaskBack({ tellaskContent: \"...\" })` and ask concrete questions; runtime will mark the transfer as `【TellaskBack】`. Do not give a final result."
+  - "Only when all objectives are completed may the tellaskee reply directly; runtime will mark the transfer as `【Completed】`."
+  - "FBR exception: markers are still runtime-injected by semantics, e.g. `【FBR‑Direct Reply】` / `【FBR‑Reasoning Only】`."
 
 ## Tool visibility
 
