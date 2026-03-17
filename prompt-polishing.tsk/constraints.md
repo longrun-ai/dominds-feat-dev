@@ -1,4 +1,0 @@
-- [owner:@prompt] 最小改动优先：只修正提示词/工具提示与实现的契约不一致点，不引入兼容层。
-- [owner:@prompt] i18n 必须同步：所有用户可见文案变更需同时更新 `zh/en`。
-- [owner:@prompt] 验收口径：以运行时可观测回执/拒绝文案为准；代码改动需通过 `pnpm -C dominds run lint:types`。
-- [owner:@prompt] 约束去重：不得将系统提示/工具文档已强制执行的通用规则再次写入 `constraints`；仅记录任务特有的硬要求。

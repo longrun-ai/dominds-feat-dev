@@ -1,3 +1,0 @@
-- [owner:@prompt] 对齐 Dominds 系统提示/工具提示与 `dominds/` 实现代码的真实约束（避免“按提示做却撞墙/误导下一步”）。
-- [owner:@prompt] 明确并前置说明硬拒绝点：rtws root 的 `.minds/`、`.dialogs/` 以及 `*.tsk/`（Taskdoc）封装访问规则。
-- [owner:@prompt] 收敛“schema 严格校验”措辞到 best-effort 真实口径，并补齐 `update_plan.plan[].status` 的 `enum` 契约。
