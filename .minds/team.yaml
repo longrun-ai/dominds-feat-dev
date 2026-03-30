@@ -1,28 +1,23 @@
 member_defaults:
   diligence-push-max: 0
 
-  provider: codex
-  model: gpt-5.4
+  # provider: codex
+  # model: gpt-5.4
   # model: gpt-5.3-codex
   # model: gpt-5.2-codex
   # model: gpt-5.2
-  model_params:
-    codex:
-      # service_tier: priority  # the "Fast" Mode
-      reasoning_effort: high
-
-  # provider: minimaxi.com-coding-plan
-  # provider: minimaxi.com
-  # model: MiniMax-M2.5
   # model_params:
-  #   anthropic:
-  #     temperature: 0.2
-  # fbr_model_params:
-  #   anthropic:
-  #     temperature: 1.0
+  #   codex:
+  #     # service_tier: priority  # the "Fast" Mode
+  #     reasoning_effort: high
+
+  provider: minimaxi.com-coding-plan
+  model: MiniMax-M2.7
 
 default_responder: ux
-shell_specialists: cmdr
+shell_specialists:
+  - cmdr
+  - gitkeeper
 
 members:
   browser_tester:
@@ -43,7 +38,12 @@ members:
       - 'Regression/回归: 覆盖登录/设置/对话运行/错误恢复等关键路径；用完释放 MCP lease（mcp_release）'
 
   fullstack:
-    model: gpt-5.2
+    # provider: codex
+    # model: gpt-5.4
+    # model_params:
+    #   codex:
+    #     reasoning_effort: high
+
     name: 全栈开发 / Fullstack Developer
     toolsets:
       - team_memory
@@ -75,14 +75,6 @@ members:
       - 'Regression/回归: 确保新增文案在 zh/en 同步；必要时请 @cmdr 代跑 lint/build/typecheck'
 
   prompt:
-    # provider: minimaxi.com-coding-plan
-    # model: MiniMax-M2.5
-    # model_params:
-    #   anthropic:
-    #     temperature: 0.2
-    # fbr_model_params:
-    #   anthropic:
-    #     temperature: 1.0
     name: 提示词专员 / Prompt Engineer
     toolsets:
       - personal_memory
@@ -96,6 +88,26 @@ members:
       - 'Non-goals/不负责: 不做大规模架构/协议重写；不替 owner 做最终语义决策'
       - 'Regression/回归: 变更前后做最小对比测试（同输入对照），并给出可复现的前后差异与验收步骤'
 
+  tech_debt_auditor:
+    # provider: codex
+    # model: gpt-5.4
+    # model_params:
+    #   codex:
+    #     reasoning_effort: high
+
+    name: 技术债务审计专员 / Technical Debt Auditor
+    toolsets:
+      - personal_memory
+      - codex_style_tools # readonly_shell/apply_patch/update_plan
+      - ws_read # dominds style txt read tools
+      - ws_mod # dominds style txt mod tools
+    gofor:
+      - 'Scope/范围: 审计产品特性早期设计探索阶段引入的临时技术债务，并推动在功能推进过程中持续清理低价值债务'
+      - 'Interfaces/接口: 基于代码/文档/任务流识别临时补丁、兼容包袱与过度设计；与 @fullstack/@ux 对齐取舍，不直接拍板产品语义'
+      - 'Deliverables/交付: 技术债务清单（含成因/代价/清理建议）、阶段性清债优先级、面向精益实现的结构化改进建议'
+      - 'Non-goals/不负责: 不为追求洁癖阻断必要探索；不接管具体功能开发 owner 决策；不做脱离业务价值的纯重构'
+      - 'Regression/回归: 每次建议都需说明若保留/若清理的影响面、回归点与验收方式，避免把"技术债优化"做成隐性行为变更'
+
   ux:
     name: UX 体验官 / UX Critic
     toolsets:
@@ -105,12 +117,25 @@ members:
       - codex_style_tools # readonly_shell/apply_patch/update_plan
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
+      - mcp_admin
     gofor:
       - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
       - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'
       - 'Deliverables/交付: 体验问题清单（严重度/复现步骤）、改进建议与验收点'
       - 'Non-goals/不负责: 作为协议 owner 决策（交给对应域负责人）'
       - 'Regression/回归: 维护关键用户旅程的人工验收清单（交 QA 纳入 gate）'
+
+  gitkeeper:
+    name: Gitkeeper (VCS Operator)
+    toolsets:
+      - os
+    gofor:
+      - 'Scope/范围: 执行涉及 VCS 写操作的命令（merge/rebase/cherry-pick/revert/reset/restore/checkout/stash）'
+      - 'Interfaces/接口: 仅接管明确需要 VCS 写操作的任务；不接管构建/测试/部署；不改变 @cmdr 职责边界；使用 `os` 工具集执行 git 命令，遵循现有 sandbox/approval 机制'
+      - 'Non-goals/不负责: 不处理合并冲突所需的代码/文档内容编辑；需诉请者配合解决'
+      - 'Constraints/约束: 允许本地修改与 `git fetch`/`git pull`；禁止 `git push`（由人类审核后手动推送）'
+      - 'Rollback/回滚: 回滚前必须创建并保留 stash；若删除本地 commit，需准确汇报（hash + 原因 + 可恢复路径）'
+      - 'Regression/回归: 每次 VCS 操作后汇报结果（含操作类型/对象/影响范围）；若涉及回滚，同时汇报 stash id 与恢复路径；确保 @cmdr 可监控所有操作'
 
   cmdr:
     name: Commander (Shell Runner)

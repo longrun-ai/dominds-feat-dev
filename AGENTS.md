@@ -209,6 +209,7 @@ This repo uses two runtime workspaces:
 ## Git Policy (Humans Manage Commits)
 
 - **Do not create or rewrite commits**: never run `git commit`, `git merge`, `git rebase`, `git cherry-pick`, `git reset`, or `git push` unless explicitly instructed.
+- **Run repo formatters before commit when available**: if the target repo defines a `pnpm format` script, run that repo's `pnpm format` before creating a commit so style changes are landed intentionally instead of leaking into later history. If no `pnpm format` script exists, follow the repo's existing submission flow without inventing a replacement formatting step.
 - **Do not add `dominds/` to this repo**: `dominds/` is intentionally gitignored; changes to `dominds` should go through PRs in the `dominds` repo.
 - Read-only git commands (`git status`, `git diff`, `git log`, `git show`, `git blame`) are allowed.
 - **Parallel worktree edits are normal**: assume humans and other agents may modify the same worktree concurrently. Do not assume exclusive control or that the working tree stays stable during a task.

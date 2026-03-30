@@ -1,0 +1,3 @@
+apiVersion: dominds.io/v1alpha1
+kind: DomindsApp
+id: rtws_root
