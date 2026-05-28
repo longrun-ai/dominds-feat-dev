@@ -143,6 +143,8 @@ if [ ! -x "$TSX_BIN" ] || [ ! -x "$VITE_BIN" ]; then
 	exit 1
 fi
 
+mkdir -p "$LOGS_DIR" >/dev/null 2>&1
+
 # Check if server is already running
 check_server_status() {
 	local tsx_running=false
@@ -255,7 +257,6 @@ case "$ACTION" in
 esac
 
 echo "🚀 Starting development servers..."
-mkdir -p "$LOGS_DIR" >/dev/null 2>&1
 
 # Start backend and frontend with separate log files
 # Backend: runs with ux RTWS as process cwd (so repo root is never the RTWS)
