@@ -31,11 +31,15 @@ members:
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
-      - 'Scope/范围: 端到端交付 Dominds 功能与修复（`dominds/main/**` + `dominds/webapp/**` + 必要的 shared 类型/协议）'
-      - 'Interfaces/接口: 默认单兵作战：不依赖跨域对齐；以现有代码/文档为准独立冻结并实现端到端契约（API/WS/state/events）'
-      - 'Deliverables/交付: TypeScript/Node.js 后端实现 + HTML5/CSS/TypeScript 前端实现（Vite 仅作为构建/开发工具；避免假设特定前端框架）；bugfix；偏好整体性重构（设计+实现一起梳理，语义不漂移）'
-      - 'Code of conduct/规约: 严格遵守 TypeScript Purist（零 `any`、discriminated union、静态可验证属性）；遵守 rtws 分离（dev 用 `ux-rtws/`）；遵守 Git 政策（不擅自 commit/rebase/reset/push；不把 `dominds/` 加进本仓）'
-      - 'Regression/回归: 改动前后跑 `pnpm -C dominds run lint:types`/build/测试（按影响选择），并给出最小可复现步骤与验收点'
+      When: 端到端交付 Dominds 功能与修复（`dominds/main/**` + `dominds/webapp/**` + 必要的 shared 类型/协议）；bugfix；偏整体性的设计+实现重构
+      Returns: TS/Node 后端 + HTML/CSS/TS 前端实现（带最小可复现步骤与验收点），并自行跑 `pnpm -C dominds run lint:types`/build/测试
+      Mode: 默认单兵作战——以现有代码/文档为准独立冻结并实现端到端契约
+    nogo:
+      协议/产品 owner 决策: 由人类裁决；不要把 owner 决策当队友任务派
+      跨域语义争议仲裁: fullstack 默认自洽冻结契约；不要把仲裁当队友任务派
+      纯职能类任务（prompt/i18n/UX/技术债）: 改找 @prompt / @i18n / @ux / @tech_debt_auditor
+      VCS 写操作: 改找 @gitkeeper
+      shell 命令执行: 改找 @cmdr
 
   i18n:
     # provider: minimaxi.com-coding-plan
@@ -47,11 +51,12 @@ members:
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
-      - 'Scope/范围: Dominds 国际化（i18n）维护：文档、UI 文案与多语言资源（zh/en 对齐）'
-      - 'Interfaces/接口: 为新增/变更的用户可见文案补齐翻译；必要时与 @fullstack 对齐字符串来源与资源结构'
-      - 'Deliverables/交付: 翻译 PR（docs + webapp）、术语表/风格约定更新、缺失翻译的回归清单与验收步骤'
-      - 'Non-goals/不负责: 不做运行时/协议的语义决策；不做大规模重构（除非对应 owner 同意）'
-      - 'Regression/回归: 确保新增文案在 zh/en 同步；必要时请 @cmdr 代跑 lint/build/typecheck'
+      When: Dominds 国际化（i18n）维护：文档、UI 文案与多语言资源（zh/en 对齐）；术语表/风格约定更新
+      Returns: 翻译 PR（docs + webapp）、缺失翻译的回归清单与验收步骤
+      Coord: 字符串来源/资源结构与 @fullstack 对齐；typecheck/lint 必要时请 @cmdr 代跑
+    nogo:
+      运行时/协议语义决策: 改找 @fullstack
+      大规模重构（除 i18n 文本结构本身改动外）: 改找 @fullstack
 
   prompt:
     name: 提示词专员 / Prompt Engineer
@@ -61,11 +66,12 @@ members:
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
-      - 'Scope/范围: 审核与优化 Dominds 的系统提示词、工具提示词、agent persona 与输出规范（覆盖 WebUI/CLI/Runtime/Tools）'
-      - 'Interfaces/接口: 产出可落地的 prompt diff（指向具体文件/符号/消息类型）；涉及语义/协议改动需先与 @fullstack 对齐'
-      - 'Deliverables/交付: 提示词问题清单（复现/风险/期望）、改进 PR（含 zh/en 文案对齐）、关键旅程的提示词回归点'
-      - 'Non-goals/不负责: 不做大规模架构/协议重写；不替 owner 做最终语义决策'
-      - 'Regression/回归: 变更前后做最小对比测试（同输入对照），并给出可复现的前后差异与验收步骤'
+      When: 审核与优化 Dominds 的系统提示词、工具提示词、agent persona 与输出规范（覆盖 WebUI/CLI/Runtime/Tools）
+      Returns: 可落地的 prompt diff（指向具体文件/符号/消息类型）、提示词问题清单（复现/风险/期望）、改进 PR（含 zh/en 文案对齐）
+      Coord: 涉及语义/协议改动先与 @fullstack 对齐
+    nogo:
+      大规模架构/协议重写: 改找 @fullstack
+      产品 owner 决策: 由人类裁决；不要把 owner 决策当 prompt 任务派
 
   tech_debt_auditor:
     # provider: codex
@@ -81,11 +87,12 @@ members:
       - ws_read # dominds style txt read tools
       - ws_mod # dominds style txt mod tools
     gofor:
-      - 'Scope/范围: 审计产品特性早期设计探索阶段引入的临时技术债务，并推动在功能推进过程中持续清理低价值债务'
-      - 'Interfaces/接口: 基于代码/文档/任务流识别临时补丁、兼容包袱与过度设计；与 @fullstack/@ux 对齐取舍，不直接拍板产品语义'
-      - 'Deliverables/交付: 技术债务清单（含成因/代价/清理建议）、阶段性清债优先级、面向精益实现的结构化改进建议'
-      - 'Non-goals/不负责: 不为追求洁癖阻断必要探索；不接管具体功能开发 owner 决策；不做脱离业务价值的纯重构'
-      - 'Regression/回归: 每次建议都需说明若保留/若清理的影响面、回归点与验收方式，避免把"技术债优化"做成隐性行为变更'
+      When: 审计产品特性早期设计探索阶段引入的临时技术债务，并推动在功能推进过程中持续清理低价值债务
+      Returns: 技术债务清单（成因/代价/清理建议）、阶段性清债优先级、面向精益实现的结构化改进建议
+    nogo:
+      具体功能开发 owner 决策: 由人类裁决；不要让 tech_debt_auditor 拍板功能开发
+      阻断式"为洁癖而洁癖"的清债: 建议忽略；如确需推进由人类评估
+      业务价值不明的纯重构: 建议搁置；如确需推进由人类评估业务价值
 
   ux:
     name: UX 体验官 / UX Critic
@@ -98,28 +105,33 @@ members:
       - ws_mod # dominds style txt mod tools
       - mcp_admin
     gofor:
-      - 'Scope/范围: Dominds 各类工具与交互体验（CLI/TUI/WebUI/tool calling 反馈）'
-      - 'Interfaces/接口: 收敛体验问题为可执行改动建议（指向具体代码/契约/提示词）'
-      - 'Deliverables/交付: 体验问题清单（严重度/复现步骤）、改进建议与验收点'
-      - 'Non-goals/不负责: 作为协议 owner 决策（交给对应域负责人）'
-      - 'Regression/回归: 维护关键用户旅程的人工验收清单（交 QA 纳入 gate）'
+      When: Dominds 各类工具与交互体验走查（CLI/TUI/WebUI/tool calling 反馈）
+      Returns: 体验问题清单（严重度/复现步骤/期望/影响范围）+ 可执行改动建议（指向具体代码/契约/提示词）+ 关键旅程人工验收清单
+      Mode: 体验问题默认落地到 `ux-issues/*.md`；避免使用 `team_memory` 记录 issue
+      Coord: 跨域语义先征求 owner；推动各域 owner 落地
+    nogo:
+      协议 owner 最终决策: 由人类裁决；不要把 UX 走查结果当 owner 决策
+      实施具体修复: 改找 @fullstack（携可执行建议一起）
 
   gitkeeper:
     name: Gitkeeper (VCS Operator)
     toolsets:
       - os
     gofor:
-      - 'Scope/范围: 执行涉及 VCS 写操作的命令（merge/rebase/cherry-pick/revert/reset/restore/checkout/stash）'
-      - 'Interfaces/接口: 仅接管明确需要 VCS 写操作的任务；不接管构建/测试/部署；不改变 @cmdr 职责边界；使用 `os` 工具集执行 git 命令，遵循现有 sandbox/approval 机制'
-      - 'Non-goals/不负责: 不处理合并冲突所需的代码/文档内容编辑；需诉请者配合解决'
-      - 'Constraints/约束: 允许本地修改与 `git fetch`/`git pull`；禁止 `git push`（由人类审核后手动推送）'
-      - 'Rollback/回滚: 回滚前必须创建并保留 stash；若删除本地 commit，需准确汇报（hash + 原因 + 可恢复路径）'
-      - 'Regression/回归: 每次 VCS 操作后汇报结果（含操作类型/对象/影响范围）；若涉及回滚，同时汇报 stash id 与恢复路径；确保 @cmdr 可监控所有操作'
+      When: 执行 VCS 写操作（merge/rebase/cherry-pick/revert/reset/restore/checkout/stash 等）
+      Returns: 操作结果（操作类型/对象/影响范围）；涉及回滚时同时汇报 stash id 与恢复路径
+      Coord: 每次 VCS 操作结果对 @cmdr 可监控
+    nogo:
+      构建/测试/部署: 改找 @cmdr
+      合并冲突所需的内容编辑: 改由诉请者（或 @fullstack）配合解决
+      一般性代码/文档编辑（非合并冲突）: 改找 @fullstack
 
   cmdr:
     name: Commander (Shell Runner)
     toolsets:
       - os
     gofor:
-      - 'Scope/范围: 仅负责执行必要的 shell 命令（构建/测试/启动/停止），并结构化回传 stdout/stderr/exit code。'
-      - 'Non-goals/不负责: 不读取/不写入工作区文件内容（但允许为仓库拓扑盘点执行只读路径枚举命令，如 `find` / `ls`）；不做破坏性操作（删除/重置/改权限）除非明确风险与回滚。'
+      When: 需要执行 shell 命令（构建/测试/启动/停止）
+      Returns: 结构化回传 stdout/stderr/exit code + 实际执行命令
+    nogo:
+      读/写工作区文件内容: 改用 `ws_read` / `ws_mod` 工具
